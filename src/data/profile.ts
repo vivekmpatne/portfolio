@@ -36,11 +36,12 @@ export const profile = {
   handles: {
     leetcode: "vivekpatnem",
     codeforces: "vivekpatnem",
-    github: "vivekpatnem",
+    github: "vivekmpatne",
   },
   // Unified coding profiles — used by Consistency, LiveStats, and future integrations
   codingProfiles: {
-    github:      { username: "vivekpatnem",  url: "https://github.com/vivekpatnem" },
+    github:      { username: "vivekmpatne",  url: "https://github.com/vivekmpatne" },
+
     linkedin:    { username: "vivekpatnem",  url: "https://www.linkedin.com/in/vivekpatnem/" },
     leetcode:    { username: "vivekpatnem",  url: "https://leetcode.com/u/vivekpatnem/" },
     codeforces:  { username: "vivekpatnem",  url: "https://codeforces.com/profile/vivekpatnem" },
