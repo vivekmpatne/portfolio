@@ -1,13 +1,37 @@
-import { Code2, Trophy, Award, Users } from "lucide-react";
+import { Code2, Users, Sparkles, GraduationCap } from "lucide-react";
 import { profile } from "@/data/profile";
 import { SectionHeader } from "./SectionHeader";
 import { LiveStats } from "./LiveStats";
 
-export const achievements = [
-  { icon: Code2, value: `${profile.stats.problemsSolved}+`, label: "DSA Problems Solved", color: "text-emerald-500" },
-  { icon: Trophy, value: profile.stats.leetcodeRating, label: "LeetCode Contest Rating", color: "text-amber-500" },
-  { icon: Award, value: profile.stats.codeforcesRating, label: "Codeforces Rating", color: "text-sky-500" },
-  { icon: Users, value: `${profile.stats.linkedinConnections}+`, label: "LinkedIn Connections", color: "text-indigo-500" },
+const achievements = [
+  {
+    icon: Code2,
+    value: `${profile.stats.problemsSolved}+`,
+    label: "DSA Problems Solved",
+    sub: "Across LeetCode, Codeforces, GFG",
+    color: "text-emerald-500",
+  },
+  {
+    icon: Users,
+    value: `${profile.stats.linkedinConnections}+`,
+    label: "Professional Connections",
+    sub: "Building a strong tech network",
+    color: "text-indigo-500",
+  },
+  {
+    icon: Sparkles,
+    value: "Coming",
+    label: "Hackathon Achievements",
+    sub: "Targeting 2026 cycle",
+    color: "text-amber-500",
+  },
+  {
+    icon: GraduationCap,
+    value: "Coming",
+    label: "Certifications",
+    sub: "Samsung SIC, NPTEL planned",
+    color: "text-sky-500",
+  },
 ];
 
 export function Achievements() {
@@ -25,7 +49,8 @@ export function Achievements() {
             >
               <Icon className={`h-6 w-6 ${a.color}`} />
               <div className="mt-4 font-display text-3xl font-semibold">{a.value}</div>
-              <div className="mt-1 text-sm text-muted-foreground">{a.label}</div>
+              <div className="mt-1 text-sm font-medium">{a.label}</div>
+              <div className="mt-1 text-xs text-muted-foreground">{a.sub}</div>
             </div>
           );
         })}
