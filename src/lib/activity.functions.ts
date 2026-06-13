@@ -154,7 +154,7 @@ export const getLeetcodeActivity = createServerFn({ method: "GET" })
 
 // ---------- Codeforces ----------
 export const getCodeforcesActivity = createServerFn({ method: "GET" })
-  .inputValidator((data: unknown) => githubInput.parse(data))
+  .inputValidator((data: unknown) => codeforcesInput.parse(data))
   .handler(async ({ data }): Promise<ActivityResult> => {
     // Codeforces' public API often returns 5xx under load. Retry transient
     // failures with exponential backoff before surfacing as unavailable.
