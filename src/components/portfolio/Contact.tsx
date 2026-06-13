@@ -25,7 +25,7 @@ export function Contact() {
 
   return (
     <section id="contact" className="mx-auto max-w-6xl px-6 py-20">
-      <SectionHeader title="Get in touch" />
+      <SectionHeader title="Let's Build Something Great Together" />
       <div className="grid gap-8 md:grid-cols-2">
         <div className="space-y-6">
           <p className="text-lg text-muted-foreground">
