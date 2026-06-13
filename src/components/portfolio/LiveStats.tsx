@@ -1,80 +1,14 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQueries } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { SiLeetcode, SiCodeforces, SiGithub } from "react-icons/si";
 import { FaLinkedin as SiLinkedin } from "react-icons/fa";
 import { profile } from "@/data/profile";
-
-async function safeFetch<T>(url: string): Promise<T> {
-  const res = await fetch(url);
-  if (!res.ok) throw new Error(`HTTP ${res.status}`);
-  return res.json();
-}
-
-function useLeetcode() {
-  return useQuery({
-    queryKey: ["lc", profile.handles.leetcode],
-    queryFn: async () => {
-      const [solved, contest] = await Promise.all([
-        safeFetch<any>(`https://alfa-leetcode-api.onrender.com/${profile.handles.leetcode}/solved`).catch(() => null),
-        safeFetch<any>(`https://alfa-leetcode-api.onrender.com/${profile.handles.leetcode}/contest`).catch(() => null),
-      ]);
-      return {
-        solved: solved?.solvedProblem ?? profile.stats.problemsSolved,
-        easy: solved?.easySolved ?? profile.stats.leetcodeEasy,
-        medium: solved?.mediumSolved ?? profile.stats.leetcodeMedium,
-        hard: solved?.hardSolved ?? profile.stats.leetcodeHard,
-        rating: contest?.contestRating ? Math.round(contest.contestRating) : profile.stats.leetcodeRating,
-      };
-    },
-    staleTime: 5 * 60_000,
-    retry: 1,
-  });
-}
-
-function useCodeforces() {
-  return useQuery({
-    queryKey: ["cf", profile.handles.codeforces],
-    queryFn: async () => {
-      const [info, status] = await Promise.all([
-        safeFetch<any>(`https://codeforces.com/api/user.info?handles=${profile.handles.codeforces}`),
-        safeFetch<any>(`https://codeforces.com/api/user.status?handle=${profile.handles.codeforces}`).catch(() => null),
-      ]);
-      const u = info?.result?.[0];
-      let solved = 0;
-      if (status?.result) {
-        const set = new Set<string>();
-        for (const s of status.result) {
-          if (s.verdict === "OK" && s.problem) {
-            set.add(`${s.problem.contestId}-${s.problem.index}`);
-          }
-        }
-        solved = set.size;
-      }
-      return {
-        rating: u?.rating ?? profile.stats.codeforcesRating,
-        rank: u?.rank ?? profile.stats.codeforcesRank,
-        solved,
-      };
-    },
-    staleTime: 5 * 60_000,
-    retry: 1,
-  });
-}
-
-function useGithub() {
-  return useQuery({
-    queryKey: ["gh", profile.handles.github],
-    queryFn: async () => {
-      const u = await safeFetch<any>(`https://api.github.com/users/${profile.handles.github}`);
-      return {
-        repos: u?.public_repos ?? profile.stats.githubRepos,
-        followers: u?.followers ?? profile.stats.githubFollowers,
-        following: u?.following ?? profile.stats.githubFollowing,
-      };
-    },
-    staleTime: 5 * 60_000,
-    retry: 1,
-  });
-}
+import {
+  getGithubActivity,
+  getLeetcodeActivity,
+  getCodeforcesActivity,
+  type ActivityResult,
+} from "@/lib/activity.functions";
 
 function Card({
   icon,
@@ -113,78 +47,135 @@ function Skeleton() {
   );
 }
 
+const Unavailable = () => (
+  <span className="text-xs font-normal text-muted-foreground">Unavailable</span>
+);
+
 export function LiveStats() {
-  const lc = useLeetcode();
-  const cf = useCodeforces();
-  const gh = useGithub();
+  const year = new Date().getFullYear();
+  const { github, leetcode, codeforces } = profile.codingProfiles;
+
+  const ghFn = useServerFn(getGithubActivity);
+  const lcFn = useServerFn(getLeetcodeActivity);
+  const cfFn = useServerFn(getCodeforcesActivity);
+
+  const [ghQ, lcQ, cfQ] = useQueries({
+    queries: [
+      {
+        queryKey: ["activity", "github", github.username, year],
+        queryFn: () => ghFn({ data: { username: github.username, year } }),
+        staleTime: 10 * 60_000,
+        retry: 1,
+      },
+      {
+        queryKey: ["activity", "leetcode", leetcode.username, year],
+        queryFn: () => lcFn({ data: { username: leetcode.username, year } }),
+        staleTime: 10 * 60_000,
+        retry: 1,
+      },
+      {
+        queryKey: ["activity", "codeforces", codeforces.username, year],
+        queryFn: () => cfFn({ data: { username: codeforces.username, year } }),
+        staleTime: 10 * 60_000,
+        retry: 1,
+      },
+    ],
+  });
+
+  const gh = ghQ.data as ActivityResult | undefined;
+  const lc = lcQ.data as ActivityResult | undefined;
+  const cf = cfQ.data as ActivityResult | undefined;
+
+  const ghOk = gh && !gh.error;
+  const lcOk = lc && !lc.error;
+  const cfOk = cf && !cf.error;
 
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
       <Card icon={<SiLeetcode />} brand="#FFA116" label="LeetCode">
-        {lc.isLoading ? (
+        {lcQ.isLoading ? (
           <Skeleton />
-        ) : (
+        ) : lcOk ? (
           <>
             <div className="font-display text-2xl font-semibold">
-              {lc.data?.rating ?? profile.stats.leetcodeRating}
-              <span className="ml-1 text-xs font-normal text-muted-foreground">rating</span>
+              {lc!.meta.contestRating ?? <Unavailable />}
+              {lc!.meta.contestRating != null && (
+                <span className="ml-1 text-xs font-normal text-muted-foreground">rating</span>
+              )}
             </div>
             <div className="mt-1 text-xs text-muted-foreground">
-              {lc.data?.solved ?? profile.stats.problemsSolved} problems solved
+              {Number(lc!.meta.totalSolved ?? 0)} problems solved
             </div>
             <div className="mt-3 grid grid-cols-3 gap-2 text-[11px]">
               <div className="rounded-md bg-emerald-500/10 px-2 py-1 text-emerald-600 dark:text-emerald-400">
-                <div className="font-semibold">{lc.data?.easy ?? 0}</div>
+                <div className="font-semibold">{Number(lc!.meta.easy ?? 0)}</div>
                 <div className="opacity-70">Easy</div>
               </div>
               <div className="rounded-md bg-amber-500/10 px-2 py-1 text-amber-600 dark:text-amber-400">
-                <div className="font-semibold">{lc.data?.medium ?? 0}</div>
+                <div className="font-semibold">{Number(lc!.meta.medium ?? 0)}</div>
                 <div className="opacity-70">Med</div>
               </div>
               <div className="rounded-md bg-rose-500/10 px-2 py-1 text-rose-600 dark:text-rose-400">
-                <div className="font-semibold">{lc.data?.hard ?? 0}</div>
+                <div className="font-semibold">{Number(lc!.meta.hard ?? 0)}</div>
                 <div className="opacity-70">Hard</div>
               </div>
             </div>
           </>
+        ) : (
+          <Unavailable />
         )}
       </Card>
 
       <Card icon={<SiCodeforces />} brand="#1F8ACB" label="Codeforces">
-        {cf.isLoading ? (
+        {cfQ.isLoading ? (
           <Skeleton />
-        ) : (
+        ) : cfOk ? (
           <>
             <div className="font-display text-2xl font-semibold">
-              {cf.data?.rating ?? profile.stats.codeforcesRating}
-              <span className="ml-1 text-xs font-normal text-muted-foreground">rating</span>
+              {cf!.meta.rating ?? <Unavailable />}
+              {cf!.meta.rating != null && (
+                <span className="ml-1 text-xs font-normal text-muted-foreground">rating</span>
+              )}
             </div>
             <div className="mt-1 text-xs capitalize text-muted-foreground">
-              Rank: {String(cf.data?.rank ?? profile.stats.codeforcesRank)}
+              Rank: {String(cf!.meta.rank ?? "unrated")}
             </div>
-            {cf.data?.solved ? (
+            {cf!.meta.maxRating != null && (
               <div className="mt-2 text-xs text-muted-foreground">
-                {cf.data.solved} problems solved
+                Max: {String(cf!.meta.maxRating)} ({String(cf!.meta.maxRank ?? "—")})
               </div>
-            ) : null}
+            )}
           </>
+        ) : (
+          <Unavailable />
         )}
       </Card>
 
       <Card icon={<SiGithub />} brand="#6e7681" label="GitHub">
-        {gh.isLoading ? (
+        {ghQ.isLoading ? (
           <Skeleton />
-        ) : (
+        ) : ghOk ? (
           <>
             <div className="font-display text-2xl font-semibold">
-              {gh.data?.repos ?? profile.stats.githubRepos}
+              {Number(gh!.meta.repos ?? 0)}
               <span className="ml-1 text-xs font-normal text-muted-foreground">repos</span>
             </div>
             <div className="mt-2 flex gap-3 text-xs text-muted-foreground">
-              <span><span className="font-semibold text-foreground">{gh.data?.followers ?? profile.stats.githubFollowers}</span> followers</span>
-              <span><span className="font-semibold text-foreground">{gh.data?.following ?? profile.stats.githubFollowing}</span> following</span>
+              <span>
+                <span className="font-semibold text-foreground">{Number(gh!.meta.followers ?? 0)}</span> followers
+              </span>
+              <span>
+                <span className="font-semibold text-foreground">{Number(gh!.meta.following ?? 0)}</span> following
+              </span>
             </div>
+            {gh!.meta.totalContributions != null && (
+              <div className="mt-2 text-xs text-muted-foreground">
+                {Number(gh!.meta.totalContributions)} contributions in {year}
+              </div>
+            )}
           </>
+        ) : (
+          <Unavailable />
         )}
       </Card>
 
