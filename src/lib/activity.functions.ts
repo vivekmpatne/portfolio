@@ -96,7 +96,7 @@ export const getGithubActivity = createServerFn({ method: "GET" })
 
 // ---------- LeetCode ----------
 export const getLeetcodeActivity = createServerFn({ method: "GET" })
-  .inputValidator((data: unknown) => githubInput.parse(data))
+  .inputValidator((data: unknown) => leetcodeInput.parse(data))
   .handler(async ({ data }): Promise<ActivityResult> => {
     const query = `
       query userData($username: String!, $year: Int!) {
