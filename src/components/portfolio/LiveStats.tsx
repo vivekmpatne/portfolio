@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
-import { SiLeetcode, SiCodeforces, SiGithub, SiLinkedin } from "react-icons/si";
+import { SiLeetcode, SiCodeforces, SiGithub } from "react-icons/si";
+import { FaLinkedin as SiLinkedin } from "react-icons/fa";
 import { profile } from "@/data/profile";
 
 async function safeFetch<T>(url: string): Promise<T> {

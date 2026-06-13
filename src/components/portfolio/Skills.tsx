@@ -1,7 +1,7 @@
 import { Code2, Monitor, Server, Wrench, Brain, type LucideIcon } from "lucide-react";
 import {
   SiJavascript, SiPython, SiCplusplus, SiMysql,
-  SiReact, SiRedux, SiReactrouter, SiTailwindcss, SiHtml5, SiCss3,
+  SiReact, SiRedux, SiReactrouter, SiTailwindcss, SiHtml5, SiCss,
   SiNodedotjs, SiExpress, SiJsonwebtokens, SiMongodb, SiMongoose,
   SiGit, SiGithub, SiPostman, SiVercel, SiRailway,
 } from "react-icons/si";
@@ -31,7 +31,7 @@ const techIcon: Record<string, IconType> = {
   "React Router": SiReactrouter,
   "Tailwind CSS": SiTailwindcss,
   HTML5: SiHtml5,
-  CSS3: SiCss3,
+  CSS3: SiCss,
   "Node.js": SiNodedotjs,
   "Express.js": SiExpress,
   "JWT Auth": SiJsonwebtokens,
