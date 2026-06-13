@@ -59,7 +59,7 @@ export function Footer() {
                 <a
                   href={l.url}
                   target="_blank"
-                  rel="noreferrer"
+                  rel="noopener noreferrer"
                   className="text-foreground/80 transition-colors hover:text-foreground hover:underline"
                 >
                   {l.name}

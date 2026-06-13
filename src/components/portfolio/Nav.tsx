@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Moon, Sun, FileText, Menu, X } from "lucide-react";
 import { profile } from "@/data/profile";
+import { useResumeAvailable } from "@/hooks/use-resume-available";
 
 const sections = [
   { id: "home", label: "Home" },
@@ -19,6 +20,7 @@ export function Nav() {
   const [progress, setProgress] = useState(0);
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState("home");
+  const resumeAvailable = useResumeAvailable();
 
   useEffect(() => {
     const onScroll = () => {
@@ -114,15 +116,17 @@ export function Nav() {
           })}
         </ul>
         <div className="flex items-center gap-2">
-          <a
-            href={profile.resumeUrl}
-            target="_blank"
-            rel="noreferrer"
-            download
-            className="hidden items-center gap-1.5 rounded-md border border-border bg-card px-3 py-1.5 text-sm font-medium shadow-card transition-all hover:-translate-y-0.5 hover:border-foreground/40 hover:bg-accent hover:shadow-card-hover sm:inline-flex"
-          >
-            <FileText className="h-3.5 w-3.5" /> Resume
-          </a>
+          {resumeAvailable && (
+            <a
+              href={profile.resumeUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              download
+              className="hidden items-center gap-1.5 rounded-md border border-border bg-card px-3 py-1.5 text-sm font-medium shadow-card transition-all hover:-translate-y-0.5 hover:border-foreground/40 hover:bg-accent hover:shadow-card-hover sm:inline-flex"
+            >
+              <FileText className="h-3.5 w-3.5" /> Resume
+            </a>
+          )}
           <button
             onClick={() => setDark((d) => !d)}
             aria-label="Toggle theme"
@@ -159,18 +163,20 @@ export function Nav() {
                 </a>
               </li>
             ))}
-            <li>
-              <a
-                href={profile.resumeUrl}
-                target="_blank"
-                rel="noreferrer"
-                download
-                onClick={() => setOpen(false)}
-                className="flex items-center gap-2 rounded-md px-3 py-2 text-foreground transition-colors hover:bg-accent"
-              >
-                <FileText className="h-4 w-4" /> Resume
-              </a>
-            </li>
+            {resumeAvailable && (
+              <li>
+                <a
+                  href={profile.resumeUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  download
+                  onClick={() => setOpen(false)}
+                  className="flex items-center gap-2 rounded-md px-3 py-2 text-foreground transition-colors hover:bg-accent"
+                >
+                  <FileText className="h-4 w-4" /> Resume
+                </a>
+              </li>
+            )}
           </ul>
         </div>
       )}
