@@ -2,8 +2,8 @@
 
 Personal portfolio of **Vivek Patne**, a 3rd-year Computer Science & Engineering (Data Science) student at RNS Institute of Technology, Bengaluru. Built as a modern, fast, recruiter-friendly site that surfaces **live coding activity** from GitHub, LeetCode, and Codeforces alongside featured projects.
 
-🔗 **Live:** https://vivekpatne.lovable.app (update once published)
-🐙 **Repo:** https://github.com/vivekmpatne
+🔗 Live: https://vivekpatne.me
+🐙 Source Code: https://github.com/vivekmpatne/portfolio
 
 ---
 
