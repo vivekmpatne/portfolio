@@ -2,8 +2,16 @@
 // SKILLS DATA — Grouped by category. Add/remove freely.
 // ============================================================
 export const skills: Record<string, string[]> = {
-  Languages: ["JavaScript", "Python", "Java", "C++", "SQL"],
-  Frontend: ["React.js", "Redux", "React Router", "Tailwind CSS", "HTML5", "CSS3"],
+  Languages: ["C", "C++", "Java", "JavaScript", "Python", "SQL"],
+  Frontend: [
+    "HTML5",
+    "CSS3",
+    "JavaScript",
+    "React.js",
+    "Redux",
+    "React Router",
+    "Tailwind CSS",
+  ],
   "Backend & Database": [
     "Node.js",
     "Express.js",
@@ -11,13 +19,23 @@ export const skills: Record<string, string[]> = {
     "JWT Auth",
     "MongoDB",
     "Mongoose",
+    "Redis",
   ],
-  "Tools & Deployment": ["Git", "GitHub", "Postman", "Vercel", "Railway", "VS Code"],
+  "Tools & Technologies": [
+    "Git",
+    "GitHub",
+    "Linux",
+    "VS Code",
+    "Postman",
+    "Docker",
+    "Kubernetes",
+    "Redis",
+    "Vercel",
+    "Railway",
+  ],
   Concepts: [
     "Data Structures & Algorithms",
     "System Design Basics",
     "MVC/Services Architecture",
-    "CI/CD Basics",
   ],
-  // TODO: Add new categories or skills here as you learn them.
 };
