@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { profile } from "@/data/profile";
-import { SectionHeader } from "./About";
+import { SectionHeader } from "./SectionHeader";
 import { SocialIcons } from "./SocialIcons";
 
 export function Contact() {
@@ -19,7 +19,7 @@ export function Contact() {
 
   return (
     <section id="contact" className="mx-auto max-w-6xl px-6 py-20">
-      <SectionHeader kicker="05" title="Get in touch" />
+      <SectionHeader title="Get in touch" />
       <div className="grid gap-10 md:grid-cols-2">
         <div>
           <p className="text-lg text-muted-foreground">

@@ -8,14 +8,24 @@ export const profile = {
   location: "Bengaluru, India",
   // TODO: replace with actual photo later (drop file in /public and update path)
   avatar: "/placeholder-avatar.png",
-  // TODO: replace with real email/phone when ready
-  email: "vivekpatne@gmail.com",
+  email: "vivekpatnem@gmail.com",
+  // TODO: replace with real phone when ready
   phone: "+91-XXXXXXXXXX",
-  // TODO: Update these competitive programming stats periodically
+  // Fallback values — shown when live APIs fail
   stats: {
-    leetcodeRating: "--",
-    codeforcesRating: "--",
-    problemsSolved: "--",
+    leetcodeRating: 1491,
+    codeforcesRating: 956,
+    problemsSolved: 334,
+    linkedinConnections: 3630,
+    githubRepos: 20,
+    githubFollowers: 10,
+    codeforcesRank: "newbie",
+  },
+  // Handles used by live-stats APIs
+  handles: {
+    leetcode: "vivekpatnem",
+    codeforces: "vivekpatnem",
+    github: "vivekpatnem",
   },
   // TODO: drop your resume PDF in /public as resume.pdf
   resumeUrl: "/resume.pdf",

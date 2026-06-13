@@ -1,28 +1,88 @@
+import { Code2, Monitor, Server, Wrench, Brain, type LucideIcon } from "lucide-react";
+import {
+  SiJavascript, SiPython, SiCplusplus, SiMysql,
+  SiReact, SiRedux, SiReactrouter, SiTailwindcss, SiHtml5, SiCss3,
+  SiNodedotjs, SiExpress, SiJsonwebtokens, SiMongodb, SiMongoose,
+  SiGit, SiGithub, SiPostman, SiVercel, SiRailway,
+} from "react-icons/si";
+import { FaJava } from "react-icons/fa";
+import { VscVscode } from "react-icons/vsc";
+import type { IconType } from "react-icons";
 import { skills } from "@/data/skills";
-import { SectionHeader } from "./About";
+import { SectionHeader } from "./SectionHeader";
+
+const categoryIcon: Record<string, LucideIcon> = {
+  Languages: Code2,
+  Frontend: Monitor,
+  "Backend & Database": Server,
+  "Tools & Deployment": Wrench,
+  Concepts: Brain,
+};
+
+const techIcon: Record<string, IconType> = {
+  JavaScript: SiJavascript,
+  Python: SiPython,
+  Java: FaJava,
+  "C++": SiCplusplus,
+  SQL: SiMysql,
+  "React.js": SiReact,
+  React: SiReact,
+  Redux: SiRedux,
+  "React Router": SiReactrouter,
+  "Tailwind CSS": SiTailwindcss,
+  HTML5: SiHtml5,
+  CSS3: SiCss3,
+  "Node.js": SiNodedotjs,
+  "Express.js": SiExpress,
+  "JWT Auth": SiJsonwebtokens,
+  MongoDB: SiMongodb,
+  Mongoose: SiMongoose,
+  Git: SiGit,
+  GitHub: SiGithub,
+  Postman: SiPostman,
+  Vercel: SiVercel,
+  Railway: SiRailway,
+  "VS Code": VscVscode,
+};
 
 export function Skills() {
   return (
     <section id="skills" className="mx-auto max-w-6xl px-6 py-20">
-      <SectionHeader kicker="02" title="Skills" />
-      <div className="space-y-8">
-        {Object.entries(skills).map(([category, items]) => (
-          <div key={category}>
-            <h3 className="mb-3 text-sm font-medium text-muted-foreground">
-              {category}
-            </h3>
-            <div className="flex flex-wrap gap-2">
-              {items.map((skill) => (
-                <span
-                  key={skill}
-                  className="rounded-md border border-border bg-card px-3 py-1.5 text-sm transition-colors hover:bg-accent"
-                >
-                  {skill}
-                </span>
-              ))}
+      <SectionHeader title="Skills" />
+      <div className="grid gap-5 md:grid-cols-2">
+        {Object.entries(skills).map(([category, items]) => {
+          const Icon = categoryIcon[category] ?? Code2;
+          return (
+            <div
+              key={category}
+              className="group relative overflow-hidden rounded-2xl border border-border bg-card/60 p-6 backdrop-blur-sm transition-all hover:-translate-y-1 hover:border-foreground/30 hover:shadow-xl"
+            >
+              <div className="pointer-events-none absolute -inset-px opacity-0 transition-opacity group-hover:opacity-100"
+                style={{ background: "radial-gradient(500px circle at 50% 0%, color-mix(in oklab, var(--foreground) 8%, transparent), transparent 60%)" }}
+              />
+              <div className="relative mb-4 flex items-center gap-3">
+                <div className="flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-background">
+                  <Icon className="h-4 w-4" />
+                </div>
+                <h3 className="font-display text-lg font-semibold">{category}</h3>
+              </div>
+              <div className="relative flex flex-wrap gap-2">
+                {items.map((skill) => {
+                  const TechIcon = techIcon[skill];
+                  return (
+                    <span
+                      key={skill}
+                      className="inline-flex items-center gap-1.5 rounded-md border border-border bg-background/80 px-2.5 py-1.5 text-sm transition-all hover:-translate-y-0.5 hover:border-foreground/40 hover:bg-accent"
+                    >
+                      {TechIcon ? <TechIcon className="h-3.5 w-3.5 text-muted-foreground" /> : null}
+                      {skill}
+                    </span>
+                  );
+                })}
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </section>
   );
