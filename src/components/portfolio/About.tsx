@@ -1,7 +1,6 @@
 import { profile } from "@/data/profile";
 import { codingProfiles } from "@/data/links";
 import { SectionHeader } from "./SectionHeader";
-import { LiveStats } from "./LiveStats";
 import { Code2, Target } from "lucide-react";
 
 const focusAreas = [
@@ -21,12 +20,6 @@ export function About() {
         {profile.bio}
       </p>
 
-      <div className="mt-10">
-        <div className="mb-4 text-xs font-medium uppercase tracking-widest text-muted-foreground">
-          Live Coding Profiles
-        </div>
-        <LiveStats />
-      </div>
 
       {/* Engineering Snapshot */}
       <div className="mt-10">
