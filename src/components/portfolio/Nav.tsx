@@ -16,6 +16,7 @@ export function Nav() {
   const [scrolled, setScrolled] = useState(false);
   const [progress, setProgress] = useState(0);
   const [open, setOpen] = useState(false);
+  const [active, setActive] = useState("home");
 
   useEffect(() => {
     const onScroll = () => {
@@ -33,12 +34,31 @@ export function Nav() {
     document.documentElement.classList.toggle("dark", dark);
   }, [dark]);
 
+  useEffect(() => {
+    const observers: IntersectionObserver[] = [];
+    sections.forEach((s) => {
+      const el = document.getElementById(s.id);
+      if (!el) return;
+      const obs = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((e) => {
+            if (e.isIntersecting) setActive(s.id);
+          });
+        },
+        { rootMargin: "-40% 0px -55% 0px", threshold: 0 }
+      );
+      obs.observe(el);
+      observers.push(obs);
+    });
+    return () => observers.forEach((o) => o.disconnect());
+  }, []);
+
   return (
     <header
       className={`sticky top-0 z-50 w-full transition-all ${
         scrolled
-          ? "border-b border-border bg-background/80 backdrop-blur"
-          : "bg-transparent"
+          ? "border-b border-border bg-background/75 shadow-nav backdrop-blur-xl"
+          : "bg-background/40 backdrop-blur-md"
       }`}
     >
       {/* Scroll progress bar */}
@@ -50,18 +70,30 @@ export function Nav() {
       </div>
 
       <nav className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-        <a href="#home" className="font-display text-lg font-semibold">
-          {profile.name.split(" ")[0]}
-          <span className="text-muted-foreground">.</span>
+        <a href="#home" className="font-display text-lg font-semibold tracking-tight">
+          Vivek Patne
         </a>
-        <ul className="hidden items-center gap-7 text-sm text-muted-foreground md:flex">
-          {sections.map((s) => (
-            <li key={s.id}>
-              <a href={`#${s.id}`} className="transition-colors hover:text-foreground">
-                {s.label}
-              </a>
-            </li>
-          ))}
+        <ul className="hidden items-center gap-1 text-sm md:flex">
+          {sections.map((s) => {
+            const isActive = active === s.id;
+            return (
+              <li key={s.id}>
+                <a
+                  href={`#${s.id}`}
+                  className={`relative rounded-md px-3 py-1.5 transition-colors ${
+                    isActive
+                      ? "text-foreground"
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  {s.label}
+                  {isActive && (
+                    <span className="absolute inset-x-3 -bottom-0.5 h-0.5 rounded-full bg-foreground" />
+                  )}
+                </a>
+              </li>
+            );
+          })}
         </ul>
         <div className="flex items-center gap-2">
           <a
@@ -69,21 +101,21 @@ export function Nav() {
             target="_blank"
             rel="noreferrer"
             download
-            className="hidden items-center gap-1.5 rounded-md border border-border bg-card px-3 py-1.5 text-sm font-medium transition-all hover:-translate-y-0.5 hover:border-foreground/40 hover:bg-accent sm:inline-flex"
+            className="hidden items-center gap-1.5 rounded-md border border-border bg-card px-3 py-1.5 text-sm font-medium shadow-card transition-all hover:-translate-y-0.5 hover:border-foreground/40 hover:bg-accent hover:shadow-card-hover sm:inline-flex"
           >
             <FileText className="h-3.5 w-3.5" /> Resume
           </a>
           <button
             onClick={() => setDark((d) => !d)}
             aria-label="Toggle theme"
-            className="rounded-md border border-border p-2 transition-colors hover:bg-accent"
+            className="rounded-md border border-border bg-card p-2 shadow-card transition-colors hover:bg-accent"
           >
             {dark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
           </button>
           <button
             onClick={() => setOpen((o) => !o)}
             aria-label="Toggle menu"
-            className="rounded-md border border-border p-2 transition-colors hover:bg-accent md:hidden"
+            className="rounded-md border border-border bg-card p-2 shadow-card transition-colors hover:bg-accent md:hidden"
           >
             {open ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
           </button>
@@ -99,7 +131,11 @@ export function Nav() {
                 <a
                   href={`#${s.id}`}
                   onClick={() => setOpen(false)}
-                  className="block rounded-md px-3 py-2 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+                  className={`block rounded-md px-3 py-2 transition-colors hover:bg-accent ${
+                    active === s.id
+                      ? "bg-accent text-foreground"
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
                 >
                   {s.label}
                 </a>

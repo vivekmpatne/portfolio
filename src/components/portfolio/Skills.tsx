@@ -55,13 +55,13 @@ export function Skills() {
           return (
             <div
               key={category}
-              className="group relative overflow-hidden rounded-2xl border border-border bg-card/60 p-6 backdrop-blur-sm transition-all hover:-translate-y-1 hover:border-foreground/30 hover:shadow-xl"
+              className="group relative overflow-hidden rounded-2xl border border-border bg-card p-6 shadow-card backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:border-foreground/30 hover:shadow-card-hover"
             >
-              <div className="pointer-events-none absolute -inset-px opacity-0 transition-opacity group-hover:opacity-100"
+              <div className="pointer-events-none absolute -inset-px opacity-0 transition-opacity duration-300 group-hover:opacity-100"
                 style={{ background: "radial-gradient(500px circle at 50% 0%, color-mix(in oklab, var(--foreground) 8%, transparent), transparent 60%)" }}
               />
-              <div className="relative mb-4 flex items-center gap-3">
-                <div className="flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-background">
+              <div className="relative mb-5 flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg border border-border bg-background shadow-card transition-transform duration-300 group-hover:scale-110">
                   <Icon className="h-4 w-4" />
                 </div>
                 <h3 className="font-display text-lg font-semibold">{category}</h3>
@@ -72,7 +72,7 @@ export function Skills() {
                   return (
                     <span
                       key={skill}
-                      className="inline-flex items-center gap-1.5 rounded-md border border-border bg-background/80 px-2.5 py-1.5 text-sm transition-all hover:-translate-y-0.5 hover:border-foreground/40 hover:bg-accent"
+                      className="inline-flex items-center gap-1.5 rounded-md border border-border bg-background/80 px-2.5 py-1.5 text-sm shadow-card transition-all duration-200 hover:-translate-y-0.5 hover:scale-105 hover:border-foreground/40 hover:bg-accent hover:shadow-card-hover"
                     >
                       {TechIcon ? <TechIcon className="h-3.5 w-3.5 text-muted-foreground" /> : null}
                       {skill}

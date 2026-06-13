@@ -21,20 +21,5 @@ export const timeline: TimelineEntry[] = [
     details:
       "CGPA: 8.48 / 10.0 | Relevant Coursework: DSA, DBMS, OS, Computer Networks",
   },
-  {
-    type: "experience",
-    // TODO: confirm title/org once internship is finalized
-    title: "Software Development Engineer Intern",
-    organization: "ITJOBXS",
-    duration: "Sept 2026 — Feb 2027",
-    details: "// TODO: Add details after internship completes",
-  },
-  {
-    type: "experience",
-    title: "IoT Engineering Trainee",
-    organization: "Samsung Innovation Campus (SIC)",
-    duration: "Aug 2026 — Sept 2026",
-    details: "// TODO: Add details after program completes",
-  },
-  // TODO: Add new entries (internships, achievements, certifications) here.
+  // TODO: Add new entries (internships, achievements, certifications) here once completed.
 ];
