@@ -3,6 +3,7 @@ import { ArrowRight, FileText, Mail, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { profile } from "@/data/profile";
 import { SocialIcons } from "./SocialIcons";
+import { useResumeAvailable } from "@/hooks/use-resume-available";
 
 export function Hero() {
   const initials = profile.name
@@ -11,6 +12,7 @@ export function Hero() {
     .join("");
 
   const [imgFailed, setImgFailed] = useState(false);
+  const resumeAvailable = useResumeAvailable();
 
   return (
     <section id="home" className="mx-auto max-w-6xl px-6 pt-20 pb-24 md:pt-28 md:pb-32">
@@ -40,11 +42,13 @@ export function Hero() {
                 View Projects <ArrowRight className="ml-1 h-4 w-4" />
               </a>
             </Button>
-            <Button asChild variant="outline">
-              <a href={profile.resumeUrl} target="_blank" rel="noreferrer" download>
-                <FileText className="mr-1 h-4 w-4" /> Resume
-              </a>
-            </Button>
+            {resumeAvailable && (
+              <Button asChild variant="outline">
+                <a href={profile.resumeUrl} target="_blank" rel="noopener noreferrer" download>
+                  <FileText className="mr-1 h-4 w-4" /> Resume
+                </a>
+              </Button>
+            )}
             <Button asChild variant="ghost">
               <a href="#contact">
                 <Mail className="mr-1 h-4 w-4" /> Contact

@@ -113,33 +113,25 @@ function ProjectCard({
         </div>
 
         <div className="mt-6 flex flex-wrap gap-2">
-          {project.githubUrl ? (
+          {project.githubUrl && (
             <a
               href={project.githubUrl}
               target="_blank"
-              rel="noreferrer"
+              rel="noopener noreferrer"
               className="inline-flex items-center gap-1.5 rounded-md border border-border px-3 py-1.5 text-sm transition-colors hover:bg-accent"
             >
               <Github className="h-4 w-4" /> Code
             </a>
-          ) : (
-            <span className="inline-flex items-center rounded-md border border-dashed border-border px-3 py-1.5 text-sm text-muted-foreground">
-              Code Soon
-            </span>
           )}
-          {project.liveUrl ? (
+          {project.liveUrl && (
             <a
               href={project.liveUrl}
               target="_blank"
-              rel="noreferrer"
+              rel="noopener noreferrer"
               className="inline-flex items-center gap-1.5 rounded-md bg-primary px-3 py-1.5 text-sm text-primary-foreground transition-opacity hover:opacity-90"
             >
               <ExternalLink className="h-4 w-4" /> Live
             </a>
-          ) : (
-            <span className="inline-flex items-center rounded-md border border-dashed border-border px-3 py-1.5 text-sm text-muted-foreground">
-              Live Soon
-            </span>
           )}
         </div>
       </div>
