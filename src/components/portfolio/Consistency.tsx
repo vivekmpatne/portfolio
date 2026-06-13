@@ -160,9 +160,16 @@ export function Consistency() {
   return (
     <section id="consistency" className="mx-auto max-w-6xl px-6 py-20">
       <SectionHeader title="Consistency Dashboard" />
-      <p className="-mt-2 mb-8 max-w-2xl text-muted-foreground">
+      <p className="-mt-2 mb-4 max-w-2xl text-muted-foreground">
         Real engineering activity aggregated live from GitHub, LeetCode, and Codeforces — no manual updates.
       </p>
+      {errors.length > 0 && (
+        <div className="mb-6 flex items-start gap-2 rounded-lg border border-amber-500/30 bg-amber-500/5 px-3 py-2 text-xs text-amber-700 dark:text-amber-400">
+          <AlertCircle className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+          <span>Some sources unavailable: {errors.join(" · ")}</span>
+        </div>
+      )}
+
 
       <div className="mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {metrics.map((m) => {
