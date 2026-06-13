@@ -14,7 +14,7 @@ const sections = [
 ];
 
 export function Nav() {
-  const [dark, setDark] = useState(false);
+  const [dark, setDark] = useState(true);
   const [scrolled, setScrolled] = useState(false);
   const [progress, setProgress] = useState(0);
   const [open, setOpen] = useState(false);
