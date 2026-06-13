@@ -77,23 +77,27 @@ export function Consistency() {
 
   const { github, leetcode, codeforces } = profile.codingProfiles;
 
+  const ghFn = useServerFn(getGithubActivity);
+  const lcFn = useServerFn(getLeetcodeActivity);
+  const cfFn = useServerFn(getCodeforcesActivity);
+
   const queries = useQueries({
     queries: [
       {
         queryKey: ["activity", "github", github.username, year],
-        queryFn: () => fetchGithub(github.username, year),
+        queryFn: () => ghFn({ data: { username: github.username, year } }),
         staleTime: 10 * 60_000,
         retry: 1,
       },
       {
         queryKey: ["activity", "leetcode", leetcode.username, year],
-        queryFn: () => fetchLeetcode(leetcode.username, year),
+        queryFn: () => lcFn({ data: { username: leetcode.username, year } }),
         staleTime: 10 * 60_000,
         retry: 1,
       },
       {
         queryKey: ["activity", "codeforces", codeforces.username, year],
-        queryFn: () => fetchCodeforces(codeforces.username, year),
+        queryFn: () => cfFn({ data: { username: codeforces.username, year } }),
         staleTime: 10 * 60_000,
         retry: 1,
       },
@@ -101,23 +105,27 @@ export function Consistency() {
   });
 
   const isLoading = queries.some((q) => q.isLoading);
-  const ghMap = queries[0].data ?? {};
-  const lcMap = queries[1].data ?? {};
-  const cfMap = queries[2].data ?? {};
+  const gh = (queries[0].data as ActivityResult | undefined) ?? EMPTY;
+  const lc = (queries[1].data as ActivityResult | undefined) ?? EMPTY;
+  const cf = (queries[2].data as ActivityResult | undefined) ?? EMPTY;
+  const errors = [gh.error, lc.error, cf.error].filter(Boolean) as string[];
 
-  const merged = useMemo(() => mergeMaps([ghMap, lcMap, cfMap]), [ghMap, lcMap, cfMap]);
+  const sumValues = (m: DayMap) => Object.values(m).reduce((a, b) => a + b, 0);
+
+  const merged = useMemo(() => mergeMaps([gh.calendar, lc.calendar, cf.calendar]), [gh, lc, cf]);
   const days = useMemo(() => buildYearDays(year), [year]);
   const stats = useMemo(() => computeStreaks(days, merged), [days, merged]);
 
   const sourceCounts: Record<string, number> = {
-    github: Object.values(ghMap).reduce((a, b) => a + b, 0),
-    leetcode: Object.values(lcMap).reduce((a, b) => a + b, 0),
-    codeforces: Object.values(cfMap).reduce((a, b) => a + b, 0),
+    github: sumValues(gh.calendar),
+    leetcode: sumValues(lc.calendar),
+    codeforces: sumValues(cf.calendar),
     codechef: 0,
     gfg: 0,
     hackerrank: 0,
   };
-  const totalContribs = Object.values(merged).reduce((a, b) => a + b, 0);
+  const totalContribs = sumValues(merged);
+
 
   // Build heatmap grid: weeks of 7 days (Sun..Sat)
   const grid = useMemo(() => {
