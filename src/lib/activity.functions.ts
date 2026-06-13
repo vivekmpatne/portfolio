@@ -89,8 +89,9 @@ export const getGithubActivity = createServerFn({ method: "GET" })
           following: user.following.totalCount,
         },
       };
-    } catch (e: any) {
-      return { calendar: {}, meta: {}, error: e?.message ?? "GitHub fetch failed" };
+    } catch (e) {
+      console.error("GitHub activity fetch failed", e);
+      return { calendar: {}, meta: {}, error: "GitHub temporarily unavailable" };
     }
   });
 
