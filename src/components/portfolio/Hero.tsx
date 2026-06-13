@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { ArrowRight, FileText, Mail, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { profile } from "@/data/profile";
@@ -9,11 +10,13 @@ export function Hero() {
     .map((n) => n[0])
     .join("");
 
+  const [imgFailed, setImgFailed] = useState(false);
+
   return (
     <section id="home" className="mx-auto max-w-6xl px-6 pt-20 pb-24 md:pt-28 md:pb-32">
       <div className="grid items-center gap-12 md:grid-cols-[1fr_auto]">
         <div>
-          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-border bg-secondary px-3 py-1 text-xs text-muted-foreground">
+          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-border bg-secondary px-3 py-1 text-xs text-muted-foreground shadow-card">
             <span className="h-1.5 w-1.5 rounded-full bg-green-500" />
             Open to SDE-1 opportunities
           </div>
@@ -54,32 +57,30 @@ export function Hero() {
           </div>
         </div>
 
-        {/* Premium gradient avatar */}
+        {/* Premium profile photo */}
         <div className="hidden md:block">
-          <div className="relative">
+          <div className="group relative">
             <div
-              className="absolute -inset-3 rounded-full opacity-60 blur-2xl"
+              className="absolute -inset-4 rounded-full opacity-60 blur-2xl transition-opacity duration-500 group-hover:opacity-90"
               style={{
                 background:
                   "conic-gradient(from 180deg at 50% 50%, #6366f1, #8b5cf6, #ec4899, #f97316, #6366f1)",
               }}
             />
-            <div className="relative h-56 w-56 rounded-full p-[2px]"
+            <div
+              className="relative h-60 w-60 rounded-full p-[3px] transition-transform duration-500 group-hover:scale-[1.03]"
               style={{
                 background:
                   "linear-gradient(135deg, #6366f1, #8b5cf6, #ec4899)",
               }}
             >
-              <div className="flex h-full w-full items-center justify-center overflow-hidden rounded-full bg-card">
-                {profile.avatar && profile.avatar !== "/placeholder-avatar.png" ? (
-                  // eslint-disable-next-line @next/next/no-img-element
+              <div className="flex h-full w-full items-center justify-center overflow-hidden rounded-full bg-card shadow-card-hover">
+                {profile.avatar && !imgFailed ? (
                   <img
                     src={profile.avatar}
                     alt={profile.name}
-                    className="h-full w-full object-cover"
-                    onError={(e) => {
-                      (e.currentTarget as HTMLImageElement).style.display = "none";
-                    }}
+                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    onError={() => setImgFailed(true)}
                   />
                 ) : (
                   <span

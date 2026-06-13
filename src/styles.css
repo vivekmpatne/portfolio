@@ -45,14 +45,19 @@
   --secondary: oklch(0.96 0.005 250);
   --secondary-foreground: oklch(0.22 0.02 250);
   --muted: oklch(0.96 0.005 250);
-  --muted-foreground: oklch(0.50 0.02 250);
+  --muted-foreground: oklch(0.45 0.02 250);
   --accent: oklch(0.95 0.02 240);
   --accent-foreground: oklch(0.22 0.02 250);
   --destructive: oklch(0.58 0.22 27);
   --destructive-foreground: oklch(0.99 0 0);
-  --border: oklch(0.92 0.005 250);
+  --border: oklch(0.90 0.006 250);
   --input: oklch(0.92 0.005 250);
   --ring: oklch(0.55 0.05 250);
+
+  /* Elegant elevation system — light mode */
+  --shadow-card: 0 1px 2px 0 rgb(15 23 42 / 0.04), 0 1px 3px 0 rgb(15 23 42 / 0.06);
+  --shadow-card-hover: 0 8px 24px -8px rgb(15 23 42 / 0.12), 0 2px 6px -2px rgb(15 23 42 / 0.08);
+  --shadow-nav: 0 1px 2px 0 rgb(15 23 42 / 0.04), 0 4px 16px -4px rgb(15 23 42 / 0.06);
 }
 
 .dark {
@@ -75,6 +80,10 @@
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 15%);
   --ring: oklch(0.55 0.03 250);
+
+  --shadow-card: 0 1px 2px 0 rgb(0 0 0 / 0.3);
+  --shadow-card-hover: 0 8px 30px -8px rgb(0 0 0 / 0.5);
+  --shadow-nav: 0 1px 2px 0 rgb(0 0 0 / 0.4);
 }
 
 @layer base {
@@ -94,4 +103,14 @@
     font-family: var(--font-display);
     letter-spacing: -0.02em;
   }
+}
+
+@utility shadow-card {
+  box-shadow: var(--shadow-card);
+}
+@utility shadow-card-hover {
+  box-shadow: var(--shadow-card-hover);
+}
+@utility shadow-nav {
+  box-shadow: var(--shadow-nav);
 }

@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from "react";
-import { Mail, Phone, Send } from "lucide-react";
+import { Mail, Phone, MapPin, Send, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -17,34 +17,73 @@ export function Contact() {
     window.location.href = `mailto:${profile.email}?subject=${subject}&body=${body}`;
   };
 
+  const contactItems = [
+    { icon: Mail, label: "Email", value: profile.email, href: `mailto:${profile.email}` },
+    { icon: Phone, label: "Phone", value: profile.phone, href: `tel:${profile.phone.replace(/\s/g, "")}` },
+    { icon: MapPin, label: "Location", value: profile.location, href: null },
+  ];
+
   return (
     <section id="contact" className="mx-auto max-w-6xl px-6 py-20">
       <SectionHeader title="Get in touch" />
-      <div className="grid gap-10 md:grid-cols-2">
-        <div>
+      <div className="grid gap-8 md:grid-cols-2">
+        <div className="space-y-6">
           <p className="text-lg text-muted-foreground">
             Always open to interesting conversations, internship opportunities,
             and collaborations. The fastest way to reach me is via email.
           </p>
-          <div className="mt-6 space-y-3 text-sm">
-            <a
-              href={`mailto:${profile.email}`}
-              className="flex items-center gap-3 text-foreground hover:underline"
-            >
-              <Mail className="h-4 w-4 text-muted-foreground" />
-              {profile.email}
-            </a>
-            <div className="flex items-center gap-3 text-foreground">
-              <Phone className="h-4 w-4 text-muted-foreground" />
-              {profile.phone}
+
+          <div className="space-y-2">
+            {contactItems.map((item) => {
+              const Icon = item.icon;
+              const inner = (
+                <div className="flex items-center gap-4 rounded-xl border border-border bg-card p-4 shadow-card transition-all hover:-translate-y-0.5 hover:border-foreground/30 hover:shadow-card-hover">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-accent">
+                    <Icon className="h-4 w-4 text-foreground" />
+                  </div>
+                  <div className="min-w-0">
+                    <div className="text-[11px] font-medium uppercase tracking-widest text-muted-foreground">
+                      {item.label}
+                    </div>
+                    <div className="truncate text-sm font-medium text-foreground">
+                      {item.value}
+                    </div>
+                  </div>
+                </div>
+              );
+              return item.href ? (
+                <a key={item.label} href={item.href} className="block">
+                  {inner}
+                </a>
+              ) : (
+                <div key={item.label}>{inner}</div>
+              );
+            })}
+          </div>
+
+          <div className="rounded-xl border border-border bg-card p-5 shadow-card">
+            <div className="mb-3 text-[11px] font-medium uppercase tracking-widest text-muted-foreground">
+              Open To
             </div>
+            <ul className="space-y-2">
+              {profile.openTo.map((item) => (
+                <li key={item} className="flex items-center gap-2 text-sm text-foreground">
+                  <span className="flex h-5 w-5 items-center justify-center rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400">
+                    <Check className="h-3 w-3" strokeWidth={3} />
+                  </span>
+                  {item}
+                </li>
+              ))}
+            </ul>
           </div>
-          <div className="mt-6">
-            <SocialIcons />
-          </div>
+
+          <SocialIcons />
         </div>
 
-        <form onSubmit={onSubmit} className="space-y-3 rounded-2xl border border-border bg-card p-6">
+        <form
+          onSubmit={onSubmit}
+          className="h-fit space-y-3 rounded-2xl border border-border bg-card p-6 shadow-card"
+        >
           <Input
             required
             placeholder="Your name"
@@ -60,7 +99,7 @@ export function Contact() {
           />
           <Textarea
             required
-            rows={5}
+            rows={6}
             placeholder="Message"
             value={form.message}
             onChange={(e) => setForm({ ...form, message: e.target.value })}
