@@ -16,14 +16,30 @@ export type ActivityResult = {
   error?: string;
 };
 
-const usernameYear = z.object({
-  username: z.string().min(1).max(64),
-  year: z.number().int().min(2010).max(2100),
-});
+// Whitelist of the portfolio owner's handles. Server functions are public
+// endpoints; restricting inputs prevents abuse of the server's GITHUB_TOKEN
+// and stops the endpoints from acting as an open proxy for arbitrary lookups.
+const ALLOWED_USERNAMES = {
+  github: new Set(["vivekmpatne"]),
+  leetcode: new Set(["vivekpatnem"]),
+  codeforces: new Set(["vivekpatnem"]),
+} as const;
+
+const makeSchema = (allowed: ReadonlySet<string>) =>
+  z.object({
+    username: z.string().min(1).max(64).refine((u) => allowed.has(u), {
+      message: "Username not allowed",
+    }),
+    year: z.number().int().min(2010).max(2100),
+  });
+
+const githubInput = makeSchema(ALLOWED_USERNAMES.github);
+const leetcodeInput = makeSchema(ALLOWED_USERNAMES.leetcode);
+const codeforcesInput = makeSchema(ALLOWED_USERNAMES.codeforces);
 
 // ---------- GitHub ----------
 export const getGithubActivity = createServerFn({ method: "GET" })
-  .inputValidator((data: unknown) => usernameYear.parse(data))
+  .inputValidator((data: unknown) => githubInput.parse(data))
   .handler(async ({ data }): Promise<ActivityResult> => {
     const token = process.env.GITHUB_TOKEN;
     if (!token) return { calendar: {}, meta: {}, error: "GITHUB_TOKEN not set" };
@@ -80,7 +96,7 @@ export const getGithubActivity = createServerFn({ method: "GET" })
 
 // ---------- LeetCode ----------
 export const getLeetcodeActivity = createServerFn({ method: "GET" })
-  .inputValidator((data: unknown) => usernameYear.parse(data))
+  .inputValidator((data: unknown) => leetcodeInput.parse(data))
   .handler(async ({ data }): Promise<ActivityResult> => {
     const query = `
       query userData($username: String!, $year: Int!) {
@@ -138,7 +154,7 @@ export const getLeetcodeActivity = createServerFn({ method: "GET" })
 
 // ---------- Codeforces ----------
 export const getCodeforcesActivity = createServerFn({ method: "GET" })
-  .inputValidator((data: unknown) => usernameYear.parse(data))
+  .inputValidator((data: unknown) => codeforcesInput.parse(data))
   .handler(async ({ data }): Promise<ActivityResult> => {
     // Codeforces' public API often returns 5xx under load. Retry transient
     // failures with exponential backoff before surfacing as unavailable.
