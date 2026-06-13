@@ -20,7 +20,7 @@ const categoryIcon: Record<string, LucideIcon> = {
 };
 
 const techIcon: Record<string, IconType> = {
-  C: SiC,
+  // C: no react-icon (renders as text only)
   JavaScript: SiJavascript,
   Python: SiPython,
   Java: FaJava,
