@@ -32,9 +32,25 @@ export function Nav() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  // Initialize from localStorage (default: dark) — runs once after mount.
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem("theme");
+      setDark(stored ? stored === "dark" : true);
+    } catch {
+      setDark(true);
+    }
+  }, []);
+
   useEffect(() => {
     document.documentElement.classList.toggle("dark", dark);
+    try {
+      localStorage.setItem("theme", dark ? "dark" : "light");
+    } catch {
+      /* ignore */
+    }
   }, [dark]);
+
 
   useEffect(() => {
     const observers: IntersectionObserver[] = [];
