@@ -248,14 +248,24 @@ export function Consistency() {
                     const date = week[di];
                     if (!date) return <div key={di} className="h-3 w-3 rounded-sm bg-transparent" />;
                     const count = merged[date] ?? 0;
+                    const ghC = gh.calendar[date] ?? 0;
+                    const lcC = lc.calendar[date] ?? 0;
+                    const cfC = cf.calendar[date] ?? 0;
+                    const parts = [
+                      `${date} — ${count} ${count === 1 ? "contribution" : "contributions"}`,
+                      ghC ? `GitHub: ${ghC}` : null,
+                      lcC ? `LeetCode: ${lcC}` : null,
+                      cfC ? `Codeforces: ${cfC}` : null,
+                    ].filter(Boolean);
                     return (
                       <div
                         key={di}
-                        title={`${count} ${count === 1 ? "contribution" : "contributions"} on ${date}`}
+                        title={parts.join("\n")}
                         className={`h-3 w-3 rounded-sm transition-transform hover:scale-150 ${intensityClass(count)}`}
                       />
                     );
                   })}
+
                 </div>
               ))}
             </div>
