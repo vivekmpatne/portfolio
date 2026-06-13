@@ -1,63 +1,21 @@
 import { useMemo, useState } from "react";
 import { useQueries } from "@tanstack/react-query";
-import { Flame, Trophy, Calendar, Zap, ChevronDown } from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
+import { Flame, Trophy, Calendar, Zap, ChevronDown, AlertCircle } from "lucide-react";
 import { SiGithub, SiLeetcode, SiCodeforces, SiCodechef, SiGeeksforgeeks, SiHackerrank } from "react-icons/si";
 import { profile } from "@/data/profile";
 import { SectionHeader } from "./SectionHeader";
+import {
+  getGithubActivity,
+  getLeetcodeActivity,
+  getCodeforcesActivity,
+  type ActivityResult,
+} from "@/lib/activity.functions";
 
 // ----- Types -----
-type DayMap = Record<string, number>; // "YYYY-MM-DD" -> count
+type DayMap = Record<string, number>;
+const EMPTY: ActivityResult = { calendar: {}, meta: {} };
 
-// ----- Fetchers -----
-async function fetchJson<T>(url: string): Promise<T> {
-  const res = await fetch(url);
-  if (!res.ok) throw new Error(`HTTP ${res.status}`);
-  return res.json();
-}
-
-async function fetchGithub(user: string, year: number): Promise<DayMap> {
-  // Free public CORS-enabled GitHub contributions API
-  const data = await fetchJson<{ contributions: Array<{ date: string; count: number }> }>(
-    `https://github-contributions-api.jogruber.de/v4/${user}?y=${year}`,
-  );
-  const m: DayMap = {};
-  for (const d of data.contributions ?? []) m[d.date] = d.count;
-  return m;
-}
-
-async function fetchLeetcode(user: string, year: number): Promise<DayMap> {
-  const data = await fetchJson<{ submissionCalendar?: string | Record<string, number> }>(
-    `https://alfa-leetcode-api.onrender.com/userProfileCalendar?username=${user}&year=${year}`,
-  );
-  let cal: Record<string, number> = {};
-  if (typeof data.submissionCalendar === "string") {
-    try { cal = JSON.parse(data.submissionCalendar); } catch { cal = {}; }
-  } else if (data.submissionCalendar) {
-    cal = data.submissionCalendar;
-  }
-  const m: DayMap = {};
-  for (const [ts, count] of Object.entries(cal)) {
-    const d = new Date(Number(ts) * 1000);
-    if (d.getUTCFullYear() === year) {
-      m[d.toISOString().slice(0, 10)] = (m[d.toISOString().slice(0, 10)] ?? 0) + Number(count);
-    }
-  }
-  return m;
-}
-
-async function fetchCodeforces(user: string, year: number): Promise<DayMap> {
-  const data = await fetchJson<{ result?: Array<{ creationTimeSeconds: number; verdict: string }> }>(
-    `https://codeforces.com/api/user.status?handle=${user}`,
-  );
-  const m: DayMap = {};
-  for (const s of data.result ?? []) {
-    const d = new Date(s.creationTimeSeconds * 1000);
-    if (d.getFullYear() !== year) continue;
-    const key = d.toISOString().slice(0, 10);
-    m[key] = (m[key] ?? 0) + 1;
-  }
-  return m;
-}
 
 // ----- Aggregation -----
 function mergeMaps(maps: DayMap[]): DayMap {
@@ -119,23 +77,27 @@ export function Consistency() {
 
   const { github, leetcode, codeforces } = profile.codingProfiles;
 
+  const ghFn = useServerFn(getGithubActivity);
+  const lcFn = useServerFn(getLeetcodeActivity);
+  const cfFn = useServerFn(getCodeforcesActivity);
+
   const queries = useQueries({
     queries: [
       {
         queryKey: ["activity", "github", github.username, year],
-        queryFn: () => fetchGithub(github.username, year),
+        queryFn: () => ghFn({ data: { username: github.username, year } }),
         staleTime: 10 * 60_000,
         retry: 1,
       },
       {
         queryKey: ["activity", "leetcode", leetcode.username, year],
-        queryFn: () => fetchLeetcode(leetcode.username, year),
+        queryFn: () => lcFn({ data: { username: leetcode.username, year } }),
         staleTime: 10 * 60_000,
         retry: 1,
       },
       {
         queryKey: ["activity", "codeforces", codeforces.username, year],
-        queryFn: () => fetchCodeforces(codeforces.username, year),
+        queryFn: () => cfFn({ data: { username: codeforces.username, year } }),
         staleTime: 10 * 60_000,
         retry: 1,
       },
@@ -143,23 +105,27 @@ export function Consistency() {
   });
 
   const isLoading = queries.some((q) => q.isLoading);
-  const ghMap = queries[0].data ?? {};
-  const lcMap = queries[1].data ?? {};
-  const cfMap = queries[2].data ?? {};
+  const gh = (queries[0].data as ActivityResult | undefined) ?? EMPTY;
+  const lc = (queries[1].data as ActivityResult | undefined) ?? EMPTY;
+  const cf = (queries[2].data as ActivityResult | undefined) ?? EMPTY;
+  const errors = [gh.error, lc.error, cf.error].filter(Boolean) as string[];
 
-  const merged = useMemo(() => mergeMaps([ghMap, lcMap, cfMap]), [ghMap, lcMap, cfMap]);
+  const sumValues = (m: DayMap) => Object.values(m).reduce((a, b) => a + b, 0);
+
+  const merged = useMemo(() => mergeMaps([gh.calendar, lc.calendar, cf.calendar]), [gh, lc, cf]);
   const days = useMemo(() => buildYearDays(year), [year]);
   const stats = useMemo(() => computeStreaks(days, merged), [days, merged]);
 
   const sourceCounts: Record<string, number> = {
-    github: Object.values(ghMap).reduce((a, b) => a + b, 0),
-    leetcode: Object.values(lcMap).reduce((a, b) => a + b, 0),
-    codeforces: Object.values(cfMap).reduce((a, b) => a + b, 0),
+    github: sumValues(gh.calendar),
+    leetcode: sumValues(lc.calendar),
+    codeforces: sumValues(cf.calendar),
     codechef: 0,
     gfg: 0,
     hackerrank: 0,
   };
-  const totalContribs = Object.values(merged).reduce((a, b) => a + b, 0);
+  const totalContribs = sumValues(merged);
+
 
   // Build heatmap grid: weeks of 7 days (Sun..Sat)
   const grid = useMemo(() => {
@@ -194,9 +160,16 @@ export function Consistency() {
   return (
     <section id="consistency" className="mx-auto max-w-6xl px-6 py-20">
       <SectionHeader title="Consistency Dashboard" />
-      <p className="-mt-2 mb-8 max-w-2xl text-muted-foreground">
+      <p className="-mt-2 mb-4 max-w-2xl text-muted-foreground">
         Real engineering activity aggregated live from GitHub, LeetCode, and Codeforces — no manual updates.
       </p>
+      {errors.length > 0 && (
+        <div className="mb-6 flex items-start gap-2 rounded-lg border border-amber-500/30 bg-amber-500/5 px-3 py-2 text-xs text-amber-700 dark:text-amber-400">
+          <AlertCircle className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+          <span>Some sources unavailable: {errors.join(" · ")}</span>
+        </div>
+      )}
+
 
       <div className="mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {metrics.map((m) => {
