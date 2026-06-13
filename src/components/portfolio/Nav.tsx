@@ -14,7 +14,7 @@ const sections = [
 ];
 
 export function Nav() {
-  const [dark, setDark] = useState(false);
+  const [dark, setDark] = useState(true);
   const [scrolled, setScrolled] = useState(false);
   const [progress, setProgress] = useState(0);
   const [open, setOpen] = useState(false);
@@ -32,9 +32,25 @@ export function Nav() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  // Initialize from localStorage (default: dark) — runs once after mount.
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem("theme");
+      setDark(stored ? stored === "dark" : true);
+    } catch {
+      setDark(true);
+    }
+  }, []);
+
   useEffect(() => {
     document.documentElement.classList.toggle("dark", dark);
+    try {
+      localStorage.setItem("theme", dark ? "dark" : "light");
+    } catch {
+      /* ignore */
+    }
   }, [dark]);
+
 
   useEffect(() => {
     const observers: IntersectionObserver[] = [];

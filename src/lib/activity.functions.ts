@@ -55,7 +55,7 @@ export const getGithubActivity = createServerFn({ method: "GET" })
         },
         body: JSON.stringify({ query, variables: { login: data.username, from, to } }),
       });
-      if (!res.ok) return { calendar: {}, meta: {}, error: `GitHub ${res.status}` };
+      if (!res.ok) return { calendar: {}, meta: {}, error: `GitHub temporarily unavailable` };
       const json: any = await res.json();
       const user = json?.data?.user;
       if (!user) return { calendar: {}, meta: {}, error: "GitHub user not found" };
@@ -101,7 +101,7 @@ export const getLeetcodeActivity = createServerFn({ method: "GET" })
         },
         body: JSON.stringify({ query, variables: { username: data.username, year: data.year } }),
       });
-      if (!res.ok) return { calendar: {}, meta: {}, error: `LeetCode ${res.status}` };
+      if (!res.ok) return { calendar: {}, meta: {}, error: `LeetCode temporarily unavailable` };
       const json: any = await res.json();
       const user = json?.data?.matchedUser;
       if (!user) return { calendar: {}, meta: {}, error: "LeetCode user not found" };
@@ -140,14 +140,32 @@ export const getLeetcodeActivity = createServerFn({ method: "GET" })
 export const getCodeforcesActivity = createServerFn({ method: "GET" })
   .inputValidator((data: unknown) => usernameYear.parse(data))
   .handler(async ({ data }): Promise<ActivityResult> => {
+    // Codeforces' public API often returns 5xx under load. Retry transient
+    // failures with exponential backoff before surfacing as unavailable.
+    const fetchWithRetry = async (url: string, attempts = 3): Promise<Response | null> => {
+      for (let i = 0; i < attempts; i++) {
+        try {
+          const r = await fetch(url, { headers: { "User-Agent": "lovable-portfolio" } });
+          if (r.ok) return r;
+          if (r.status < 500 && r.status !== 429) return r; // non-retryable client error
+        } catch {
+          /* network error — retry */
+        }
+        await new Promise((res) => setTimeout(res, 300 * Math.pow(2, i)));
+      }
+      return null;
+    };
+
     try {
       const [statusRes, infoRes] = await Promise.all([
-        fetch(`https://codeforces.com/api/user.status?handle=${encodeURIComponent(data.username)}`),
-        fetch(`https://codeforces.com/api/user.info?handles=${encodeURIComponent(data.username)}`),
+        fetchWithRetry(`https://codeforces.com/api/user.status?handle=${encodeURIComponent(data.username)}`),
+        fetchWithRetry(`https://codeforces.com/api/user.info?handles=${encodeURIComponent(data.username)}`),
       ]);
-      if (!statusRes.ok) return { calendar: {}, meta: {}, error: `Codeforces ${statusRes.status}` };
+      if (!statusRes || !statusRes.ok) {
+        return { calendar: {}, meta: {}, error: "Codeforces temporarily unavailable" };
+      }
       const status: any = await statusRes.json();
-      const info: any = infoRes.ok ? await infoRes.json() : null;
+      const info: any = infoRes && infoRes.ok ? await infoRes.json() : null;
 
       const calendar: DayMap = {};
       for (const s of status.result ?? []) {
@@ -168,6 +186,7 @@ export const getCodeforcesActivity = createServerFn({ method: "GET" })
         },
       };
     } catch (e: any) {
-      return { calendar: {}, meta: {}, error: e?.message ?? "Codeforces fetch failed" };
+      return { calendar: {}, meta: {}, error: "Codeforces temporarily unavailable" };
     }
   });
+
