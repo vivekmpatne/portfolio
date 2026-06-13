@@ -1,5 +1,6 @@
 // ============================================================
-// PROFILE DATA — Edit your personal info here.
+// PROFILE DATA — Single source of truth for all profile info,
+// stats, and coding platform usernames/URLs.
 // ============================================================
 import avatarAsset from "@/assets/vivek-patne.jpeg.asset.json";
 
@@ -25,19 +26,29 @@ export const profile = {
     githubFollowing: 15,
     codeforcesRank: "newbie",
   },
-  // Things the user is open to (Contact section)
   openTo: [
     "Software Engineering Internships",
     "SDE-1 Opportunities",
     "Full Stack Development Roles",
     "Open Source Collaboration",
   ],
-  // Handles used by live-stats APIs
+  // Legacy handles — kept for backwards compat with LiveStats
   handles: {
     leetcode: "vivekpatnem",
     codeforces: "vivekpatnem",
     github: "vivekpatnem",
   },
-  // TODO: drop your resume PDF in /public as resume.pdf
+  // Unified coding profiles — used by Consistency, LiveStats, and future integrations
+  codingProfiles: {
+    github:      { username: "vivekpatnem",  url: "https://github.com/vivekpatnem" },
+    linkedin:    { username: "vivekpatnem",  url: "https://www.linkedin.com/in/vivekpatnem/" },
+    leetcode:    { username: "vivekpatnem",  url: "https://leetcode.com/u/vivekpatnem/" },
+    codeforces:  { username: "vivekpatnem",  url: "https://codeforces.com/profile/vivekpatnem" },
+    codechef:    { username: "viv9ekpatnem", url: "https://www.codechef.com/users/viv9ekpatnem" },
+    gfg:         { username: "vivekpcom8",   url: "https://www.geeksforgeeks.org/user/vivekpcom8" },
+    hackerrank:  { username: "vivekpatnem",  url: "https://www.hackerrank.com/profile/vivekpatnem" },
+    atcoder:     { username: "vivekpatnem",  url: "https://atcoder.jp/users/vivekpatnem" },
+    codolio:     { username: "Viwake",       url: "https://codolio.com/profile/Viwake" },
+  },
   resumeUrl: "/resume.pdf",
 };
