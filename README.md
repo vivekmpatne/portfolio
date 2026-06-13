@@ -1,75 +1,122 @@
-# Vivek Patne — Personal Portfolio
+# Vivek Patne — Portfolio
 
-A clean, minimal, data-driven personal portfolio website. All content lives in
-plain TypeScript files under `src/data/` so updating projects, skills, or
-experience is a one-file edit — no component changes required.
+Personal portfolio of **Vivek Patne**, a 3rd-year Computer Science & Engineering (Data Science) student at RNS Institute of Technology, Bengaluru. Built as a modern, fast, recruiter-friendly site that surfaces **live coding activity** from GitHub, LeetCode, and Codeforces alongside featured projects.
 
-**Live demo:** _// TODO: add Vercel link after deploy_
+🔗 **Live:** https://vivekpatne.lovable.app (update once published)
+🐙 **Repo:** https://github.com/vivekmpatne
 
-## Tech Stack
+---
 
-- React 19 + TypeScript
-- TanStack Start / TanStack Router (file-based routing)
-- Tailwind CSS v4
-- Shadcn/UI primitives
-- Lucide React icons
-- Vite 7
+## ✨ Features
 
-## Run Locally
+- **Live GitHub stats** — repos, followers, following, and a real contribution heatmap via the GitHub GraphQL API.
+- **Live LeetCode stats** — contest rating, total solved, Easy / Medium / Hard breakdown via LeetCode's public GraphQL.
+- **Live Codeforces stats** — rating, rank, and per-day submissions via the Codeforces REST API (with retry + backoff).
+- **Consistency dashboard** — unified contribution heatmap merging all three platforms with per-source tooltips.
+- **Dark mode by default** with pre-hydration bootstrap (no flash) and `localStorage` persistence.
+- **SEO-ready** — semantic HTML, full Open Graph + Twitter card metadata, canonical URLs.
+- **Resilient** — APIs that fail show "Unavailable" instead of misleading zeros; broken/missing links are hidden instead of rendered.
+- **Responsive** — works cleanly from 360px mobile up to wide desktop.
+
+---
+
+## 🛠 Tech Stack
+
+- **Framework:** [TanStack Start](https://tanstack.com/start) (React 19, SSR) on Vite 7
+- **Styling:** Tailwind CSS v4 (via `@import` + theme tokens in `src/styles.css`)
+- **UI primitives:** shadcn/ui + Radix UI
+- **Data fetching:** TanStack Query + TanStack Server Functions
+- **Icons:** lucide-react, react-icons
+- **Runtime:** Cloudflare Workers (edge) via Lovable Cloud
+- **Language:** TypeScript (strict)
+
+---
+
+## 🚀 Getting Started
 
 ```bash
-git clone https://github.com/vivekpatnem/portfolio.git
-cd portfolio
-npm install   # or bun install
-npm run dev
+# Install
+bun install
+
+# Dev server
+bun run dev
+
+# Production build
+bun run build
 ```
 
-Open http://localhost:5173 (or the port Vite prints).
+The app expects a `GITHUB_TOKEN` (scope: `read:user`) for the GitHub GraphQL integration:
 
-## How to Update Content
-
-All editable content lives in **`src/data/`**. You never need to touch component
-code to update what's on the site.
-
-| File | What it controls |
-| --- | --- |
-| `src/data/profile.ts` | Name, tagline, bio, location, email, phone, stats, resume URL |
-| `src/data/links.ts` | All social + coding-profile URLs (GitHub, LinkedIn, LeetCode, etc.) |
-| `src/data/skills.ts` | Skills grouped by category (chip clusters) |
-| `src/data/projects.ts` | Project cards — add/remove projects here |
-| `src/data/experience.ts` | Education & experience timeline entries |
-
-### Add a new project
-
-Open `src/data/projects.ts` and append a new object to the `projects` array:
-
-```ts
-{
-  title: "My New Project",
-  description: "Short pitch of what it does and why it matters.",
-  techStack: ["React", "Node.js", "Postgres"],
-  githubUrl: "https://github.com/you/repo",  // or null
-  liveUrl: "https://example.com",            // or null
-  status: "live",                            // "live" | "in-progress" | "planned"
-  featured: true,
-}
+```bash
+# .env
+GITHUB_TOKEN=ghp_xxx
 ```
 
-That's it — the Projects section re-renders automatically.
+LeetCode and Codeforces APIs require no authentication.
 
-### Add a timeline entry
+---
 
-Open `src/data/experience.ts` and append to `timeline`. `type` can be
-`"education"`, `"experience"`, or `"achievement"`.
+## 📁 Project Structure
 
-### Replace placeholders
+```
+src/
+├── routes/              # File-based routing (TanStack Router)
+│   ├── __root.tsx       # Root layout, SEO metadata, theme bootstrap
+│   └── index.tsx        # Home page
+├── components/portfolio/ # Hero, About, Skills, Projects, Consistency, LiveStats, Contact, ...
+├── components/ui/       # shadcn/ui primitives
+├── lib/
+│   └── activity.functions.ts  # Server functions: GitHub / LeetCode / Codeforces
+├── data/
+│   ├── profile.ts       # Name, bio, handles, coding profiles (single source of truth)
+│   ├── projects.ts      # Project list
+│   ├── skills.ts        # Skills
+│   ├── experience.ts    # Experience timeline
+│   └── links.ts         # External links
+├── hooks/               # Reusable hooks (e.g. useResumeAvailable)
+└── styles.css           # Tailwind v4 + design tokens
+```
 
-Search the repo for `TODO:` — every placeholder (real email, repo URLs, resume
-PDF, stats, etc.) is marked with a comment so they're easy to find.
+---
 
-Drop `resume.pdf` into `/public` to wire up the Resume button.
+## ✏️ Customising
 
-## Deploy
+Most content lives in `src/data/`:
 
-Any static-friendly host works (Vercel, Netlify, Cloudflare Pages). Build with
-`npm run build` and serve the output.
+- **Profile / handles** → `src/data/profile.ts` (`profile.codingProfiles.github.username` is the single source of truth for GitHub URLs)
+- **Projects** → `src/data/projects.ts` (set `githubUrl` / `liveUrl` to `null` to hide that button)
+- **Skills** → `src/data/skills.ts`
+- **Experience** → `src/data/experience.ts`
+- **Resume** → drop `resume.pdf` into `public/`; the Resume button appears automatically.
+
+---
+
+## 📡 Live Integrations — How They Work
+
+All third-party calls run server-side via TanStack `createServerFn` to avoid CORS and to keep `GITHUB_TOKEN` out of the bundle.
+
+| Source     | Endpoint                                     | Auth      | Cached |
+|------------|----------------------------------------------|-----------|--------|
+| GitHub     | `https://api.github.com/graphql`             | Token     | 10 min |
+| LeetCode   | `https://leetcode.com/graphql` (public)      | None      | 10 min |
+| Codeforces | `https://codeforces.com/api/*` (with retry)  | None      | 10 min |
+
+Failures degrade gracefully:
+1. Loading skeleton
+2. Last successful cached value (TanStack Query `staleTime`)
+3. "Unavailable" — never an incorrect `0`
+
+---
+
+## 📫 Contact
+
+- **Email:** vivekpatnem@gmail.com
+- **LinkedIn:** https://www.linkedin.com/in/vivekpatnem/
+- **LeetCode:** https://leetcode.com/u/vivekpatnem
+- **Codeforces:** https://codeforces.com/profile/vivekpatnem
+
+---
+
+## 📄 License
+
+MIT © Vivek Patne
