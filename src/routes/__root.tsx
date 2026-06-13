@@ -77,34 +77,24 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Vivek Patne — CSE-DS Student & Aspiring SDE-1" },
-      {
-        name: "description",
-        content:
-          "Portfolio of Vivek Patne — 3rd-year CSE (Data Science) student at RNSIT Bengaluru. Live DSA stats, projects, and full-stack work.",
-      },
       { name: "author", content: "Vivek Patne" },
       { name: "theme-color", content: "#0a0a0a" },
-      { property: "og:title", content: "Vivek Patne — Aspiring SDE-1 Portfolio" },
-      {
-        property: "og:description",
-        content:
-          "CSE-DS student building full-stack apps. Live GitHub, LeetCode & Codeforces stats, featured projects, and contact.",
-      },
       { property: "og:type", content: "website" },
       { property: "og:site_name", content: "Vivek Patne" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:site", content: "@vm_patne" },
-      { name: "twitter:title", content: "Vivek Patne — Aspiring SDE-1 Portfolio" },
-      {
-        name: "twitter:description",
-        content:
-          "CSE-DS student building full-stack apps. Live coding stats, projects, and contact.",
-      },
     ],
-    links: [
-      { rel: "stylesheet", href: appCss },
-      { rel: "canonical", href: "https://vivekpatne.lovable.app/" },
+    links: [{ rel: "stylesheet", href: appCss }],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "WebSite",
+          name: "Vivek Patne — Portfolio",
+          url: "https://vivek-patne-portfolio.lovable.app/",
+        }),
+      },
     ],
   }),
   shellComponent: RootShell,
