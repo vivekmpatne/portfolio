@@ -1,63 +1,21 @@
 import { useMemo, useState } from "react";
 import { useQueries } from "@tanstack/react-query";
-import { Flame, Trophy, Calendar, Zap, ChevronDown } from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
+import { Flame, Trophy, Calendar, Zap, ChevronDown, AlertCircle } from "lucide-react";
 import { SiGithub, SiLeetcode, SiCodeforces, SiCodechef, SiGeeksforgeeks, SiHackerrank } from "react-icons/si";
 import { profile } from "@/data/profile";
 import { SectionHeader } from "./SectionHeader";
+import {
+  getGithubActivity,
+  getLeetcodeActivity,
+  getCodeforcesActivity,
+  type ActivityResult,
+} from "@/lib/activity.functions";
 
 // ----- Types -----
-type DayMap = Record<string, number>; // "YYYY-MM-DD" -> count
+type DayMap = Record<string, number>;
+const EMPTY: ActivityResult = { calendar: {}, meta: {} };
 
-// ----- Fetchers -----
-async function fetchJson<T>(url: string): Promise<T> {
-  const res = await fetch(url);
-  if (!res.ok) throw new Error(`HTTP ${res.status}`);
-  return res.json();
-}
-
-async function fetchGithub(user: string, year: number): Promise<DayMap> {
-  // Free public CORS-enabled GitHub contributions API
-  const data = await fetchJson<{ contributions: Array<{ date: string; count: number }> }>(
-    `https://github-contributions-api.jogruber.de/v4/${user}?y=${year}`,
-  );
-  const m: DayMap = {};
-  for (const d of data.contributions ?? []) m[d.date] = d.count;
-  return m;
-}
-
-async function fetchLeetcode(user: string, year: number): Promise<DayMap> {
-  const data = await fetchJson<{ submissionCalendar?: string | Record<string, number> }>(
-    `https://alfa-leetcode-api.onrender.com/userProfileCalendar?username=${user}&year=${year}`,
-  );
-  let cal: Record<string, number> = {};
-  if (typeof data.submissionCalendar === "string") {
-    try { cal = JSON.parse(data.submissionCalendar); } catch { cal = {}; }
-  } else if (data.submissionCalendar) {
-    cal = data.submissionCalendar;
-  }
-  const m: DayMap = {};
-  for (const [ts, count] of Object.entries(cal)) {
-    const d = new Date(Number(ts) * 1000);
-    if (d.getUTCFullYear() === year) {
-      m[d.toISOString().slice(0, 10)] = (m[d.toISOString().slice(0, 10)] ?? 0) + Number(count);
-    }
-  }
-  return m;
-}
-
-async function fetchCodeforces(user: string, year: number): Promise<DayMap> {
-  const data = await fetchJson<{ result?: Array<{ creationTimeSeconds: number; verdict: string }> }>(
-    `https://codeforces.com/api/user.status?handle=${user}`,
-  );
-  const m: DayMap = {};
-  for (const s of data.result ?? []) {
-    const d = new Date(s.creationTimeSeconds * 1000);
-    if (d.getFullYear() !== year) continue;
-    const key = d.toISOString().slice(0, 10);
-    m[key] = (m[key] ?? 0) + 1;
-  }
-  return m;
-}
 
 // ----- Aggregation -----
 function mergeMaps(maps: DayMap[]): DayMap {
