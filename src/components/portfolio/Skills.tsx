@@ -1,6 +1,6 @@
 import { Code2, Monitor, Server, Wrench, Brain, Terminal, type LucideIcon } from "lucide-react";
 import {
-  SiJavascript, SiPython, SiCplusplus, SiC, SiMysql,
+  SiJavascript, SiPython, SiCplusplus, SiMysql,
   SiReact, SiRedux, SiReactrouter, SiTailwindcss, SiHtml5, SiCss,
   SiNodedotjs, SiExpress, SiJsonwebtokens, SiMongodb, SiMongoose, SiRedis,
   SiGit, SiGithub, SiPostman, SiVercel, SiRailway, SiDocker, SiKubernetes, SiLinux,
