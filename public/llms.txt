@@ -1,0 +1,7 @@
+# Vivek Patne — Portfolio
+
+> Personal portfolio of Vivek Patne, a 3rd-year Computer Science & Engineering (Data Science) student at RNS Institute of Technology, Bengaluru. Showcases live coding activity (GitHub, LeetCode, Codeforces), featured full-stack projects, skills, and contact details.
+
+## Pages
+
+- [Home](/): Hero, about, live coding stats, consistency heatmap, achievements, skills, projects, experience, and contact in a single-page portfolio.

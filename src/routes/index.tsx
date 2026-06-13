@@ -12,19 +12,56 @@ import { Footer } from "@/components/portfolio/Footer";
 import { BackToTop } from "@/components/portfolio/BackToTop";
 import { profile } from "@/data/profile";
 
+const SITE_URL = "https://vivek-patne-portfolio.lovable.app";
+const TITLE = "Vivek Patne — Aspiring SDE-1 Portfolio";
+const DESCRIPTION =
+  "CSE-DS student at RNSIT Bengaluru. Live GitHub, LeetCode & Codeforces stats, featured full-stack projects, and contact.";
+
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: `${profile.name} — ${profile.tagline}` },
-      { name: "description", content: profile.bio },
-      { property: "og:title", content: `${profile.name} — Portfolio` },
-      { property: "og:description", content: profile.bio },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: `${profile.name} — Portfolio` },
-      { name: "twitter:description", content: profile.bio },
+      { title: TITLE },
+      { name: "description", content: DESCRIPTION },
+      { property: "og:title", content: TITLE },
+      { property: "og:description", content: DESCRIPTION },
+      { property: "og:url", content: `${SITE_URL}/` },
+      { name: "twitter:title", content: TITLE },
+      { name: "twitter:description", content: DESCRIPTION },
     ],
-    links: [{ rel: "canonical", href: "/" }],
+    links: [{ rel: "canonical", href: `${SITE_URL}/` }],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "Person",
+          name: profile.name,
+          jobTitle: "Software Engineering Student",
+          description: profile.bio,
+          url: `${SITE_URL}/`,
+          email: `mailto:${profile.email}`,
+          address: {
+            "@type": "PostalAddress",
+            addressLocality: "Bengaluru",
+            addressCountry: "IN",
+          },
+          alumniOf: {
+            "@type": "CollegeOrUniversity",
+            name: "RNS Institute of Technology, Bengaluru",
+          },
+          sameAs: [
+            profile.codingProfiles.github.url,
+            profile.codingProfiles.linkedin.url,
+            profile.codingProfiles.leetcode.url,
+            profile.codingProfiles.codeforces.url,
+            profile.codingProfiles.codechef.url,
+            profile.codingProfiles.gfg.url,
+            profile.codingProfiles.hackerrank.url,
+            profile.codingProfiles.atcoder.url,
+          ],
+        }),
+      },
+    ],
   }),
   component: Index,
 });
@@ -48,4 +85,3 @@ function Index() {
     </div>
   );
 }
-

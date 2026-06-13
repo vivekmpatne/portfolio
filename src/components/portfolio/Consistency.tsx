@@ -213,6 +213,7 @@ export function Consistency() {
             </div>
             <div className="relative">
               <select
+                aria-label="Select year"
                 value={year}
                 onChange={(e) => setYear(Number(e.target.value))}
                 className="appearance-none rounded-lg border border-border bg-background px-3 py-1.5 pr-8 text-sm font-medium shadow-card focus:outline-none focus:ring-2 focus:ring-foreground/20"

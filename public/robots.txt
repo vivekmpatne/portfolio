@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://vivek-patne-portfolio.lovable.app/sitemap.xml
