@@ -45,7 +45,7 @@ export function About() {
               key={p.name}
               href={p.url}
               target="_blank"
-              rel="noreferrer"
+              rel="noopener noreferrer"
               className="rounded-full border border-border bg-card px-4 py-1.5 text-sm text-foreground transition-colors hover:border-foreground/40 hover:bg-accent"
             >
               {p.name}

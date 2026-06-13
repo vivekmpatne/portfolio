@@ -22,7 +22,7 @@ export const projects: Project[] = [
     description:
       "Full-stack MERN consistency tracker with a 7-day target system — built for disciplined DSA prep from Tier-3 to SDE. Includes smart daily targets, rolling 14-day average ETA calculations, and progress analytics.",
     techStack: ["React", "Node.js", "Express", "MongoDB", "JWT", "Vercel"],
-    githubUrl: "https://github.com/vivekpatnem/dsa-tracker",
+    githubUrl: null,
     liveUrl: "https://tier3torise.vercel.app",
     status: "live",
     featured: true,

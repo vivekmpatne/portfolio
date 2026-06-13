@@ -1,9 +1,13 @@
 // ============================================================
 // LINKS DATA — All external profile URLs. Edit freely.
 // ============================================================
+// Single source of truth for GitHub username — keep in sync with
+// profile.codingProfiles.github.username (used by GraphQL integration).
+const GITHUB_USERNAME = "vivekmpatne";
+
 export const links = {
   // Social
-  github: "https://github.com/vivekpatnem",
+  github: `https://github.com/${GITHUB_USERNAME}`,
   linkedin: "https://www.linkedin.com/in/vivekpatnem/",
   x: "https://x.com/vm_patne",
   instagram: "https://instagram.com/vm_patne",
@@ -18,8 +22,8 @@ export const links = {
   hackerrank: "https://www.hackerrank.com/profile/vivekpatnem",
   atcoder: "https://atcoder.jp/users/vivekpatnem",
 
-  // TODO: replace once portfolio repo is created on GitHub
-  portfolioRepo: "https://github.com/vivekpatnem/portfolio",
+  // Portfolio repo — null until the repo is created (button is hidden).
+  portfolioRepo: null as string | null,
 };
 
 export const socialLinks = [
