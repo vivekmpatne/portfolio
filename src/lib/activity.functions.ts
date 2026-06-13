@@ -39,7 +39,7 @@ const codeforcesInput = makeSchema(ALLOWED_USERNAMES.codeforces);
 
 // ---------- GitHub ----------
 export const getGithubActivity = createServerFn({ method: "GET" })
-  .inputValidator((data: unknown) => usernameYear.parse(data))
+  .inputValidator((data: unknown) => githubInput.parse(data))
   .handler(async ({ data }): Promise<ActivityResult> => {
     const token = process.env.GITHUB_TOKEN;
     if (!token) return { calendar: {}, meta: {}, error: "GITHUB_TOKEN not set" };
@@ -96,7 +96,7 @@ export const getGithubActivity = createServerFn({ method: "GET" })
 
 // ---------- LeetCode ----------
 export const getLeetcodeActivity = createServerFn({ method: "GET" })
-  .inputValidator((data: unknown) => usernameYear.parse(data))
+  .inputValidator((data: unknown) => githubInput.parse(data))
   .handler(async ({ data }): Promise<ActivityResult> => {
     const query = `
       query userData($username: String!, $year: Int!) {
@@ -154,7 +154,7 @@ export const getLeetcodeActivity = createServerFn({ method: "GET" })
 
 // ---------- Codeforces ----------
 export const getCodeforcesActivity = createServerFn({ method: "GET" })
-  .inputValidator((data: unknown) => usernameYear.parse(data))
+  .inputValidator((data: unknown) => githubInput.parse(data))
   .handler(async ({ data }): Promise<ActivityResult> => {
     // Codeforces' public API often returns 5xx under load. Retry transient
     // failures with exponential backoff before surfacing as unavailable.
