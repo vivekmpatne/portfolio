@@ -4,6 +4,11 @@ import { profile } from "@/data/profile";
 import { SocialIcons } from "./SocialIcons";
 
 export function Hero() {
+  const initials = profile.name
+    .split(" ")
+    .map((n) => n[0])
+    .join("");
+
   return (
     <section id="home" className="mx-auto max-w-6xl px-6 pt-20 pb-24 md:pt-28 md:pb-32">
       <div className="grid items-center gap-12 md:grid-cols-[1fr_auto]">
@@ -33,7 +38,7 @@ export function Hero() {
               </a>
             </Button>
             <Button asChild variant="outline">
-              <a href={profile.resumeUrl} target="_blank" rel="noreferrer">
+              <a href={profile.resumeUrl} target="_blank" rel="noreferrer" download>
                 <FileText className="mr-1 h-4 w-4" /> Resume
               </a>
             </Button>
@@ -49,15 +54,47 @@ export function Hero() {
           </div>
         </div>
 
-        {/* Avatar */}
+        {/* Premium gradient avatar */}
         <div className="hidden md:block">
-          <div className="relative h-56 w-56 overflow-hidden rounded-2xl border border-border bg-secondary">
-            {/* TODO: replace placeholder with actual photo in /public */}
-            <div className="flex h-full w-full items-center justify-center font-display text-6xl text-muted-foreground">
-              {profile.name
-                .split(" ")
-                .map((n) => n[0])
-                .join("")}
+          <div className="relative">
+            <div
+              className="absolute -inset-3 rounded-full opacity-60 blur-2xl"
+              style={{
+                background:
+                  "conic-gradient(from 180deg at 50% 50%, #6366f1, #8b5cf6, #ec4899, #f97316, #6366f1)",
+              }}
+            />
+            <div className="relative h-56 w-56 rounded-full p-[2px]"
+              style={{
+                background:
+                  "linear-gradient(135deg, #6366f1, #8b5cf6, #ec4899)",
+              }}
+            >
+              <div className="flex h-full w-full items-center justify-center overflow-hidden rounded-full bg-card">
+                {profile.avatar && profile.avatar !== "/placeholder-avatar.png" ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={profile.avatar}
+                    alt={profile.name}
+                    className="h-full w-full object-cover"
+                    onError={(e) => {
+                      (e.currentTarget as HTMLImageElement).style.display = "none";
+                    }}
+                  />
+                ) : (
+                  <span
+                    className="font-display text-6xl font-semibold"
+                    style={{
+                      background:
+                        "linear-gradient(135deg, #6366f1, #8b5cf6, #ec4899)",
+                      WebkitBackgroundClip: "text",
+                      WebkitTextFillColor: "transparent",
+                    }}
+                  >
+                    {initials}
+                  </span>
+                )}
+              </div>
             </div>
           </div>
         </div>
