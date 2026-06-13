@@ -55,7 +55,7 @@ export const getGithubActivity = createServerFn({ method: "GET" })
         },
         body: JSON.stringify({ query, variables: { login: data.username, from, to } }),
       });
-      if (!res.ok) return { calendar: {}, meta: {}, error: `GitHub ${res.status}` };
+      if (!res.ok) return { calendar: {}, meta: {}, error: `GitHub temporarily unavailable` };
       const json: any = await res.json();
       const user = json?.data?.user;
       if (!user) return { calendar: {}, meta: {}, error: "GitHub user not found" };
@@ -101,7 +101,7 @@ export const getLeetcodeActivity = createServerFn({ method: "GET" })
         },
         body: JSON.stringify({ query, variables: { username: data.username, year: data.year } }),
       });
-      if (!res.ok) return { calendar: {}, meta: {}, error: `LeetCode ${res.status}` };
+      if (!res.ok) return { calendar: {}, meta: {}, error: `LeetCode temporarily unavailable` };
       const json: any = await res.json();
       const user = json?.data?.matchedUser;
       if (!user) return { calendar: {}, meta: {}, error: "LeetCode user not found" };
