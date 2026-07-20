@@ -3,7 +3,7 @@ import portraitAsset from "@/assets/vivek-portrait.png.asset.json";
 
 // Density ramp: dim → dense. Mixes digits/letters so the portrait
 // still reads as "code" but has real tonal range.
-const RAMP = " .,:-=+*x#%@$█".split("");
+const RAMP = " .`'-:_,^=;><+!rc*/z?sLTv)J7(|Fi{C}fI31tlu[neoZ5Yxjya]2ESwqkP6h9d4VpOGbUAKXHm8RD#$Bg0MNWQ%&@".split("");
 // Character pool used to pick the specific glyph within a density bucket
 const POOL = "01vivekpatne{}<>/#*+=%".split("");
 
@@ -16,7 +16,7 @@ type Props = {
  * Renders the portrait as a phosphor ASCII art field.
  * Sampled client-side from a canvas so it stays crisp on any DPI.
  */
-export function AsciiPortrait({ width = 78, className = "" }: Props) {
+export function AsciiPortrait({ width = 96, className = "" }: Props) {
   const [rows, setRows] = useState<Array<Array<{ ch: string; a: number }>>>([]);
   const rafRef = useRef<number | null>(null);
   const [tick, setTick] = useState(0);
@@ -29,12 +29,14 @@ export function AsciiPortrait({ width = 78, className = "" }: Props) {
       const aspect = img.height / img.width;
       const cols = width;
       // Characters are ~2x taller than wide → compensate
-      const rowsN = Math.round(cols * aspect * 0.55);
+      const rowsN = Math.round(cols * aspect * 0.5);
       const canvas = document.createElement("canvas");
       canvas.width = cols;
       canvas.height = rowsN;
       const ctx = canvas.getContext("2d");
       if (!ctx) return;
+      // Slight contrast boost via filter
+      ctx.filter = "contrast(125%) brightness(98%)";
       ctx.drawImage(img, 0, 0, cols, rowsN);
       const data = ctx.getImageData(0, 0, cols, rowsN).data;
       const out: Array<Array<{ ch: string; a: number }>> = [];
@@ -45,28 +47,26 @@ export function AsciiPortrait({ width = 78, className = "" }: Props) {
           const r = data[i], g = data[i + 1], b = data[i + 2];
           const lum = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
           // Invert: dark parts of face = bright chars
-          const inv = 1 - lum;
-          // Blank near-white background
-          if (lum > 0.96) {
+          let inv = 1 - lum;
+          // Gamma to lift mid/dark tones (more definition in hair/face)
+          inv = Math.pow(inv, 0.72);
+          // Blank near-white background only
+          if (lum > 0.97) {
             row.push({ ch: " ", a: 0 });
             continue;
           }
-          // Density bucket → char
           const dIdx = Math.min(
             RAMP.length - 1,
             Math.floor(inv * RAMP.length),
           );
           const densityCh = RAMP[dIdx];
-          // For mid tones use pool chars so it feels like source code,
-          // for very dark regions keep dense glyphs for definition.
           let ch: string;
-          if (inv < 0.35) {
+          if (inv < 0.28) {
             ch = POOL[(x * 7 + y * 13) % POOL.length];
           } else {
             ch = densityCh;
           }
-          // Opacity floor 0.55 so faint chars stay visible on dark bg
-          const a = Math.min(1, 0.55 + inv * 0.75);
+          const a = Math.min(1, 0.62 + inv * 0.7);
           row.push({ ch, a });
         }
         out.push(row);
