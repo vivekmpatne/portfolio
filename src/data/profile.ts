@@ -45,7 +45,7 @@ export const profile = {
     linkedin:    { username: "vivekpatnem",  url: "https://www.linkedin.com/in/vivekpatnem/" },
     leetcode:    { username: "vivekpatnem",  url: "https://leetcode.com/u/vivekpatnem/" },
     codeforces:  { username: "vivekpatnem",  url: "https://codeforces.com/profile/vivekpatnem" },
-    codechef:    { username: "viv9ekpatnem", url: "https://www.codechef.com/users/viv9ekpatnem" },
+    codechef:    { username: "vivekpatnem",  url: "https://www.codechef.com/users/vivekpatnem" },
     gfg:         { username: "vivekpcom8",   url: "https://www.geeksforgeeks.org/user/vivekpcom8" },
     hackerrank:  { username: "vivekpatnem",  url: "https://www.hackerrank.com/profile/vivekpatnem" },
     atcoder:     { username: "vivekpatnem",  url: "https://atcoder.jp/users/vivekpatnem" },
