@@ -17,7 +17,7 @@ export const links = {
   // Coding profiles
   leetcode: "https://leetcode.com/u/vivekpatnem",
   codeforces: "https://codeforces.com/profile/vivekpatnem",
-  codechef: "https://www.codechef.com/users/viv9ekpatnem",
+  codechef: "https://www.codechef.com/users/vivekpatnem",
   gfg: "https://www.geeksforgeeks.org/user/vivekpcom8",
   hackerrank: "https://www.hackerrank.com/profile/vivekpatnem",
   atcoder: "https://atcoder.jp/users/vivekpatnem",
