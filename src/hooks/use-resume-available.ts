@@ -15,6 +15,11 @@ export function useResumeAvailable(): boolean | null {
       setAvailable(false);
       return;
     }
+    // External links (Google Drive, etc.) are assumed valid; skip HEAD probe.
+    if (/^https?:\/\//i.test(url)) {
+      setAvailable(true);
+      return;
+    }
     fetch(url, { method: "HEAD" })
       .then((r) => {
         if (cancelled) return;
