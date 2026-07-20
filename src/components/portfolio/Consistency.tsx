@@ -284,6 +284,7 @@ export function Consistency() {
                     const cfC = cf.calendar[date] ?? 0;
                     const ccC = cc.calendar[date] ?? 0;
                     const hrC = hr.calendar[date] ?? 0;
+                    const ggC = gg.calendar[date] ?? 0;
                     const parts = [
                       `${date} — ${count} ${count === 1 ? "contribution" : "contributions"}`,
                       ghC ? `GitHub: ${ghC}` : null,
@@ -291,6 +292,7 @@ export function Consistency() {
                       cfC ? `Codeforces: ${cfC}` : null,
                       ccC ? `CodeChef: ${ccC}` : null,
                       hrC ? `HackerRank: ${hrC}` : null,
+                      ggC ? `GeeksforGeeks: ${ggC}` : null,
                     ].filter(Boolean);
                     return (
                       <div
