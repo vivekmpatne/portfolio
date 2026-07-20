@@ -308,7 +308,7 @@ export function Consistency() {
           {SOURCES.map((s) => {
             const Icon = s.icon;
             const count = sourceCounts[s.key] ?? 0;
-            const tracked = ["github", "leetcode", "codeforces"].includes(s.key);
+            const tracked = ["github", "leetcode", "codeforces", "codechef", "hackerrank"].includes(s.key);
             return (
               <div
                 key={s.key}
