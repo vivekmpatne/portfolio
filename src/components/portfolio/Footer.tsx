@@ -33,17 +33,17 @@ export function Footer() {
           </span>
           <span className="opacity-40">|</span>
           <span><span className="opacity-60">host</span> <span className="text-foreground/85">vivek.os</span></span>
-          <span className="opacity-40">|</span>
-          <span><span className="opacity-60">shell</span> <span className="text-foreground/85">bash-6.2</span></span>
-          <span className="opacity-40">|</span>
-          <span><span className="opacity-60">uptime</span> <span className="text-foreground/85">graduating 2028</span></span>
-          <span className="ml-auto hidden opacity-70 md:inline">press <kbd className="border border-[var(--phosphor)]/40 px-1">`</kbd> to open shell</span>
+          <span className="opacity-40 hidden sm:inline">|</span>
+          <span className="hidden sm:inline"><span className="opacity-60">shell</span> <span className="text-foreground/85">bash-6.2</span></span>
+          <span className="opacity-40 hidden md:inline">|</span>
+          <span className="hidden md:inline"><span className="opacity-60">uptime</span> <span className="text-foreground/85">graduating 2028</span></span>
+          <span className="ml-auto hidden opacity-70 lg:inline">press <kbd className="border border-[var(--phosphor)]/40 px-1">`</kbd> to open shell</span>
         </div>
       </div>
 
-      <div className="mx-auto max-w-6xl px-6 py-12">
+      <div className="mx-auto max-w-6xl px-6 py-10">
         {/* Prompt heading */}
-        <div className="mb-8 text-[12px] text-muted-foreground">
+        <div className="mb-6 text-[12px] text-muted-foreground">
           <span className="phosphor-glow">guest@vivek</span>
           <span className="opacity-60">:</span>
           <span className="opacity-70">~/portfolio</span>
@@ -51,31 +51,29 @@ export function Footer() {
           <span className="text-foreground/90">tree --footer</span>
         </div>
 
-        <div className="grid gap-8 md:grid-cols-4">
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-[1.15fr_1fr_1fr_1.2fr]">
           {/* Identity block */}
-          <div className="md:col-span-1">
-            <div className="border border-[var(--phosphor)]/40 bg-background/50 p-4">
-              <div className="flex items-center gap-2 border-b border-[var(--phosphor)]/25 pb-2 text-[10px] uppercase tracking-widest text-muted-foreground">
-                <span className="h-2 w-2 bg-[var(--phosphor)] shadow-[0_0_6px_var(--phosphor)]" />
-                <span>whoami.log</span>
-              </div>
-              <div className="mt-3 font-display text-xl text-foreground">
-                <span className="phosphor-glow">&gt;</span> {profile.name}
-              </div>
-              <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
-                <span className="phosphor-glow">// </span>
-                Building toward Software Engineer.
-              </p>
-              <div className="mt-3 flex flex-wrap gap-1 text-[10px]">
-                <span className="border border-[var(--phosphor)]/40 px-1.5 py-0.5 text-[var(--phosphor)]">CSE-DS</span>
-                <span className="border border-[var(--phosphor)]/40 px-1.5 py-0.5 text-[var(--phosphor)]">RNSIT</span>
-                <span className="border border-[var(--phosphor)]/40 px-1.5 py-0.5 text-[var(--phosphor)]">2024→28</span>
-              </div>
+          <div className="border border-[var(--phosphor)]/40 bg-background/50 p-4">
+            <div className="flex items-center gap-2 border-b border-[var(--phosphor)]/25 pb-2 text-[10px] uppercase tracking-widest text-muted-foreground">
+              <span className="h-2 w-2 bg-[var(--phosphor)] shadow-[0_0_6px_var(--phosphor)]" />
+              <span>whoami.log</span>
+            </div>
+            <div className="mt-3 font-display text-xl text-foreground">
+              <span className="phosphor-glow">&gt;</span> {profile.name}
+            </div>
+            <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
+              <span className="phosphor-glow">// </span>
+              Building toward Software Engineer.
+            </p>
+            <div className="mt-3 flex flex-wrap gap-1 text-[10px]">
+              <span className="border border-[var(--phosphor)]/40 px-1.5 py-0.5 text-[var(--phosphor)]">CSE-DS</span>
+              <span className="border border-[var(--phosphor)]/40 px-1.5 py-0.5 text-[var(--phosphor)]">RNSIT</span>
+              <span className="border border-[var(--phosphor)]/40 px-1.5 py-0.5 text-[var(--phosphor)]">2024→28</span>
             </div>
           </div>
 
           {/* nav */}
-          <div>
+          <div className="min-w-0">
             <FooterColHeader label="./nav" />
             <ul className="mt-3 space-y-1.5 text-[13px]">
               {quickLinks.map((l) => (
@@ -93,7 +91,7 @@ export function Footer() {
           </div>
 
           {/* connect */}
-          <div>
+          <div className="min-w-0">
             <FooterColHeader label="./connect" />
             <ul className="mt-3 space-y-1.5 text-[13px]">
               {connectLinks.map((l) => (
@@ -105,7 +103,7 @@ export function Footer() {
                     className="group flex items-center gap-2 text-foreground/80 transition-colors hover:text-[var(--phosphor)]"
                   >
                     <span className="text-[var(--phosphor)] opacity-40 group-hover:opacity-100">$</span>
-                    <span className="group-hover:underline">open {l.name}</span>
+                    <span className="truncate group-hover:underline">open {l.name}</span>
                   </a>
                 </li>
               ))}
@@ -113,7 +111,7 @@ export function Footer() {
           </div>
 
           {/* contact */}
-          <div>
+          <div className="min-w-0">
             <FooterColHeader label="./contact" />
             <ul className="mt-3 space-y-2 text-[12px]">
               <li className="flex items-start gap-2">
@@ -137,12 +135,12 @@ export function Footer() {
         </div>
 
         {/* Marquee ticker */}
-        <div className="mt-10 overflow-hidden border border-[var(--phosphor)]/30 bg-background/60">
-          <div className="flex gap-8 whitespace-nowrap py-2 text-[11px] text-muted-foreground [animation:footer-ticker_35s_linear_infinite]">
+        <div className="mt-8 overflow-hidden border border-[var(--phosphor)]/30 bg-background/60">
+          <div className="flex w-max gap-8 whitespace-nowrap py-2 text-[11px] text-muted-foreground [animation:footer-ticker_40s_linear_infinite]">
             {Array.from({ length: 2 }).map((_, i) => (
-              <span key={i} className="flex shrink-0 items-center gap-8 pl-8">
+              <div key={i} className="flex shrink-0 items-center gap-8 pl-8">
                 <span><span className="text-[var(--phosphor)]">$</span> git log --oneline</span>
-                <span className="opacity-70">e4a1b · feat: shipped consistency v3</span>
+                <span className="opacity-70">e4a1b · feat: consistency v3</span>
                 <span className="opacity-40">•</span>
                 <span className="opacity-70">c9f22 · perf: ascii portrait sampler</span>
                 <span className="opacity-40">•</span>
@@ -152,8 +150,7 @@ export function Footer() {
                 <span className="opacity-40">•</span>
                 <span><span className="text-[var(--phosphor)]">$</span> uptime →</span>
                 <span className="opacity-70">graduating 2028 · open_to_work=true</span>
-                <span className="opacity-40">•</span>
-              </span>
+              </div>
             ))}
           </div>
         </div>
