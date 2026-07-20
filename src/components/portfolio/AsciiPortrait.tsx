@@ -1,9 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import portraitAsset from "@/assets/vivek-portrait.png.asset.json";
 
-// Density ramp: dark → light
-const RAMP = "01".split("");
-const RAMP2 = "10.:-=+*#%@01vivekpatne".split("");
+// Density ramp: dim → dense. Mixes digits/letters so the portrait
+// still reads as "code" but has real tonal range.
+const RAMP = " .,:-=+*x#%@$█".split("");
+// Character pool used to pick the specific glyph within a density bucket
+const POOL = "01vivekpatne{}<>/#*+=%".split("");
 
 type Props = {
   width?: number; // number of chars across
@@ -14,7 +16,7 @@ type Props = {
  * Renders the portrait as a phosphor ASCII art field.
  * Sampled client-side from a canvas so it stays crisp on any DPI.
  */
-export function AsciiPortrait({ width = 72, className = "" }: Props) {
+export function AsciiPortrait({ width = 78, className = "" }: Props) {
   const [rows, setRows] = useState<Array<Array<{ ch: string; a: number }>>>([]);
   const rafRef = useRef<number | null>(null);
   const [tick, setTick] = useState(0);
@@ -25,8 +27,8 @@ export function AsciiPortrait({ width = 72, className = "" }: Props) {
     img.src = portraitAsset.url;
     img.onload = () => {
       const aspect = img.height / img.width;
-      // Characters are ~2x taller than wide → compensate
       const cols = width;
+      // Characters are ~2x taller than wide → compensate
       const rowsN = Math.round(cols * aspect * 0.55);
       const canvas = document.createElement("canvas");
       canvas.width = cols;
@@ -41,21 +43,31 @@ export function AsciiPortrait({ width = 72, className = "" }: Props) {
         for (let x = 0; x < cols; x++) {
           const i = (y * cols + x) * 4;
           const r = data[i], g = data[i + 1], b = data[i + 2];
-          // luminance
           const lum = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
           // Invert: dark parts of face = bright chars
           const inv = 1 - lum;
-          // Threshold near-white background to blank
-          if (lum > 0.94) {
+          // Blank near-white background
+          if (lum > 0.96) {
             row.push({ ch: " ", a: 0 });
             continue;
           }
-          const rampIdx = Math.min(
-            RAMP2.length - 1,
-            Math.floor(inv * RAMP2.length),
+          // Density bucket → char
+          const dIdx = Math.min(
+            RAMP.length - 1,
+            Math.floor(inv * RAMP.length),
           );
-          const ch = RAMP2[rampIdx];
-          row.push({ ch, a: Math.min(1, 0.35 + inv * 0.9) });
+          const densityCh = RAMP[dIdx];
+          // For mid tones use pool chars so it feels like source code,
+          // for very dark regions keep dense glyphs for definition.
+          let ch: string;
+          if (inv < 0.35) {
+            ch = POOL[(x * 7 + y * 13) % POOL.length];
+          } else {
+            ch = densityCh;
+          }
+          // Opacity floor 0.55 so faint chars stay visible on dark bg
+          const a = Math.min(1, 0.55 + inv * 0.75);
+          row.push({ ch, a });
         }
         out.push(row);
       }
@@ -63,12 +75,12 @@ export function AsciiPortrait({ width = 72, className = "" }: Props) {
     };
   }, [width]);
 
-  // Gentle scanline sweep
+  // Slow scanning highlight row
   useEffect(() => {
     let last = 0;
     const loop = (t: number) => {
-      if (t - last > 90) {
-        setTick((v) => (v + 1) % 10000);
+      if (t - last > 120) {
+        setTick((v) => v + 1);
         last = t;
       }
       rafRef.current = requestAnimationFrame(loop);
@@ -79,48 +91,39 @@ export function AsciiPortrait({ width = 72, className = "" }: Props) {
     };
   }, []);
 
+  const scanRow = rows.length ? tick % (rows.length + 20) : 0;
+
   return (
     <div
-      className={`relative select-none font-mono leading-[0.85] tracking-[0.05em] text-[9px] sm:text-[10px] md:text-[11px] ${className}`}
+      className={`relative select-none font-mono leading-[0.9] tracking-[0.02em] text-[10px] sm:text-[11px] md:text-[12px] ${className}`}
       aria-label="ASCII portrait of Vivek Patne"
       role="img"
     >
       <pre className="m-0 whitespace-pre">
-        {rows.map((row, y) => (
-          <div key={y} className="flex">
-            {row.map((c, x) => {
-              // Subtle horizontal shimmer following tick
-              const shimmer = (x + y * 2 + tick) % 47 === 0 ? "0" : c.ch;
-              return (
+        {rows.map((row, y) => {
+          const highlighted = y === scanRow;
+          return (
+            <div key={y} className="flex">
+              {row.map((c, x) => (
                 <span
                   key={x}
                   style={{
                     color: "var(--phosphor)",
-                    opacity: c.a,
+                    opacity: highlighted && c.a > 0 ? Math.min(1, c.a + 0.25) : c.a,
                     textShadow:
-                      c.a > 0.7
-                        ? "0 0 6px color-mix(in oklab, var(--phosphor) 55%, transparent)"
+                      c.a > 0.65
+                        ? "0 0 4px color-mix(in oklab, var(--phosphor) 65%, transparent)"
                         : undefined,
+                    fontWeight: c.a > 0.85 ? 700 : 400,
                   }}
                 >
-                  {shimmer}
+                  {c.ch}
                 </span>
-              );
-            })}
-          </div>
-        ))}
+              ))}
+            </div>
+          );
+        })}
       </pre>
-      {/* Scan overlay */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0"
-        style={{
-          background:
-            "repeating-linear-gradient(to bottom, transparent 0 2px, color-mix(in oklab, var(--phosphor) 10%, transparent) 2px 3px)",
-          mixBlendMode: "overlay",
-          opacity: 0.35,
-        }}
-      />
       {/* Corner brackets */}
       <span className="pointer-events-none absolute -left-2 -top-2 h-3 w-3 border-l border-t border-[var(--phosphor)]" />
       <span className="pointer-events-none absolute -right-2 -top-2 h-3 w-3 border-r border-t border-[var(--phosphor)]" />
@@ -129,3 +132,4 @@ export function AsciiPortrait({ width = 72, className = "" }: Props) {
     </div>
   );
 }
+
