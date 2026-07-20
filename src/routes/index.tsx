@@ -14,9 +14,10 @@ import { TerminalOverlay } from "@/components/portfolio/TerminalOverlay";
 import { profile } from "@/data/profile";
 
 const SITE_URL = "https://vivek-patne-portfolio.lovable.app";
-const TITLE = "Vivek Patne — Aspiring Software Engineer Portfolio";
+const TITLE = "Vivek Patne — CSE-DS · Aspiring Software Engineer · Building in Public";
 const DESCRIPTION =
-  "CSE-DS student at RNSIT Bengaluru. Live GitHub, LeetCode & Codeforces stats, featured full-stack projects, and contact.";
+  "Vivek Patne — CSE-DS student at RNSIT Bengaluru. Live GitHub, LeetCode & Codeforces stats, featured full-stack projects, and contact.";
+
 
 export const Route = createFileRoute("/")({
   head: () => ({
