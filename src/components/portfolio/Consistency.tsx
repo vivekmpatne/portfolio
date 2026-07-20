@@ -326,7 +326,7 @@ export function Consistency() {
           })}
         </div>
         <p className="mt-3 text-xs text-muted-foreground">
-          CodeChef, GeeksforGeeks, and HackerRank don't expose public activity APIs — profiles are linked above.
+          GeeksforGeeks doesn't publish a per-day activity feed — profile is linked above.
         </p>
       </div>
     </section>
