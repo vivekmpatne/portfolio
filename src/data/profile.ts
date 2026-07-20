@@ -19,12 +19,12 @@ export const profile = {
   // functions and show "Unavailable" on failure — they never fall back
   // to hardcoded numbers.
   stats: {
-    problemsSolved: 334,
+    problemsSolved: 500,
     linkedinConnections: 5000,
   },
   openTo: [
     "Software Engineering Internships",
-    "SDE-1 Opportunities",
+    "Software Engineer Opportunities",
     "Full Stack Development Roles",
     "Open Source Collaboration",
   ],
