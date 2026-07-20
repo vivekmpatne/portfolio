@@ -6,7 +6,7 @@ import { SocialIcons } from "./SocialIcons";
 import { useResumeAvailable } from "@/hooks/use-resume-available";
 
 const ROLES = [
-  "Aspiring SDE-1",
+  "Aspiring Software Engineer",
   "Full-Stack Engineer",
   "DSA Grinder",
   "Building in Public",
