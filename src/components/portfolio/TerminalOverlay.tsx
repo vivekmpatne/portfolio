@@ -160,7 +160,7 @@ export function TerminalOverlay() {
         <button
           type="button"
           onClick={() => setOpen(true)}
-          className="fixed bottom-4 right-4 z-40 flex items-center gap-2 border border-[var(--phosphor)]/60 bg-background/90 px-3 py-2 font-mono text-xs uppercase tracking-widest text-[var(--phosphor)] backdrop-blur-sm transition-all hover:bg-[var(--phosphor)]/10 hover:shadow-[0_0_20px_-4px_var(--phosphor)]"
+          className="fixed bottom-16 right-4 z-40 flex items-center gap-2 border border-[var(--phosphor)]/60 bg-background/90 px-3 py-2 font-mono text-xs uppercase tracking-widest text-[var(--phosphor)] backdrop-blur-sm transition-all hover:bg-[var(--phosphor)]/10 hover:shadow-[0_0_20px_-4px_var(--phosphor)]"
           aria-label="Open interactive shell"
         >
           <ShellIcon className="h-3.5 w-3.5" />
