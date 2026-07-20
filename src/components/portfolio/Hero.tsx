@@ -28,9 +28,7 @@ export function Hero() {
           <p className="mt-4 text-lg text-muted-foreground md:text-xl">
             {profile.tagline}
           </p>
-          <p className="mt-6 max-w-xl text-base leading-relaxed text-muted-foreground">
-            {profile.bio}
-          </p>
+          {/* Full bio lives in the About section — kept as single source to avoid duplication. */}
           <div className="mt-5 flex items-center gap-2 text-sm text-muted-foreground">
             <MapPin className="h-4 w-4" />
             {profile.location}
