@@ -82,8 +82,10 @@ export function TerminalOverlay() {
     const draw = () => {
       ctx.clearRect(0, 0, width, height);
       ctx.font = `12px "JetBrains Mono", monospace`;
+      const isDark = document.documentElement.classList.contains("dark");
+      const rgb = isDark ? "120, 255, 170" : "40, 120, 70";
       for (const p of particles) {
-        ctx.fillStyle = `rgba(120, 255, 170, ${p.a})`;
+        ctx.fillStyle = `rgba(${rgb}, ${p.a})`;
         ctx.fillText(p.c, p.x, p.y);
         p.y -= p.v;
         if (p.y < -12) {
