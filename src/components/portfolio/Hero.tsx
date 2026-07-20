@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button";
 import { profile } from "@/data/profile";
 import { SocialIcons } from "./SocialIcons";
 import { useResumeAvailable } from "@/hooks/use-resume-available";
+import { AsciiPortrait } from "./AsciiPortrait";
+
 
 const ROLES = [
   "Aspiring Software Engineer",
