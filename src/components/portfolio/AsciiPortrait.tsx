@@ -93,42 +93,49 @@ export function AsciiPortrait({ width = 78, className = "" }: Props) {
 
   const scanRow = rows.length ? tick % (rows.length + 20) : 0;
 
+  // Auto-fit: each mono char ~0.6em wide → font-size = 100% / (cols * 0.6) of container
+  const fontSize = `calc((100cqi) / ${width} / 0.6)`;
   return (
     <div
-      className={`relative select-none font-mono leading-[0.9] tracking-[0.02em] text-[10px] sm:text-[11px] md:text-[12px] ${className}`}
+      className={`@container relative w-full select-none font-mono leading-[0.9] tracking-[0.01em] ${className}`}
+      style={{ containerType: "inline-size" }}
       aria-label="ASCII portrait of Vivek Patne"
       role="img"
     >
-      <pre className="m-0 whitespace-pre">
+      <pre className="m-0 w-full overflow-hidden whitespace-pre" style={{ fontSize }}>
         {rows.map((row, y) => {
           const highlighted = y === scanRow;
           return (
             <div key={y} className="flex">
-              {row.map((c, x) => (
-                <span
-                  key={x}
-                  style={{
-                    color: "var(--phosphor)",
-                    opacity: highlighted && c.a > 0 ? Math.min(1, c.a + 0.25) : c.a,
-                    textShadow:
-                      c.a > 0.65
-                        ? "0 0 4px color-mix(in oklab, var(--phosphor) 65%, transparent)"
-                        : undefined,
-                    fontWeight: c.a > 0.85 ? 700 : 400,
-                  }}
-                >
-                  {c.ch}
-                </span>
-              ))}
+              {row.map((c, x) => {
+                const base = c.a === 0 ? 0 : Math.max(0.7, c.a);
+                const op = highlighted && c.a > 0 ? Math.min(1, base + 0.2) : base;
+                return (
+                  <span
+                    key={x}
+                    style={{
+                      color: "var(--phosphor)",
+                      opacity: op,
+                      textShadow:
+                        c.a > 0.6
+                          ? "0 0 3px color-mix(in oklab, var(--phosphor) 75%, transparent)"
+                          : undefined,
+                      fontWeight: c.a > 0.8 ? 700 : 500,
+                    }}
+                  >
+                    {c.ch}
+                  </span>
+                );
+              })}
             </div>
           );
         })}
       </pre>
       {/* Corner brackets */}
-      <span className="pointer-events-none absolute -left-2 -top-2 h-3 w-3 border-l border-t border-[var(--phosphor)]" />
-      <span className="pointer-events-none absolute -right-2 -top-2 h-3 w-3 border-r border-t border-[var(--phosphor)]" />
-      <span className="pointer-events-none absolute -bottom-2 -left-2 h-3 w-3 border-b border-l border-[var(--phosphor)]" />
-      <span className="pointer-events-none absolute -bottom-2 -right-2 h-3 w-3 border-b border-r border-[var(--phosphor)]" />
+      <span className="pointer-events-none absolute -left-1.5 -top-1.5 h-2.5 w-2.5 border-l border-t border-[var(--phosphor)]" />
+      <span className="pointer-events-none absolute -right-1.5 -top-1.5 h-2.5 w-2.5 border-r border-t border-[var(--phosphor)]" />
+      <span className="pointer-events-none absolute -bottom-1.5 -left-1.5 h-2.5 w-2.5 border-b border-l border-[var(--phosphor)]" />
+      <span className="pointer-events-none absolute -bottom-1.5 -right-1.5 h-2.5 w-2.5 border-b border-r border-[var(--phosphor)]" />
     </div>
   );
 }

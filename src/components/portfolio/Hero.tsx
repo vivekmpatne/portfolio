@@ -161,14 +161,14 @@ export function Hero() {
         </div>
 
         {/* ASCII portrait column */}
-        <div className="relative mx-auto w-full max-w-[380px] md:mx-0 md:w-[320px] lg:w-[380px]">
+        <div className="relative mx-auto w-full max-w-[360px] md:mx-0 md:w-[300px] lg:w-[360px]">
           <div className="mb-2 flex items-center justify-between font-mono text-[10px] text-muted-foreground">
             <span><span className="phosphor-glow">$</span> cat ./me.ascii</span>
-            <span className="opacity-60">72 × ∞ · phosphor</span>
+            <span className="opacity-60">64 × ∞ · phosphor</span>
           </div>
-          <div className="relative border border-[var(--phosphor)]/40 bg-background/60 p-3 shadow-card">
-            <AsciiPortrait width={72} />
-            <div className="mt-2 flex items-center justify-between border-t border-[var(--phosphor)]/25 pt-2 font-mono text-[10px] text-muted-foreground">
+          <div className="relative overflow-hidden border border-[var(--phosphor)]/50 bg-[color-mix(in_oklab,var(--phosphor)_6%,var(--background))] p-3 shadow-card">
+            <AsciiPortrait width={64} />
+            <div className="mt-2 flex items-center justify-between border-t border-[var(--phosphor)]/30 pt-2 font-mono text-[10px] text-muted-foreground">
               <span>vivek@patne</span>
               <span className="phosphor-glow">[ ONLINE ]</span>
             </div>
