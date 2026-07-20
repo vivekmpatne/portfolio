@@ -25,6 +25,7 @@ const ALLOWED_USERNAMES = {
   codeforces: new Set(["vivekpatnem"]),
   codechef: new Set(["vivekpatnem"]),
   hackerrank: new Set(["vivekpatnem"]),
+  gfg: new Set(["vivekpcom8"]),
 } as const;
 
 const makeSchema = (allowed: ReadonlySet<string>) =>
@@ -40,6 +41,7 @@ const leetcodeInput = makeSchema(ALLOWED_USERNAMES.leetcode);
 const codeforcesInput = makeSchema(ALLOWED_USERNAMES.codeforces);
 const codechefInput = makeSchema(ALLOWED_USERNAMES.codechef);
 const hackerrankInput = makeSchema(ALLOWED_USERNAMES.hackerrank);
+const gfgInput = makeSchema(ALLOWED_USERNAMES.gfg);
 
 // ---------- GitHub ----------
 export const getGithubActivity = createServerFn({ method: "GET" })
