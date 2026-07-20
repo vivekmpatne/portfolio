@@ -7,7 +7,7 @@ import avatarAsset from "@/assets/vivek-patne.jpeg.asset.json";
 export const profile = {
   name: "Vivek Patne",
   tagline: "CSE-DS Student | Aspiring SDE-1 | Building in Public",
-  bio: "3rd-year Computer Science & Engineering (Data Science) student at RNS Institute of Technology, Bengaluru. Focused on Data Structures & Algorithms, Full-Stack Development, and building real-world software products.",
+  bio: "Computer Science & Engineering (Data Science), RNS Institute of Technology, Bengaluru — Class of 2028. Focused on Data Structures & Algorithms, Full-Stack Development, and building real-world software products.",
   location: "Bengaluru, India",
   avatar: avatarAsset.url,
   email: "vivekpatnem@gmail.com",
