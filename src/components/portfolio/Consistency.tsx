@@ -11,6 +11,7 @@ import {
   getCodeforcesActivity,
   getCodechefActivity,
   getHackerrankActivity,
+  getGfgActivity,
   type ActivityResult,
 } from "@/lib/activity.functions";
 
