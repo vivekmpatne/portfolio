@@ -1,122 +1,454 @@
-# Vivek Patne — Portfolio
+# Vivek Patne | Developer Portfolio
 
-Personal portfolio of **Vivek Patne**, a 3rd-year Computer Science & Engineering (Data Science) student at RNS Institute of Technology, Bengaluru. Built as a modern, fast, recruiter-friendly site that surfaces **live coding activity** from GitHub, LeetCode, and Codeforces alongside featured projects.
+Personal developer portfolio of **Vivek Patne**, a Computer Science & Engineering (Data Science) student at RNS Institute of Technology, Bengaluru, graduating in 2028.
 
-🔗 Live: https://vivekpatne.me
-🐙 Source Code: https://github.com/vivekmpatne/portfolio
+Built as a fast, terminal-inspired developer portfolio showcasing my **software engineering journey, projects, technical skills, and live coding activity** across multiple competitive programming and development platforms.
 
----
+## Live Portfolio
 
-## ✨ Features
+**Live Website:** https://vivekpatne.me
 
-- **Live GitHub stats** — repos, followers, following, and a real contribution heatmap via the GitHub GraphQL API.
-- **Live LeetCode stats** — contest rating, total solved, Easy / Medium / Hard breakdown via LeetCode's public GraphQL.
-- **Live Codeforces stats** — rating, rank, and per-day submissions via the Codeforces REST API (with retry + backoff).
-- **Consistency dashboard** — unified contribution heatmap merging all three platforms with per-source tooltips.
-- **Dark mode by default** with pre-hydration bootstrap (no flash) and `localStorage` persistence.
-- **SEO-ready** — semantic HTML, full Open Graph + Twitter card metadata, canonical URLs.
-- **Resilient** — APIs that fail show "Unavailable" instead of misleading zeros; broken/missing links are hidden instead of rendered.
-- **Responsive** — works cleanly from 360px mobile up to wide desktop.
+**Source Code:** https://github.com/vivekmpatne/portfolio
 
 ---
 
-## 🛠 Tech Stack
+## Features
 
-- **Framework:** [TanStack Start](https://tanstack.com/start) (React 19, SSR) on Vite 7
-- **Styling:** Tailwind CSS v4 (via `@import` + theme tokens in `src/styles.css`)
-- **UI primitives:** shadcn/ui + Radix UI
-- **Data fetching:** TanStack Query + TanStack Server Functions
-- **Icons:** lucide-react, react-icons
-- **Runtime:** Cloudflare Workers (edge) via Lovable Cloud
-- **Language:** TypeScript (strict)
+### Terminal-Inspired Developer UI
+
+- Custom terminal and phosphor-inspired visual design
+- Interactive shell-style elements and command-based navigation
+- Animated typewriter role display
+- Responsive ASCII portrait generated from a real image
+- Light and dark theme support
+- Fully responsive layout across mobile, tablet, and desktop
+
+### Live Coding Profiles
+
+The portfolio dynamically retrieves coding statistics instead of relying entirely on manually maintained values.
+
+- **GitHub**
+  - Public repositories
+  - Followers and following
+  - Contribution activity
+  - Contribution calendar data
+
+- **LeetCode**
+  - Contest rating
+  - Total problems solved
+  - Easy / Medium / Hard breakdown
+  - Coding activity
+
+- **Codeforces**
+  - Current rating
+  - Maximum rating
+  - Rank
+  - Submission activity
+
+### Engineering Consistency Dashboard
+
+A unified activity dashboard aggregates coding activity across:
+
+- GitHub
+- LeetCode
+- Codeforces
+- CodeChef
+- GeeksforGeeks
+- HackerRank
+
+The dashboard includes:
+
+- Unified yearly contribution heatmap
+- Current activity streak
+- Longest streak
+- Active days
+- Total engineering activity
+- Platform-wise contribution counts
+- Year-based activity view
+
+This provides a broader view of engineering consistency instead of measuring activity from a single platform.
+
+### Projects
+
+Projects are managed through a centralized data configuration.
+
+Each project can include:
+
+- Description
+- Technology stack
+- Development status
+- GitHub repository
+- Live deployment
+- Project screenshot
+- Featured project status
+
+Missing repository, deployment, or image links are handled gracefully instead of rendering broken UI.
+
+### Recruiter-Focused Sections
+
+- Hero / introduction
+- About
+- Engineering consistency
+- Achievements
+- Live coding profiles
+- Technical skills
+- Featured projects
+- Experience
+- Contact and social profiles
+
+### Reliability and Performance
+
+- Server-side API integrations
+- TanStack Query caching
+- Graceful API failure handling
+- Loading skeletons
+- Missing data shown as `Unavailable` instead of misleading values
+- Environment variables kept server-side
+- Production build validation
+- Responsive image and asset handling
+
+### SEO
+
+- Semantic HTML
+- Metadata configuration
+- Open Graph metadata
+- Twitter card metadata
+- Canonical URL support
+- Structured website metadata
 
 ---
 
-## 🚀 Getting Started
+## Tech Stack
+
+| Category | Technology |
+| --- | --- |
+| Framework | TanStack Start |
+| Frontend | React 19 |
+| Language | TypeScript |
+| Build Tool | Vite 7 |
+| Styling | Tailwind CSS v4 |
+| UI Components | shadcn/ui + Radix UI |
+| Data Fetching | TanStack Query |
+| Server Logic | TanStack Server Functions |
+| Icons | Lucide React + React Icons |
+| Runtime / Deployment | Vercel |
+| Package Runtime | Bun |
+
+---
+
+## Getting Started
+
+### 1. Clone the repository
 
 ```bash
-# Install
+git clone <your-repository-url>
+cd portfolio
+```
+
+### 2. Install dependencies
+
+```bash
 bun install
+```
 
-# Dev server
+### 3. Configure environment variables
+
+Create a `.env` file in the project root.
+
+```env
+GITHUB_TOKEN=your_github_token
+```
+
+The GitHub token is used server-side for GitHub GraphQL requests.
+
+> Never commit `.env` or real API tokens to GitHub.
+
+LeetCode and Codeforces integrations do not require authentication.
+
+Additional environment variables may be required if optional integrations such as Supabase are enabled.
+
+### 4. Start the development server
+
+```bash
 bun run dev
+```
 
-# Production build
+The development server will normally be available at:
+
+```text
+http://localhost:8080
+```
+
+### 5. Create a production build
+
+```bash
 bun run build
 ```
 
-The app expects a `GITHUB_TOKEN` (scope: `read:user`) for the GitHub GraphQL integration:
+A successful build verifies that the application can be compiled for production deployment.
+
+---
+
+## Project Structure
+
+```text
+portfolio/
+├── public/
+│   ├── projects/
+│   │   └── dsa-tracker.png       # Project screenshots
+│   └── ...                        # Public static assets
+│
+├── src/
+│   ├── assets/
+│   │   ├── vivek-portrait.png     # Source image for ASCII portrait
+│   │   └── ...                    # Other bundled assets
+│   │
+│   ├── components/
+│   │   ├── portfolio/
+│   │   │   ├── Hero.tsx           # Hero and terminal-style introduction
+│   │   │   ├── AsciiPortrait.tsx  # Dynamic ASCII portrait renderer
+│   │   │   ├── About.tsx
+│   │   │   ├── Consistency.tsx    # Engineering activity dashboard
+│   │   │   ├── Achievements.tsx
+│   │   │   ├── LiveStats.tsx      # Live coding profile statistics
+│   │   │   ├── Skills.tsx
+│   │   │   ├── Projects.tsx
+│   │   │   ├── Experience.tsx
+│   │   │   ├── Contact.tsx
+│   │   │   └── ...
+│   │   │
+│   │   └── ui/                    # shadcn/ui primitives
+│   │
+│   ├── data/
+│   │   ├── profile.ts             # Profile and coding platform usernames
+│   │   ├── projects.ts            # Project configuration
+│   │   ├── skills.ts              # Technical skills
+│   │   ├── experience.ts          # Experience timeline
+│   │   └── links.ts               # External/social links
+│   │
+│   ├── hooks/
+│   │   └── ...                    # Reusable React hooks
+│   │
+│   ├── integrations/
+│   │   └── supabase/              # Optional Supabase integration
+│   │
+│   ├── lib/
+│   │   └── activity.functions.ts  # Server-side coding platform integrations
+│   │
+│   ├── routes/
+│   │   ├── __root.tsx             # Root layout, SEO and theme bootstrap
+│   │   └── index.tsx              # Main portfolio route
+│   │
+│   ├── routeTree.gen.ts           # Auto-generated TanStack route tree
+│   ├── start.ts                   # TanStack Start configuration
+│   └── styles.css                 # Tailwind v4 and global design tokens
+│
+├── .env                           # Local secrets, never committed
+├── .gitignore
+├── package.json
+└── README.md
+```
+
+> `routeTree.gen.ts` is generated automatically by TanStack Router and should generally not be edited manually.
+
+---
+
+## Data Architecture
+
+The portfolio keeps most manually maintained information inside `src/data/`, providing a centralized source of truth.
+
+### Profile and Coding Accounts
+
+Edit:
+
+```text
+src/data/profile.ts
+```
+
+This contains:
+
+- Name
+- Bio
+- Location
+- Contact information
+- Coding platform usernames
+- Coding profile URLs
+- Manually maintained statistics
+- Resume configuration
+
+The `codingProfiles` object centralizes platform usernames for integrations such as:
+
+```text
+GitHub
+LinkedIn
+LeetCode
+Codeforces
+CodeChef
+GeeksforGeeks
+HackerRank
+AtCoder
+Codolio
+```
+
+### Projects
+
+Edit:
+
+```text
+src/data/projects.ts
+```
+
+To add a project, append another project object.
+
+Project screenshots should be placed inside:
+
+```text
+public/projects/
+```
+
+Example:
+
+```text
+public/projects/my-project.png
+```
+
+Then reference it as:
+
+```text
+/projects/my-project.png
+```
+
+Set `githubUrl`, `liveUrl`, or `image` to `null` when they are not available.
+
+This prevents fake links and broken image requests.
+
+### Skills
+
+Edit:
+
+```text
+src/data/skills.ts
+```
+
+### Experience
+
+Edit:
+
+```text
+src/data/experience.ts
+```
+
+### External Links
+
+Edit:
+
+```text
+src/data/links.ts
+```
+
+---
+
+## Live Integrations
+
+Third-party coding platform requests are handled through server-side functions where appropriate.
+
+This prevents sensitive credentials such as the GitHub token from being exposed in the browser bundle.
+
+| Platform | Data | Authentication |
+| --- | --- | --- |
+| GitHub | Profile + contribution activity | GitHub token |
+| LeetCode | Problems, rating and activity | None |
+| Codeforces | Rating, rank and submissions | None |
+| CodeChef | Activity data | Integration dependent |
+| GeeksforGeeks | Activity data | Community/public integration |
+| HackerRank | Activity data | Integration dependent |
+
+The main server-side activity logic lives in:
+
+```text
+src/lib/activity.functions.ts
+```
+
+TanStack Query is used for client-side caching and request state management.
+
+---
+
+## Error Handling
+
+External APIs are not assumed to be permanently available.
+
+The UI handles failures through:
+
+1. Loading states and skeletons
+2. Cached data where available
+3. Graceful fallback states
+4. `Unavailable` when live statistics cannot be retrieved
+
+The portfolio avoids displaying fabricated or misleading statistics when an API request fails.
+
+---
+
+## Security
+
+Sensitive credentials are stored using environment variables.
+
+The `.env` file is excluded through `.gitignore`.
+
+Before publishing changes, secrets can be checked with:
 
 ```bash
-# .env
-GITHUB_TOKEN=ghp_xxx
+git grep -n -E "ghp_|github_pat_|SUPABASE_SERVICE_ROLE|PRIVATE_KEY"
 ```
 
-LeetCode and Codeforces APIs require no authentication.
+Never commit:
+
+- GitHub personal access tokens
+- Supabase service-role keys
+- Private API keys
+- `.env` files
 
 ---
 
-## 📁 Project Structure
+## Updating the Portfolio
 
+The normal development workflow is:
+
+```text
+Edit locally
+    ↓
+Test with bun run dev
+    ↓
+Verify production build with bun run build
+    ↓
+git add
+    ↓
+git commit
+    ↓
+git push
+    ↓
+Deployment updates
 ```
-src/
-├── routes/              # File-based routing (TanStack Router)
-│   ├── __root.tsx       # Root layout, SEO metadata, theme bootstrap
-│   └── index.tsx        # Home page
-├── components/portfolio/ # Hero, About, Skills, Projects, Consistency, LiveStats, Contact, ...
-├── components/ui/       # shadcn/ui primitives
-├── lib/
-│   └── activity.functions.ts  # Server functions: GitHub / LeetCode / Codeforces
-├── data/
-│   ├── profile.ts       # Name, bio, handles, coding profiles (single source of truth)
-│   ├── projects.ts      # Project list
-│   ├── skills.ts        # Skills
-│   ├── experience.ts    # Experience timeline
-│   └── links.ts         # External links
-├── hooks/               # Reusable hooks (e.g. useResumeAvailable)
-└── styles.css           # Tailwind v4 + design tokens
-```
+
+For most content updates, modify the files inside `src/data/` rather than changing component logic.
 
 ---
 
-## ✏️ Customising
+## Contact
 
-Most content lives in `src/data/`:
+**Vivek Patne**
 
-- **Profile / handles** → `src/data/profile.ts` (`profile.codingProfiles.github.username` is the single source of truth for GitHub URLs)
-- **Projects** → `src/data/projects.ts` (set `githubUrl` / `liveUrl` to `null` to hide that button)
-- **Skills** → `src/data/skills.ts`
-- **Experience** → `src/data/experience.ts`
-- **Resume** → drop `resume.pdf` into `public/`; the Resume button appears automatically.
+Computer Science & Engineering (Data Science)
+RNS Institute of Technology, Bengaluru
+Graduating 2028
 
----
-
-## 📡 Live Integrations — How They Work
-
-All third-party calls run server-side via TanStack `createServerFn` to avoid CORS and to keep `GITHUB_TOKEN` out of the bundle.
-
-| Source     | Endpoint                                     | Auth      | Cached |
-|------------|----------------------------------------------|-----------|--------|
-| GitHub     | `https://api.github.com/graphql`             | Token     | 10 min |
-| LeetCode   | `https://leetcode.com/graphql` (public)      | None      | 10 min |
-| Codeforces | `https://codeforces.com/api/*` (with retry)  | None      | 10 min |
-
-Failures degrade gracefully:
-1. Loading skeleton
-2. Last successful cached value (TanStack Query `staleTime`)
-3. "Unavailable" — never an incorrect `0`
+- Email: vivekpatnem@gmail.com
+- LinkedIn: linkedin.com/in/vivekpatnem
+- GitHub: github.com/vivekmpatne
+- LeetCode: leetcode.com/u/vivekpatnem
+- Codeforces: codeforces.com/profile/vivekpatnem
 
 ---
 
-## 📫 Contact
-
-- **Email:** vivekpatnem@gmail.com
-- **LinkedIn:** https://www.linkedin.com/in/vivekpatnem/
-- **LeetCode:** https://leetcode.com/u/vivekpatnem
-- **Codeforces:** https://codeforces.com/profile/vivekpatnem
-
----
-
-## 📄 License
+## License
 
 MIT © Vivek Patne
