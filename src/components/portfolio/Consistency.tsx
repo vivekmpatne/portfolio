@@ -273,11 +273,15 @@ export function Consistency() {
                     const ghC = gh.calendar[date] ?? 0;
                     const lcC = lc.calendar[date] ?? 0;
                     const cfC = cf.calendar[date] ?? 0;
+                    const ccC = cc.calendar[date] ?? 0;
+                    const hrC = hr.calendar[date] ?? 0;
                     const parts = [
                       `${date} — ${count} ${count === 1 ? "contribution" : "contributions"}`,
                       ghC ? `GitHub: ${ghC}` : null,
                       lcC ? `LeetCode: ${lcC}` : null,
                       cfC ? `Codeforces: ${cfC}` : null,
+                      ccC ? `CodeChef: ${ccC}` : null,
+                      hrC ? `HackerRank: ${hrC}` : null,
                     ].filter(Boolean);
                     return (
                       <div
