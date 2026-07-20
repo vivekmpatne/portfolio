@@ -1,9 +1,12 @@
 import { useEffect, useRef, useState } from "react";
-import portraitAsset from "@/assets/vivek-portrait.png.asset.json";
+import portraitAsset from "@/assets/vivek-portrait.png";
 
 // Density ramp: dim → dense. Mixes digits/letters so the portrait
 // still reads as "code" but has real tonal range.
-const RAMP = " .`'-:_,^=;><+!rc*/z?sLTv)J7(|Fi{C}fI31tlu[neoZ5Yxjya]2ESwqkP6h9d4VpOGbUAKXHm8RD#$Bg0MNWQ%&@".split("");
+const RAMP =
+  " .`'-:_,^=;><+!rc*/z?sLTv)J7(|Fi{C}fI31tlu[neoZ5Yxjya]2ESwqkP6h9d4VpOGbUAKXHm8RD#$Bg0MNWQ%&@".split(
+    "",
+  );
 // Character pool used to pick the specific glyph within a density bucket
 const POOL = "01vivekpatne{}<>/#*+=%".split("");
 
@@ -24,7 +27,7 @@ export function AsciiPortrait({ width = 96, className = "" }: Props) {
   useEffect(() => {
     const img = new Image();
     img.crossOrigin = "anonymous";
-    img.src = portraitAsset.url;
+    img.src = portraitAsset;
     img.onload = () => {
       const aspect = img.height / img.width;
       const cols = width;
@@ -44,7 +47,9 @@ export function AsciiPortrait({ width = 96, className = "" }: Props) {
         const row: Array<{ ch: string; a: number }> = [];
         for (let x = 0; x < cols; x++) {
           const i = (y * cols + x) * 4;
-          const r = data[i], g = data[i + 1], b = data[i + 2];
+          const r = data[i],
+            g = data[i + 1],
+            b = data[i + 2];
           const lum = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
           // Invert: dark parts of face = bright chars
           let inv = 1 - lum;
@@ -55,10 +60,7 @@ export function AsciiPortrait({ width = 96, className = "" }: Props) {
             row.push({ ch: " ", a: 0 });
             continue;
           }
-          const dIdx = Math.min(
-            RAMP.length - 1,
-            Math.floor(inv * RAMP.length),
-          );
+          const dIdx = Math.min(RAMP.length - 1, Math.floor(inv * RAMP.length));
           const densityCh = RAMP[dIdx];
           let ch: string;
           if (inv < 0.28) {
@@ -139,4 +141,3 @@ export function AsciiPortrait({ width = 96, className = "" }: Props) {
     </div>
   );
 }
-

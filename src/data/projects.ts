@@ -46,7 +46,7 @@ export const projects: Project[] = [
     liveUrl: null,
     status: "in-progress",
     featured: true,
-    image: "/projects/chefkart.png",
+    image: null,
   },
   {
     id: "samsung-sic",
