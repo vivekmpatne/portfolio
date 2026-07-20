@@ -27,7 +27,7 @@ export function Footer() {
         <div>
           <div className="font-display text-xl font-semibold">{profile.name}</div>
           <p className="mt-2 max-w-xs text-sm text-muted-foreground">
-            Building toward SDE-1.
+            Building toward Software Engineer.
           </p>
         </div>
 

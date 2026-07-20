@@ -107,7 +107,7 @@ export function Shell({ onClose }: { onClose: () => void }) {
           out(""),
           out(`location : ${profile.location}`),
           out(`email    : ${profile.email}`),
-          out(`status   : open to SDE-1 opportunities`),
+          out(`status   : open to Software Engineer opportunities`),
         ]);
         break;
       case "skills": {

@@ -6,7 +6,7 @@ import { SocialIcons } from "./SocialIcons";
 import { useResumeAvailable } from "@/hooks/use-resume-available";
 
 const ROLES = [
-  "Aspiring SDE-1",
+  "Aspiring Software Engineer",
   "Full-Stack Engineer",
   "DSA Grinder",
   "Building in Public",
@@ -82,7 +82,7 @@ export function Hero() {
         </span>
         <span className="inline-flex items-center gap-1.5">
           <span className="h-2 w-2 rounded-full bg-[var(--phosphor)] shadow-[0_0_8px_var(--phosphor)]" />
-          status: OPEN_TO_SDE1
+          status: OPEN_TO_WORK
         </span>
         <span className="inline-flex items-center gap-1.5">
           <span className="opacity-60">uptime:</span> graduating 2028
