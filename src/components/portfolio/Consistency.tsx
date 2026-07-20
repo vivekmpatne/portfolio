@@ -337,7 +337,7 @@ export function Consistency() {
           })}
         </div>
         <p className="mt-3 text-xs text-muted-foreground">
-          GeeksforGeeks doesn't publish a per-day activity feed — profile is linked above.
+          All six platforms feed the heatmap live. GeeksforGeeks activity comes via a community proxy and may lag by a day.
         </p>
       </div>
     </section>
