@@ -6,7 +6,14 @@
 // All run server-side to avoid CORS + token leakage.
 // ============================================================
 import { createServerFn } from "@tanstack/react-start";
-import { z } from "zod";
+import {
+  githubInput,
+  leetcodeInput,
+  codeforcesInput,
+  codechefInput,
+  hackerrankInput,
+  gfgInput,
+} from "./activity-schemas";
 
 type DayMap = Record<string, number>;
 
@@ -16,32 +23,6 @@ export type ActivityResult = {
   error?: string;
 };
 
-// Whitelist of the portfolio owner's handles. Server functions are public
-// endpoints; restricting inputs prevents abuse of the server's GITHUB_TOKEN
-// and stops the endpoints from acting as an open proxy for arbitrary lookups.
-const ALLOWED_USERNAMES = {
-  github: new Set(["vivekmpatne"]),
-  leetcode: new Set(["vivekpatnem"]),
-  codeforces: new Set(["vivekpatnem"]),
-  codechef: new Set(["vivekpatnem"]),
-  hackerrank: new Set(["vivekpatnem"]),
-  gfg: new Set(["vivekpcom8"]),
-} as const;
-
-const makeSchema = (allowed: ReadonlySet<string>) =>
-  z.object({
-    username: z.string().min(1).max(64).refine((u) => allowed.has(u), {
-      message: "Username not allowed",
-    }),
-    year: z.number().int().min(2010).max(2100),
-  });
-
-const githubInput = makeSchema(ALLOWED_USERNAMES.github);
-const leetcodeInput = makeSchema(ALLOWED_USERNAMES.leetcode);
-const codeforcesInput = makeSchema(ALLOWED_USERNAMES.codeforces);
-const codechefInput = makeSchema(ALLOWED_USERNAMES.codechef);
-const hackerrankInput = makeSchema(ALLOWED_USERNAMES.hackerrank);
-const gfgInput = makeSchema(ALLOWED_USERNAMES.gfg);
 
 // ---------- GitHub ----------
 export const getGithubActivity = createServerFn({ method: "GET" })
