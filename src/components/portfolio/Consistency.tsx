@@ -9,6 +9,8 @@ import {
   getGithubActivity,
   getLeetcodeActivity,
   getCodeforcesActivity,
+  getCodechefActivity,
+  getHackerrankActivity,
   type ActivityResult,
 } from "@/lib/activity.functions";
 
@@ -75,11 +77,13 @@ export function Consistency() {
   const years = [currentYear, currentYear - 1, currentYear - 2];
   const [year, setYear] = useState(currentYear);
 
-  const { github, leetcode, codeforces } = profile.codingProfiles;
+  const { github, leetcode, codeforces, codechef, hackerrank } = profile.codingProfiles;
 
   const ghFn = useServerFn(getGithubActivity);
   const lcFn = useServerFn(getLeetcodeActivity);
   const cfFn = useServerFn(getCodeforcesActivity);
+  const ccFn = useServerFn(getCodechefActivity);
+  const hrFn = useServerFn(getHackerrankActivity);
 
   const queries = useQueries({
     queries: [
@@ -101,6 +105,18 @@ export function Consistency() {
         staleTime: 10 * 60_000,
         retry: 1,
       },
+      {
+        queryKey: ["activity", "codechef", codechef.username, year],
+        queryFn: () => ccFn({ data: { username: codechef.username, year } }),
+        staleTime: 10 * 60_000,
+        retry: 1,
+      },
+      {
+        queryKey: ["activity", "hackerrank", hackerrank.username, year],
+        queryFn: () => hrFn({ data: { username: hackerrank.username, year } }),
+        staleTime: 10 * 60_000,
+        retry: 1,
+      },
     ],
   });
 
@@ -108,11 +124,16 @@ export function Consistency() {
   const gh = (queries[0].data as ActivityResult | undefined) ?? EMPTY;
   const lc = (queries[1].data as ActivityResult | undefined) ?? EMPTY;
   const cf = (queries[2].data as ActivityResult | undefined) ?? EMPTY;
-  const errors = [gh.error, lc.error, cf.error].filter(Boolean) as string[];
+  const cc = (queries[3].data as ActivityResult | undefined) ?? EMPTY;
+  const hr = (queries[4].data as ActivityResult | undefined) ?? EMPTY;
+  const errors = [gh.error, lc.error, cf.error, cc.error, hr.error].filter(Boolean) as string[];
 
   const sumValues = (m: DayMap) => Object.values(m).reduce((a, b) => a + b, 0);
 
-  const merged = useMemo(() => mergeMaps([gh.calendar, lc.calendar, cf.calendar]), [gh, lc, cf]);
+  const merged = useMemo(
+    () => mergeMaps([gh.calendar, lc.calendar, cf.calendar, cc.calendar, hr.calendar]),
+    [gh, lc, cf, cc, hr],
+  );
   const days = useMemo(() => buildYearDays(year), [year]);
   const stats = useMemo(() => computeStreaks(days, merged), [days, merged]);
 
@@ -120,9 +141,9 @@ export function Consistency() {
     github: sumValues(gh.calendar),
     leetcode: sumValues(lc.calendar),
     codeforces: sumValues(cf.calendar),
-    codechef: 0,
+    codechef: sumValues(cc.calendar),
     gfg: 0,
-    hackerrank: 0,
+    hackerrank: sumValues(hr.calendar),
   };
   const totalContribs = sumValues(merged);
 
@@ -161,7 +182,7 @@ export function Consistency() {
     <section id="consistency" className="mx-auto max-w-6xl px-6 py-20">
       <SectionHeader title="Consistency Dashboard" />
       <p className="-mt-2 mb-4 max-w-2xl text-muted-foreground">
-        Real engineering activity aggregated live from GitHub, LeetCode, and Codeforces — no manual updates.
+        Real engineering activity aggregated live from GitHub, LeetCode, Codeforces, CodeChef, and HackerRank — no manual updates.
       </p>
       {errors.length > 0 && (
         <div className="mb-6 flex items-start gap-2 rounded-lg border border-amber-500/30 bg-amber-500/5 px-3 py-2 text-xs text-amber-700 dark:text-amber-400">
@@ -252,11 +273,15 @@ export function Consistency() {
                     const ghC = gh.calendar[date] ?? 0;
                     const lcC = lc.calendar[date] ?? 0;
                     const cfC = cf.calendar[date] ?? 0;
+                    const ccC = cc.calendar[date] ?? 0;
+                    const hrC = hr.calendar[date] ?? 0;
                     const parts = [
                       `${date} — ${count} ${count === 1 ? "contribution" : "contributions"}`,
                       ghC ? `GitHub: ${ghC}` : null,
                       lcC ? `LeetCode: ${lcC}` : null,
                       cfC ? `Codeforces: ${cfC}` : null,
+                      ccC ? `CodeChef: ${ccC}` : null,
+                      hrC ? `HackerRank: ${hrC}` : null,
                     ].filter(Boolean);
                     return (
                       <div
@@ -283,7 +308,7 @@ export function Consistency() {
           {SOURCES.map((s) => {
             const Icon = s.icon;
             const count = sourceCounts[s.key] ?? 0;
-            const tracked = ["github", "leetcode", "codeforces"].includes(s.key);
+            const tracked = ["github", "leetcode", "codeforces", "codechef", "hackerrank"].includes(s.key);
             return (
               <div
                 key={s.key}
@@ -301,7 +326,7 @@ export function Consistency() {
           })}
         </div>
         <p className="mt-3 text-xs text-muted-foreground">
-          CodeChef, GeeksforGeeks, and HackerRank don't expose public activity APIs — profiles are linked above.
+          GeeksforGeeks doesn't publish a per-day activity feed — profile is linked above.
         </p>
       </div>
     </section>

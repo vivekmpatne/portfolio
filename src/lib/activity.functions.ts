@@ -23,6 +23,8 @@ const ALLOWED_USERNAMES = {
   github: new Set(["vivekmpatne"]),
   leetcode: new Set(["vivekpatnem"]),
   codeforces: new Set(["vivekpatnem"]),
+  codechef: new Set(["vivekpatnem"]),
+  hackerrank: new Set(["vivekpatnem"]),
 } as const;
 
 const makeSchema = (allowed: ReadonlySet<string>) =>
@@ -36,6 +38,8 @@ const makeSchema = (allowed: ReadonlySet<string>) =>
 const githubInput = makeSchema(ALLOWED_USERNAMES.github);
 const leetcodeInput = makeSchema(ALLOWED_USERNAMES.leetcode);
 const codeforcesInput = makeSchema(ALLOWED_USERNAMES.codeforces);
+const codechefInput = makeSchema(ALLOWED_USERNAMES.codechef);
+const hackerrankInput = makeSchema(ALLOWED_USERNAMES.hackerrank);
 
 // ---------- GitHub ----------
 export const getGithubActivity = createServerFn({ method: "GET" })
@@ -205,6 +209,69 @@ export const getCodeforcesActivity = createServerFn({ method: "GET" })
       };
     } catch (e: any) {
       return { calendar: {}, meta: {}, error: "Codeforces temporarily unavailable" };
+    }
+  });
+
+// ---------- CodeChef ----------
+// CodeChef has no public API, but the profile page embeds a
+// `userDailySubmissionsStats` JS array with per-day submission counts.
+export const getCodechefActivity = createServerFn({ method: "GET" })
+  .inputValidator((data: unknown) => codechefInput.parse(data))
+  .handler(async ({ data }): Promise<ActivityResult> => {
+    try {
+      const res = await fetch(`https://www.codechef.com/users/${encodeURIComponent(data.username)}`, {
+        headers: { "User-Agent": "Mozilla/5.0 (compatible; lovable-portfolio/1.0)" },
+      });
+      if (!res.ok) return { calendar: {}, meta: {}, error: "CodeChef temporarily unavailable" };
+      const html = await res.text();
+      const m = html.match(/userDailySubmissionsStats\s*=\s*(\[[\s\S]*?\]);/);
+      const calendar: DayMap = {};
+      if (m) {
+        const arr: Array<{ date: string; value: string | number }> = JSON.parse(m[1]);
+        for (const { date, value } of arr) {
+          const [y, mo, d] = date.split("-").map(Number);
+          if (y !== data.year) continue;
+          const key = `${y}-${String(mo).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+          calendar[key] = (calendar[key] ?? 0) + Number(value);
+        }
+      }
+      const ratingMatch = html.match(/class="rating-number"[^>]*>(\d+)</);
+      const starsMatch = html.match(/rating-star[^>]*>([★]+)/);
+      return {
+        calendar,
+        meta: {
+          rating: ratingMatch ? Number(ratingMatch[1]) : null,
+          stars: starsMatch ? starsMatch[1].length : null,
+        },
+      };
+    } catch (e) {
+      console.error("CodeChef activity fetch failed", e);
+      return { calendar: {}, meta: {}, error: "CodeChef temporarily unavailable" };
+    }
+  });
+
+// ---------- HackerRank ----------
+// Public endpoint returning { "YYYY-MM-DD": count } for the last ~year.
+export const getHackerrankActivity = createServerFn({ method: "GET" })
+  .inputValidator((data: unknown) => hackerrankInput.parse(data))
+  .handler(async ({ data }): Promise<ActivityResult> => {
+    try {
+      const res = await fetch(
+        `https://www.hackerrank.com/rest/hackers/${encodeURIComponent(data.username)}/submission_histories/`,
+        { headers: { "User-Agent": "Mozilla/5.0 (compatible; lovable-portfolio/1.0)" } },
+      );
+      if (!res.ok) return { calendar: {}, meta: {}, error: "HackerRank temporarily unavailable" };
+      const json: Record<string, number> = await res.json();
+      const calendar: DayMap = {};
+      for (const [date, count] of Object.entries(json)) {
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) continue;
+        if (Number(date.slice(0, 4)) !== data.year) continue;
+        calendar[date] = (calendar[date] ?? 0) + Number(count);
+      }
+      return { calendar, meta: {} };
+    } catch (e) {
+      console.error("HackerRank activity fetch failed", e);
+      return { calendar: {}, meta: {}, error: "HackerRank temporarily unavailable" };
     }
   });
 
