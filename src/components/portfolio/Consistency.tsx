@@ -9,6 +9,8 @@ import {
   getGithubActivity,
   getLeetcodeActivity,
   getCodeforcesActivity,
+  getCodechefActivity,
+  getHackerrankActivity,
   type ActivityResult,
 } from "@/lib/activity.functions";
 
