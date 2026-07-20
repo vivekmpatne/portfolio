@@ -182,7 +182,7 @@ export function Consistency() {
     <section id="consistency" className="mx-auto max-w-6xl px-6 py-20">
       <SectionHeader title="Consistency Dashboard" />
       <p className="-mt-2 mb-4 max-w-2xl text-muted-foreground">
-        Real engineering activity aggregated live from GitHub, LeetCode, and Codeforces — no manual updates.
+        Real engineering activity aggregated live from GitHub, LeetCode, Codeforces, CodeChef, and HackerRank — no manual updates.
       </p>
       {errors.length > 0 && (
         <div className="mb-6 flex items-start gap-2 rounded-lg border border-amber-500/30 bg-amber-500/5 px-3 py-2 text-xs text-amber-700 dark:text-amber-400">
