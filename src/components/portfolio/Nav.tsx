@@ -20,6 +20,7 @@ export function Nav() {
   const [progress, setProgress] = useState(0);
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState("home");
+  const resumeUrl = profile.resumeUrl;
   const resumeAvailable = useResumeAvailable();
 
   useEffect(() => {
@@ -75,7 +76,7 @@ export function Nav() {
 
   return (
     <header
-      className={`sticky top-0 z-50 w-full transition-all ${
+      className={`fixed top-0 left-0 right-0 z-50 w-full transition-all ${
         scrolled
           ? "border-b border-border bg-background/75 shadow-nav backdrop-blur-xl"
           : "bg-background/40 backdrop-blur-md"
@@ -116,9 +117,9 @@ export function Nav() {
           })}
         </ul>
         <div className="flex items-center gap-2">
-          {resumeAvailable && (
+          {resumeUrl && resumeAvailable && (
             <a
-              href={profile.resumeUrl}
+              href={resumeUrl}
               target="_blank"
               rel="noopener noreferrer"
               download
@@ -163,10 +164,10 @@ export function Nav() {
                 </a>
               </li>
             ))}
-            {resumeAvailable && (
+            {resumeUrl && resumeAvailable && (
               <li>
                 <a
-                  href={profile.resumeUrl}
+                  href={resumeUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   download

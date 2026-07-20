@@ -51,5 +51,7 @@ export const profile = {
     atcoder:     { username: "vivekpatnem",  url: "https://atcoder.jp/users/vivekpatnem" },
     codolio:     { username: "Viwake",       url: "https://codolio.com/profile/Viwake" },
   },
-  resumeUrl: "/resume.pdf",
+  // Resume PDF / Google Drive public link. Paste the URL here when ready.
+  // Leave null to hide the Resume action everywhere.
+  resumeUrl: null as string | null,
 };

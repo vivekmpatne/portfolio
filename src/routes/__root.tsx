@@ -108,7 +108,7 @@ function RootShell({ children }: { children: ReactNode }) {
   // Defaults to dark; respects localStorage("theme") if set.
   const themeBootstrap = `(function(){try{var t=localStorage.getItem('theme');var d=t?t==='dark':true;if(d)document.documentElement.classList.add('dark');}catch(e){document.documentElement.classList.add('dark');}})();`;
   return (
-    <html lang="en">
+    <html lang="en" className="scroll-pt-20">
       <head>
         <HeadContent />
         <script dangerouslySetInnerHTML={{ __html: themeBootstrap }} />

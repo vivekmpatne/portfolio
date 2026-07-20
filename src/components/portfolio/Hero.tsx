@@ -12,6 +12,7 @@ export function Hero() {
     .join("");
 
   const [imgFailed, setImgFailed] = useState(false);
+  const resumeUrl = profile.resumeUrl;
   const resumeAvailable = useResumeAvailable();
 
   return (
@@ -40,9 +41,9 @@ export function Hero() {
                 View Projects <ArrowRight className="ml-1 h-4 w-4" />
               </a>
             </Button>
-            {resumeAvailable && (
+            {resumeUrl && resumeAvailable && (
               <Button asChild variant="outline">
-                <a href={profile.resumeUrl} target="_blank" rel="noopener noreferrer" download>
+                <a href={resumeUrl} target="_blank" rel="noopener noreferrer" download>
                   <FileText className="mr-1 h-4 w-4" /> Resume
                 </a>
               </Button>

@@ -2,8 +2,11 @@ import { useEffect, useState } from "react";
 import { profile } from "@/data/profile";
 
 /**
- * Returns true if profile.resumeUrl exists (HEAD 200). While probing returns null.
- * Used to hide the Resume button when /public/resume.pdf is missing.
+ * Returns true if profile.resumeUrl is set and reachable.
+ * - Empty/null URL → false.
+ * - External URL (http/https) → true (skip HEAD probe).
+ * - Local path → HEAD 200 with non-HTML content-type.
+ * While probing returns null.
  */
 export function useResumeAvailable(): boolean | null {
   const [available, setAvailable] = useState<boolean | null>(null);
@@ -13,6 +16,11 @@ export function useResumeAvailable(): boolean | null {
     const url = profile.resumeUrl;
     if (!url) {
       setAvailable(false);
+      return;
+    }
+    // External links (Google Drive, etc.) are assumed valid; skip HEAD probe.
+    if (/^https?:\/\//i.test(url)) {
+      setAvailable(true);
       return;
     }
     fetch(url, { method: "HEAD" })
