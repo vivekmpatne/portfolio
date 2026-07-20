@@ -1,8 +1,10 @@
-import { Code2, Users, Sparkles, GraduationCap } from "lucide-react";
+import { Code2 } from "lucide-react";
 import { profile } from "@/data/profile";
 import { SectionHeader } from "./SectionHeader";
 import { LiveStats } from "./LiveStats";
 
+// Only real, earned achievements belong here. Do not add "Coming Soon"
+// placeholders — add new entries once they're actually completed.
 const achievements = [
   {
     icon: Code2,
@@ -10,27 +12,6 @@ const achievements = [
     label: "DSA Problems Solved",
     sub: "Across LeetCode, Codeforces, GFG",
     color: "text-emerald-500",
-  },
-  {
-    icon: Users,
-    value: `${profile.stats.linkedinConnections}+`,
-    label: "Professional Connections",
-    sub: "Building a strong tech network",
-    color: "text-indigo-500",
-  },
-  {
-    icon: Sparkles,
-    value: "Coming",
-    label: "Hackathon Achievements",
-    sub: "Targeting 2026 cycle",
-    color: "text-amber-500",
-  },
-  {
-    icon: GraduationCap,
-    value: "Coming",
-    label: "Certifications",
-    sub: "Samsung SIC, NPTEL planned",
-    color: "text-sky-500",
   },
 ];
 

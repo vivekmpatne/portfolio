@@ -20,7 +20,7 @@ export const profile = {
     leetcodeEasy: 0,
     leetcodeMedium: 0,
     leetcodeHard: 0,
-    linkedinConnections: 4000,
+    linkedinConnections: 5000,
     githubRepos: 20,
     githubFollowers: 10,
     githubFollowing: 15,
