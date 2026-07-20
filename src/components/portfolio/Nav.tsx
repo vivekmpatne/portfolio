@@ -84,21 +84,26 @@ export function Nav() {
     >
       {/* Scroll progress ribbon — loading-bar style */}
       <div
-        className="absolute inset-x-0 top-0 h-[3px] overflow-hidden bg-foreground/5"
+        className="absolute inset-x-0 top-0 h-[3px] overflow-hidden bg-[hsl(var(--phosphor)/0.12)]"
         aria-hidden
       >
         <div
-          className="relative h-full bg-foreground/85 shadow-[0_0_10px_var(--phosphor)] transition-[width] duration-100 ease-out"
+          className="relative h-full bg-[hsl(var(--phosphor))] shadow-[0_0_10px_hsl(var(--phosphor)/0.9)] transition-[width] duration-100 ease-out"
           style={{ width: `${progress}%` }}
         >
           {/* moving highlight sweep */}
-          <div className="pointer-events-none absolute inset-y-0 -left-1/4 w-1/4 animate-[ribbon_1.6s_linear_infinite] bg-gradient-to-r from-transparent via-background/80 to-transparent mix-blend-overlay" />
+          <div className="pointer-events-none absolute inset-y-0 -left-1/4 w-1/4 animate-[ribbon_1.6s_linear_infinite] bg-gradient-to-r from-transparent via-white/70 to-transparent mix-blend-overlay" />
         </div>
       </div>
       {/* Loading-style label with animated dots */}
-      <div className="pointer-events-none absolute right-3 top-[5px] hidden font-mono text-[9px] uppercase tracking-[0.25em] text-muted-foreground sm:block">
-        loading<span className="loading-dots" /> {Math.round(progress)}%
+      <div className="pointer-events-none absolute right-3 top-[5px] hidden font-mono text-[9px] uppercase tracking-[0.25em] text-[hsl(var(--phosphor))] sm:block">
+        {progress >= 99.5 ? (
+          <span>[ loaded ] 100%</span>
+        ) : (
+          <>loading<span className="loading-dots" /> {Math.round(progress)}%</>
+        )}
       </div>
+
 
       <nav className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
         <a href="#home" className="font-display text-lg font-semibold tracking-tight">
