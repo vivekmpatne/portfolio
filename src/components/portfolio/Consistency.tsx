@@ -77,11 +77,13 @@ export function Consistency() {
   const years = [currentYear, currentYear - 1, currentYear - 2];
   const [year, setYear] = useState(currentYear);
 
-  const { github, leetcode, codeforces } = profile.codingProfiles;
+  const { github, leetcode, codeforces, codechef, hackerrank } = profile.codingProfiles;
 
   const ghFn = useServerFn(getGithubActivity);
   const lcFn = useServerFn(getLeetcodeActivity);
   const cfFn = useServerFn(getCodeforcesActivity);
+  const ccFn = useServerFn(getCodechefActivity);
+  const hrFn = useServerFn(getHackerrankActivity);
 
   const queries = useQueries({
     queries: [
@@ -103,6 +105,18 @@ export function Consistency() {
         staleTime: 10 * 60_000,
         retry: 1,
       },
+      {
+        queryKey: ["activity", "codechef", codechef.username, year],
+        queryFn: () => ccFn({ data: { username: codechef.username, year } }),
+        staleTime: 10 * 60_000,
+        retry: 1,
+      },
+      {
+        queryKey: ["activity", "hackerrank", hackerrank.username, year],
+        queryFn: () => hrFn({ data: { username: hackerrank.username, year } }),
+        staleTime: 10 * 60_000,
+        retry: 1,
+      },
     ],
   });
 
@@ -110,11 +124,16 @@ export function Consistency() {
   const gh = (queries[0].data as ActivityResult | undefined) ?? EMPTY;
   const lc = (queries[1].data as ActivityResult | undefined) ?? EMPTY;
   const cf = (queries[2].data as ActivityResult | undefined) ?? EMPTY;
-  const errors = [gh.error, lc.error, cf.error].filter(Boolean) as string[];
+  const cc = (queries[3].data as ActivityResult | undefined) ?? EMPTY;
+  const hr = (queries[4].data as ActivityResult | undefined) ?? EMPTY;
+  const errors = [gh.error, lc.error, cf.error, cc.error, hr.error].filter(Boolean) as string[];
 
   const sumValues = (m: DayMap) => Object.values(m).reduce((a, b) => a + b, 0);
 
-  const merged = useMemo(() => mergeMaps([gh.calendar, lc.calendar, cf.calendar]), [gh, lc, cf]);
+  const merged = useMemo(
+    () => mergeMaps([gh.calendar, lc.calendar, cf.calendar, cc.calendar, hr.calendar]),
+    [gh, lc, cf, cc, hr],
+  );
   const days = useMemo(() => buildYearDays(year), [year]);
   const stats = useMemo(() => computeStreaks(days, merged), [days, merged]);
 
@@ -122,9 +141,9 @@ export function Consistency() {
     github: sumValues(gh.calendar),
     leetcode: sumValues(lc.calendar),
     codeforces: sumValues(cf.calendar),
-    codechef: 0,
+    codechef: sumValues(cc.calendar),
     gfg: 0,
-    hackerrank: 0,
+    hackerrank: sumValues(hr.calendar),
   };
   const totalContribs = sumValues(merged);
 
