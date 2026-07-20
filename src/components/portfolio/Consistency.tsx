@@ -11,6 +11,7 @@ import {
   getCodeforcesActivity,
   getCodechefActivity,
   getHackerrankActivity,
+  getGfgActivity,
   type ActivityResult,
 } from "@/lib/activity.functions";
 
@@ -77,13 +78,14 @@ export function Consistency() {
   const years = [currentYear, currentYear - 1, currentYear - 2];
   const [year, setYear] = useState(currentYear);
 
-  const { github, leetcode, codeforces, codechef, hackerrank } = profile.codingProfiles;
+  const { github, leetcode, codeforces, codechef, hackerrank, gfg } = profile.codingProfiles;
 
   const ghFn = useServerFn(getGithubActivity);
   const lcFn = useServerFn(getLeetcodeActivity);
   const cfFn = useServerFn(getCodeforcesActivity);
   const ccFn = useServerFn(getCodechefActivity);
   const hrFn = useServerFn(getHackerrankActivity);
+  const gfgFn = useServerFn(getGfgActivity);
 
   const queries = useQueries({
     queries: [
@@ -117,6 +119,12 @@ export function Consistency() {
         staleTime: 10 * 60_000,
         retry: 1,
       },
+      {
+        queryKey: ["activity", "gfg", gfg.username, year],
+        queryFn: () => gfgFn({ data: { username: gfg.username, year } }),
+        staleTime: 10 * 60_000,
+        retry: 1,
+      },
     ],
   });
 
@@ -126,13 +134,14 @@ export function Consistency() {
   const cf = (queries[2].data as ActivityResult | undefined) ?? EMPTY;
   const cc = (queries[3].data as ActivityResult | undefined) ?? EMPTY;
   const hr = (queries[4].data as ActivityResult | undefined) ?? EMPTY;
-  const errors = [gh.error, lc.error, cf.error, cc.error, hr.error].filter(Boolean) as string[];
+  const gg = (queries[5].data as ActivityResult | undefined) ?? EMPTY;
+  const errors = [gh.error, lc.error, cf.error, cc.error, hr.error, gg.error].filter(Boolean) as string[];
 
   const sumValues = (m: DayMap) => Object.values(m).reduce((a, b) => a + b, 0);
 
   const merged = useMemo(
-    () => mergeMaps([gh.calendar, lc.calendar, cf.calendar, cc.calendar, hr.calendar]),
-    [gh, lc, cf, cc, hr],
+    () => mergeMaps([gh.calendar, lc.calendar, cf.calendar, cc.calendar, hr.calendar, gg.calendar]),
+    [gh, lc, cf, cc, hr, gg],
   );
   const days = useMemo(() => buildYearDays(year), [year]);
   const stats = useMemo(() => computeStreaks(days, merged), [days, merged]);
@@ -142,7 +151,7 @@ export function Consistency() {
     leetcode: sumValues(lc.calendar),
     codeforces: sumValues(cf.calendar),
     codechef: sumValues(cc.calendar),
-    gfg: 0,
+    gfg: sumValues(gg.calendar),
     hackerrank: sumValues(hr.calendar),
   };
   const totalContribs = sumValues(merged);
@@ -275,6 +284,7 @@ export function Consistency() {
                     const cfC = cf.calendar[date] ?? 0;
                     const ccC = cc.calendar[date] ?? 0;
                     const hrC = hr.calendar[date] ?? 0;
+                    const ggC = gg.calendar[date] ?? 0;
                     const parts = [
                       `${date} — ${count} ${count === 1 ? "contribution" : "contributions"}`,
                       ghC ? `GitHub: ${ghC}` : null,
@@ -282,6 +292,7 @@ export function Consistency() {
                       cfC ? `Codeforces: ${cfC}` : null,
                       ccC ? `CodeChef: ${ccC}` : null,
                       hrC ? `HackerRank: ${hrC}` : null,
+                      ggC ? `GeeksforGeeks: ${ggC}` : null,
                     ].filter(Boolean);
                     return (
                       <div
@@ -308,7 +319,7 @@ export function Consistency() {
           {SOURCES.map((s) => {
             const Icon = s.icon;
             const count = sourceCounts[s.key] ?? 0;
-            const tracked = ["github", "leetcode", "codeforces", "codechef", "hackerrank"].includes(s.key);
+            const tracked = ["github", "leetcode", "codeforces", "codechef", "hackerrank", "gfg"].includes(s.key);
             return (
               <div
                 key={s.key}
@@ -326,7 +337,7 @@ export function Consistency() {
           })}
         </div>
         <p className="mt-3 text-xs text-muted-foreground">
-          GeeksforGeeks doesn't publish a per-day activity feed — profile is linked above.
+          All six platforms feed the heatmap live. GeeksforGeeks activity comes via a community proxy and may lag by a day.
         </p>
       </div>
     </section>

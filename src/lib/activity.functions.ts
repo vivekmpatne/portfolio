@@ -25,6 +25,7 @@ const ALLOWED_USERNAMES = {
   codeforces: new Set(["vivekpatnem"]),
   codechef: new Set(["vivekpatnem"]),
   hackerrank: new Set(["vivekpatnem"]),
+  gfg: new Set(["vivekpcom8"]),
 } as const;
 
 const makeSchema = (allowed: ReadonlySet<string>) =>
@@ -40,6 +41,7 @@ const leetcodeInput = makeSchema(ALLOWED_USERNAMES.leetcode);
 const codeforcesInput = makeSchema(ALLOWED_USERNAMES.codeforces);
 const codechefInput = makeSchema(ALLOWED_USERNAMES.codechef);
 const hackerrankInput = makeSchema(ALLOWED_USERNAMES.hackerrank);
+const gfgInput = makeSchema(ALLOWED_USERNAMES.gfg);
 
 // ---------- GitHub ----------
 export const getGithubActivity = createServerFn({ method: "GET" })
@@ -274,4 +276,38 @@ export const getHackerrankActivity = createServerFn({ method: "GET" })
       return { calendar: {}, meta: {}, error: "HackerRank temporarily unavailable" };
     }
   });
+
+// ---------- GeeksforGeeks ----------
+// GFG has no official API. Uses the community `gfg-stats-api` proxy which
+// exposes a per-day heatmap. If it goes down we surface unavailable.
+export const getGfgActivity = createServerFn({ method: "GET" })
+  .inputValidator((data: unknown) => gfgInput.parse(data))
+  .handler(async ({ data }): Promise<ActivityResult> => {
+    try {
+      const res = await fetch(
+        `https://gfg-stats-api.vercel.app/${encodeURIComponent(data.username)}/heatmap`,
+        { headers: { "User-Agent": "lovable-portfolio" } },
+      );
+      if (!res.ok) return { calendar: {}, meta: {}, error: "GeeksforGeeks temporarily unavailable" };
+      const json: any = await res.json();
+      const days: Array<{ date: string; count: number }> = json?.data?.dailyContributions ?? [];
+      const calendar: DayMap = {};
+      for (const d of days) {
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(d.date)) continue;
+        if (Number(d.date.slice(0, 4)) !== data.year) continue;
+        calendar[d.date] = (calendar[d.date] ?? 0) + Number(d.count);
+      }
+      return {
+        calendar,
+        meta: {
+          totalSubmissions: json?.data?.totalSubmissions ?? null,
+          totalActiveDays: json?.data?.totalActiveDays ?? null,
+        },
+      };
+    } catch (e) {
+      console.error("GFG activity fetch failed", e);
+      return { calendar: {}, meta: {}, error: "GeeksforGeeks temporarily unavailable" };
+    }
+  });
+
 
