@@ -1,11 +1,18 @@
 // ============================================================
-// PROJECTS DATA — Most important file to edit over time.
+// PROJECTS DATA — Single source of truth for the Projects section.
+//
 // To add a new project: append a new object below with the same shape.
-// Drop screenshots into /public/projects/ and reference them via `image`.
+//   • Drop the screenshot into /public/projects/ and reference it via `image`.
+//   • Set githubUrl / liveUrl to null if not applicable — the button hides
+//     automatically (no fake "#" links).
+//   • `featured: true` pins it to the top; order within the array is preserved.
+//
+// Zero component changes are needed to add more projects — just push here.
 // ============================================================
 export type ProjectStatus = "live" | "in-progress" | "planned";
 
 export interface Project {
+  id: string;
   title: string;
   description: string;
   techStack: string[];
@@ -18,6 +25,7 @@ export interface Project {
 
 export const projects: Project[] = [
   {
+    id: "dsa-tracker",
     title: "DSA Tracker",
     description:
       "Full-stack MERN consistency tracker with a 7-day target system — built for disciplined DSA prep from Tier-3 to SDE. Includes smart daily targets, rolling 14-day average ETA calculations, and progress analytics.",
@@ -29,6 +37,7 @@ export const projects: Project[] = [
     image: "/projects/dsa-tracker.png",
   },
   {
+    id: "chefkart",
     title: "ChefKart",
     description:
       "Full-stack food delivery platform with role-based dashboards (user, chef, admin) and Razorpay payment integration.",
@@ -40,17 +49,7 @@ export const projects: Project[] = [
     image: "/projects/chefkart.png",
   },
   {
-    title: "URL Shortener",
-    description:
-      "Production-ready URL shortener with analytics dashboard, modular Services/DAO architecture, and MongoDB indexing.",
-    techStack: ["React", "Express", "MongoDB", "Redux", "TanStack Query"],
-    githubUrl: null,
-    liveUrl: null,
-    status: "in-progress",
-    featured: false,
-    image: "/projects/url-shortener.png",
-  },
-  {
+    id: "samsung-sic",
     title: "Samsung SIC Capstone",
     description:
       "IoT system using Raspberry Pi, sensors, and a Node.js + Grafana data pipeline.",
@@ -61,4 +60,8 @@ export const projects: Project[] = [
     featured: false,
     image: null,
   },
+  // ────────────────────────────────────────────────────────────
+  // 👇 FUTURE PROJECTS — append new objects here (IoT, MERN, etc.).
+  //    No changes needed in Projects.tsx or ProjectCard.tsx.
+  // ────────────────────────────────────────────────────────────
 ];

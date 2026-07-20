@@ -15,60 +15,32 @@ const statusDot: Record<Project["status"], string> = {
 };
 
 export function Projects() {
-  const featured = projects.filter((p) => p.featured);
-  const [hero, ...restFeatured] = featured;
-  const others = projects.filter((p) => !p.featured);
+  // All projects render with the same side-by-side "hero" layout
+  // (banner on one side, content on the other) — matching the
+  // DSA Tracker card. Featured projects float to the top.
+  const ordered = [
+    ...projects.filter((p) => p.featured),
+    ...projects.filter((p) => !p.featured),
+  ];
 
   return (
     <section id="projects" className="mx-auto max-w-6xl px-6 py-20">
       <SectionHeader title="Projects" />
 
-      {hero && (
-        <div className="mb-5">
-          <ProjectCard project={hero} variant="hero" />
-        </div>
-      )}
-
-      {restFeatured.length > 0 && (
-        <div className="grid gap-5 md:grid-cols-2">
-          {restFeatured.map((p) => (
-            <ProjectCard key={p.title} project={p} variant="featured" />
-          ))}
-        </div>
-      )}
-
-      {others.length > 0 && (
-        <div className="mt-5 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-          {others.map((p) => (
-            <ProjectCard key={p.title} project={p} />
-          ))}
-        </div>
-      )}
+      <div className="grid gap-5">
+        {ordered.map((p) => (
+          <ProjectCard key={p.id} project={p} />
+        ))}
+      </div>
     </section>
   );
 }
 
-function ProjectCard({
-  project,
-  variant = "default",
-}: {
-  project: Project;
-  variant?: "default" | "featured" | "hero";
-}) {
-  const isHero = variant === "hero";
-
+function ProjectCard({ project }: { project: Project }) {
   return (
-    <article
-      className={`group relative flex flex-col overflow-hidden rounded-2xl border border-border bg-card transition-all hover:-translate-y-1 hover:border-foreground/30 hover:shadow-xl ${
-        isHero ? "md:grid md:grid-cols-2 md:gap-0" : ""
-      }`}
-    >
+    <article className="group relative flex flex-col overflow-hidden rounded-2xl border border-border bg-card transition-all hover:-translate-y-1 hover:border-foreground/30 hover:shadow-xl md:grid md:grid-cols-2 md:gap-0">
       {project.image && (
-        <div
-          className={`relative overflow-hidden border-border bg-secondary ${
-            isHero ? "border-b md:border-b-0 md:border-r aspect-[16/10] md:aspect-auto" : "aspect-[16/9] border-b"
-          }`}
-        >
+        <div className="relative overflow-hidden border-b border-border bg-secondary aspect-[16/10] md:aspect-auto md:border-b-0 md:border-r">
           {/* eslint-disable-next-line jsx-a11y/alt-text */}
           <img
             src={project.image}
@@ -81,7 +53,7 @@ function ProjectCard({
         </div>
       )}
 
-      <div className={`flex flex-1 flex-col ${isHero ? "p-7 md:p-8" : "p-6"}`}>
+      <div className="flex flex-1 flex-col p-7 md:p-8">
         <div className="mb-3 flex flex-wrap items-center gap-2">
           {project.featured && (
             <span className="inline-flex items-center gap-1 rounded-full border border-border bg-accent px-2.5 py-0.5 text-[10px] font-medium uppercase tracking-wider">
@@ -94,7 +66,7 @@ function ProjectCard({
           </span>
         </div>
 
-        <h3 className={`font-display font-semibold ${isHero ? "text-2xl md:text-3xl" : "text-xl"}`}>
+        <h3 className="font-display font-semibold text-2xl md:text-3xl">
           {project.title}
         </h3>
         <p className="mt-2 flex-1 text-sm leading-relaxed text-muted-foreground">
