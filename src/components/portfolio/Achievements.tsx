@@ -1,11 +1,31 @@
-import { Code2 } from "lucide-react";
+import { Code2, type LucideIcon } from "lucide-react";
+// To add a future achievement, pick any icon from lucide-react and import it above.
+// Examples: Trophy (hackathon win), Award (certification), Star (recognition),
+// GraduationCap (degree/course), Sparkles (milestone), Users (community).
 import { profile } from "@/data/profile";
 import { SectionHeader } from "./SectionHeader";
 import { LiveStats } from "./LiveStats";
 
+type Achievement = {
+  icon: LucideIcon;
+  value: string;      // Big headline number/label, e.g. "334+", "Winner", "2026"
+  label: string;      // Short title, e.g. "Hackathon Winner"
+  sub: string;        // One-line context, e.g. "Smart India Hackathon 2026"
+  color: string;      // Tailwind text-* class, e.g. "text-emerald-500"
+};
+
 // Only real, earned achievements belong here. Do not add "Coming Soon"
 // placeholders — add new entries once they're actually completed.
-const achievements = [
+//
+// TEMPLATE — copy, uncomment, fill in, and drop into the array below:
+// {
+//   icon: Trophy,
+//   value: "1st",
+//   label: "Hackathon Winner",
+//   sub: "Event name • Year",
+//   color: "text-amber-500",
+// },
+const achievements: Achievement[] = [
   {
     icon: Code2,
     value: `${profile.stats.problemsSolved}+`,
