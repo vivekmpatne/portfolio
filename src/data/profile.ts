@@ -12,19 +12,15 @@ export const profile = {
   avatar: avatarAsset.url,
   email: "vivekpatnem@gmail.com",
   phone: "+91 7676287523",
-  // Fallback values — shown when live APIs fail
+  // Manually-maintained stats.
+  //   • linkedinConnections — LinkedIn has no public API; edit here to update the card.
+  //   • problemsSolved      — headline DSA count shown in Achievements.
+  // Live platform stats (LeetCode / Codeforces / GitHub) come from server
+  // functions and show "Unavailable" on failure — they never fall back
+  // to hardcoded numbers.
   stats: {
-    leetcodeRating: 1491,
-    codeforcesRating: 956,
     problemsSolved: 334,
-    leetcodeEasy: 0,
-    leetcodeMedium: 0,
-    leetcodeHard: 0,
     linkedinConnections: 5000,
-    githubRepos: 20,
-    githubFollowers: 10,
-    githubFollowing: 15,
-    codeforcesRank: "newbie",
   },
   openTo: [
     "Software Engineering Internships",
