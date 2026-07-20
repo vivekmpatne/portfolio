@@ -1,106 +1,140 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ArrowRight, FileText, Mail, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { profile } from "@/data/profile";
 import { SocialIcons } from "./SocialIcons";
 import { useResumeAvailable } from "@/hooks/use-resume-available";
 
-export function Hero() {
-  const initials = profile.name
-    .split(" ")
-    .map((n) => n[0])
-    .join("");
+const ROLES = [
+  "Aspiring SDE-1",
+  "Full-Stack Engineer",
+  "DSA Grinder",
+  "Building in Public",
+];
 
-  const [imgFailed, setImgFailed] = useState(false);
+export function Hero() {
   const resumeUrl = profile.resumeUrl;
   const resumeAvailable = useResumeAvailable();
 
+  // Rotating role with typewriter effect
+  const [rIndex, setRIndex] = useState(0);
+  const [text, setText] = useState("");
+  const [deleting, setDeleting] = useState(false);
+
+  useEffect(() => {
+    const full = ROLES[rIndex];
+    const delay = deleting ? 40 : 80;
+    const timer = setTimeout(() => {
+      if (!deleting) {
+        const next = full.slice(0, text.length + 1);
+        setText(next);
+        if (next === full) setTimeout(() => setDeleting(true), 1400);
+      } else {
+        const next = full.slice(0, text.length - 1);
+        setText(next);
+        if (next === "") {
+          setDeleting(false);
+          setRIndex((i) => (i + 1) % ROLES.length);
+        }
+      }
+    }, delay);
+    return () => clearTimeout(timer);
+  }, [text, deleting, rIndex]);
+
   return (
-    <section id="home" className="mx-auto max-w-6xl px-6 pt-20 pb-24 md:pt-28 md:pb-32">
-      <div className="grid items-center gap-12 md:grid-cols-[1fr_auto]">
-        <div>
-          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-border bg-secondary px-3 py-1 text-xs text-muted-foreground shadow-card">
-            <span className="h-1.5 w-1.5 rounded-full bg-green-500" />
-            Open to SDE-1 opportunities
-          </div>
-          <h1 className="font-display text-5xl font-semibold leading-tight tracking-tight md:text-6xl">
-            Hi, I'm {profile.name}.
-          </h1>
-          <p className="mt-4 text-lg text-muted-foreground md:text-xl">
-            {profile.tagline}
-          </p>
-          {/* Full bio lives in the About section — kept as single source to avoid duplication. */}
-          <div className="mt-5 flex items-center gap-2 text-sm text-muted-foreground">
-            <MapPin className="h-4 w-4" />
-            {profile.location}
-          </div>
+    <section
+      id="home"
+      className="mx-auto max-w-6xl px-6 pt-24 pb-20 md:pt-32 md:pb-28"
+    >
+      {/* Boot header */}
+      <pre className="hidden select-none whitespace-pre text-[10px] leading-tight text-muted-foreground sm:block">
+{`┌──[ vivek.os v2.1 ─ tty0 ]────────────────────────────────────────┐
+│ boot ok · shell online · phosphor.glow=ON · scanlines=ON         │
+└──────────────────────────────────────────────────────────────────┘`}
+      </pre>
 
-          <div className="mt-8 flex flex-wrap items-center gap-3">
-            <Button asChild>
-              <a href="#projects">
-                View Projects <ArrowRight className="ml-1 h-4 w-4" />
-              </a>
-            </Button>
-            {resumeUrl && resumeAvailable && (
-              <Button asChild variant="outline">
-                <a href={resumeUrl} target="_blank" rel="noopener noreferrer" download>
-                  <FileText className="mr-1 h-4 w-4" /> Resume
-                </a>
-              </Button>
-            )}
-            <Button asChild variant="ghost">
-              <a href="#contact">
-                <Mail className="mr-1 h-4 w-4" /> Contact
-              </a>
-            </Button>
-          </div>
+      <div className="mt-6 flex items-center gap-2 text-sm">
+        <span className="phosphor-glow">guest@vivek</span>
+        <span className="text-muted-foreground">:</span>
+        <span className="text-muted-foreground">~</span>
+        <span className="phosphor-glow">$</span>
+        <span className="text-foreground/90">whoami</span>
+      </div>
 
-          <div className="mt-8">
-            <SocialIcons />
-          </div>
-        </div>
+      <h1 className="mt-4 font-display text-6xl leading-none tracking-wide md:text-8xl">
+        &gt; <span className="phosphor-glow">{profile.name}</span>_
+      </h1>
 
-        {/* Premium profile photo */}
-        <div className="hidden md:block">
-          <div className="group relative">
-            <div
-              className="absolute -inset-4 rounded-full opacity-60 blur-2xl transition-opacity duration-500 group-hover:opacity-90"
-              style={{
-                background:
-                  "conic-gradient(from 180deg at 50% 50%, #6366f1, #8b5cf6, #ec4899, #f97316, #6366f1)",
-              }}
-            />
-            <div
-              className="relative h-60 w-60 rounded-full p-[3px] transition-transform duration-500 group-hover:scale-[1.03]"
-              style={{
-                background:
-                  "linear-gradient(135deg, #6366f1, #8b5cf6, #ec4899)",
-              }}
-            >
-              <div className="flex h-full w-full items-center justify-center overflow-hidden rounded-full bg-card shadow-card-hover">
-                {profile.avatar && !imgFailed ? (
-                  <img
-                    src={profile.avatar}
-                    alt={profile.name}
-                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                    onError={() => setImgFailed(true)}
-                  />
-                ) : (
-                  <span
-                    className="font-display text-6xl font-semibold"
-                    style={{
-                      background:
-                        "linear-gradient(135deg, #6366f1, #8b5cf6, #ec4899)",
-                      WebkitBackgroundClip: "text",
-                      WebkitTextFillColor: "transparent",
-                    }}
-                  >
-                    {initials}
-                  </span>
-                )}
-              </div>
-            </div>
-          </div>
+      <div className="mt-6 flex items-center gap-2 text-lg text-foreground/90 md:text-xl">
+        <span className="text-muted-foreground">role:</span>
+        <span className="phosphor-glow">{text}</span>
+        <span className="term-cursor" />
+      </div>
+
+      <p className="mt-6 max-w-2xl text-sm leading-relaxed text-muted-foreground md:text-base">
+        <span className="phosphor-glow">// </span>
+        {profile.tagline}
+      </p>
+
+      <div className="mt-4 flex flex-wrap items-center gap-4 text-xs text-muted-foreground">
+        <span className="inline-flex items-center gap-1.5">
+          <MapPin className="h-3.5 w-3.5" /> {profile.location}
+        </span>
+        <span className="inline-flex items-center gap-1.5">
+          <span className="h-2 w-2 rounded-full bg-[var(--phosphor)] shadow-[0_0_8px_var(--phosphor)]" />
+          status: OPEN_TO_SDE1
+        </span>
+        <span className="inline-flex items-center gap-1.5">
+          <span className="opacity-60">uptime:</span> graduating 2028
+        </span>
+      </div>
+
+      {/* Command hints */}
+      <div className="mt-8 flex flex-wrap items-center gap-3">
+        <Button asChild variant="outline" className="rounded-none border-[var(--phosphor)]/60 bg-transparent font-mono text-sm text-foreground hover:bg-[var(--phosphor)]/10 hover:text-foreground">
+          <a href="#projects">
+            ./view_projects <ArrowRight className="ml-1 h-4 w-4" />
+          </a>
+        </Button>
+        {resumeUrl && resumeAvailable && (
+          <Button asChild variant="outline" className="rounded-none border-border bg-transparent font-mono text-sm hover:bg-accent">
+            <a href={resumeUrl} target="_blank" rel="noopener noreferrer" download>
+              <FileText className="mr-1 h-4 w-4" /> cat resume.pdf
+            </a>
+          </Button>
+        )}
+        <Button asChild variant="ghost" className="rounded-none font-mono text-sm">
+          <a href="#contact">
+            <Mail className="mr-1 h-4 w-4" /> ./contact
+          </a>
+        </Button>
+        <button
+          type="button"
+          onClick={() =>
+            window.dispatchEvent(new CustomEvent("term:open", { detail: "help" }))
+          }
+          className="rounded-none border border-dashed border-[var(--phosphor)]/50 px-3 py-2 font-mono text-sm text-[var(--phosphor)] transition-colors hover:bg-[var(--phosphor)]/10"
+        >
+          {"> open shell (`)"}
+        </button>
+      </div>
+
+      <div className="mt-8">
+        <SocialIcons />
+      </div>
+
+      <div className="mt-10 text-xs text-muted-foreground">
+        <span className="phosphor-glow">guest@vivek</span>
+        <span>:~$ </span>
+        <span className="text-foreground/90">help</span>
+        <span className="term-cursor ml-1" />
+        <div className="mt-1 opacity-70">
+          try:{" "}
+          <code className="text-foreground/90">about</code> ·{" "}
+          <code className="text-foreground/90">skills</code> ·{" "}
+          <code className="text-foreground/90">projects</code> ·{" "}
+          <code className="text-foreground/90">open leetcode</code> ·{" "}
+          <code className="text-foreground/90">contact</code>
         </div>
       </div>
     </section>
