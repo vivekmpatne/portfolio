@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button";
 import { profile } from "@/data/profile";
 import { SocialIcons } from "./SocialIcons";
 import { useResumeAvailable } from "@/hooks/use-resume-available";
+import { AsciiPortrait } from "./AsciiPortrait";
+
 
 const ROLES = [
   "Aspiring Software Engineer",
@@ -46,12 +48,31 @@ export function Hero() {
       id="home"
       className="mx-auto max-w-6xl px-6 pt-24 pb-20 md:pt-32 md:pb-28"
     >
-      {/* Boot header */}
-      <pre className="hidden select-none whitespace-pre text-[10px] leading-tight text-muted-foreground sm:block">
-{`┌──[ vivek.os v2.1 ─ tty0 ]────────────────────────────────────────┐
-│ boot ok · shell online · phosphor.glow=ON · scanlines=ON         │
-└──────────────────────────────────────────────────────────────────┘`}
-      </pre>
+      {/* Boot header — cleaner, unique framed status bar */}
+      <div className="mb-8 hidden font-mono text-[11px] sm:block">
+        <div className="flex items-stretch gap-0 text-muted-foreground">
+          <div className="flex items-center gap-2 border border-[var(--phosphor)]/50 bg-[var(--phosphor)]/5 px-3 py-1">
+            <span className="inline-flex h-1.5 w-1.5 animate-pulse rounded-full bg-[var(--phosphor)] shadow-[0_0_6px_var(--phosphor)]" />
+            <span className="phosphor-glow font-semibold">vivek.os</span>
+            <span className="opacity-60">v2.1</span>
+            <span className="opacity-50">·</span>
+            <span className="opacity-70">tty0</span>
+          </div>
+          <div className="hidden items-center gap-3 border-y border-r border-[var(--phosphor)]/30 px-3 py-1 md:flex">
+            <span><span className="opacity-60">boot</span> <span className="text-[var(--phosphor)]">ok</span></span>
+            <span className="opacity-40">|</span>
+            <span><span className="opacity-60">shell</span> <span className="text-[var(--phosphor)]">online</span></span>
+            <span className="opacity-40">|</span>
+            <span><span className="opacity-60">glow</span> <span className="text-[var(--phosphor)]">on</span></span>
+            <span className="opacity-40">|</span>
+            <span><span className="opacity-60">scan</span> <span className="text-[var(--phosphor)]">on</span></span>
+          </div>
+        </div>
+      </div>
+
+      <div className="grid gap-10 md:grid-cols-[minmax(0,1fr)_auto] md:items-start md:gap-12">
+        <div className="min-w-0">
+
 
       <div className="mt-6 flex items-center gap-2 text-sm">
         <span className="phosphor-glow">guest@vivek</span>
@@ -137,6 +158,24 @@ export function Hero() {
           <code className="text-foreground/90">contact</code>
         </div>
       </div>
+        </div>
+
+        {/* ASCII portrait column */}
+        <div className="relative mx-auto w-full max-w-[380px] md:mx-0 md:w-[320px] lg:w-[380px]">
+          <div className="mb-2 flex items-center justify-between font-mono text-[10px] text-muted-foreground">
+            <span><span className="phosphor-glow">$</span> cat ./me.ascii</span>
+            <span className="opacity-60">72 × ∞ · phosphor</span>
+          </div>
+          <div className="relative border border-[var(--phosphor)]/40 bg-background/60 p-3 shadow-card">
+            <AsciiPortrait width={72} />
+            <div className="mt-2 flex items-center justify-between border-t border-[var(--phosphor)]/25 pt-2 font-mono text-[10px] text-muted-foreground">
+              <span>vivek@patne</span>
+              <span className="phosphor-glow">[ ONLINE ]</span>
+            </div>
+          </div>
+        </div>
+      </div>
     </section>
   );
 }
+

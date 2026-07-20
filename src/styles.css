@@ -37,33 +37,34 @@
 
 :root {
   --radius: 0.125rem;
-  /* Light "paper terminal" theme — amber/green on parchment */
-  --background: oklch(0.985 0.01 95);
-  --foreground: oklch(0.22 0.03 150);
-  --card: oklch(0.97 0.015 95);
-  --card-foreground: oklch(0.22 0.03 150);
-  --popover: oklch(0.98 0.01 95);
-  --popover-foreground: oklch(0.22 0.03 150);
-  --primary: oklch(0.52 0.16 150);
-  --primary-foreground: oklch(0.98 0.01 95);
-  --secondary: oklch(0.94 0.02 95);
-  --secondary-foreground: oklch(0.25 0.03 150);
-  --muted: oklch(0.94 0.015 95);
-  --muted-foreground: oklch(0.45 0.03 150);
-  --accent: oklch(0.92 0.04 130);
-  --accent-foreground: oklch(0.22 0.03 150);
+  /* Light "paper terminal" — crisp off-white with deep forest phosphor */
+  --background: oklch(0.985 0.005 120);
+  --foreground: oklch(0.18 0.04 155);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.18 0.04 155);
+  --popover: oklch(0.995 0.003 120);
+  --popover-foreground: oklch(0.18 0.04 155);
+  --primary: oklch(0.42 0.16 150);
+  --primary-foreground: oklch(0.985 0.005 120);
+  --secondary: oklch(0.955 0.012 130);
+  --secondary-foreground: oklch(0.22 0.04 155);
+  --muted: oklch(0.955 0.008 120);
+  --muted-foreground: oklch(0.42 0.05 155);
+  --accent: oklch(0.94 0.05 140);
+  --accent-foreground: oklch(0.18 0.04 155);
   --destructive: oklch(0.55 0.22 25);
   --destructive-foreground: oklch(0.98 0 0);
-  --border: oklch(0.55 0.08 150 / 35%);
-  --input: oklch(0.94 0.02 95);
-  --ring: oklch(0.55 0.16 150);
-  --phosphor: oklch(0.48 0.17 150);
-  --amber-term: oklch(0.62 0.16 75);
+  --border: oklch(0.42 0.12 150 / 28%);
+  --input: oklch(0.955 0.012 130);
+  --ring: oklch(0.42 0.16 150);
+  --phosphor: oklch(0.38 0.18 150);
+  --amber-term: oklch(0.55 0.17 75);
 
-  --shadow-card: 0 0 0 1px oklch(0.48 0.17 150 / 15%);
-  --shadow-card-hover: 0 0 20px -6px oklch(0.48 0.17 150 / 30%), 0 0 0 1px oklch(0.48 0.17 150 / 50%);
-  --shadow-nav: 0 0 0 1px oklch(0.48 0.17 150 / 15%);
+  --shadow-card: 0 1px 0 oklch(0.38 0.18 150 / 8%), 0 0 0 1px oklch(0.38 0.18 150 / 18%);
+  --shadow-card-hover: 0 0 24px -8px oklch(0.38 0.18 150 / 35%), 0 0 0 1px oklch(0.38 0.18 150 / 55%);
+  --shadow-nav: 0 1px 0 oklch(0.38 0.18 150 / 12%);
 }
+
 
 /* Dark mode = phosphor CRT terminal */
 .dark {
