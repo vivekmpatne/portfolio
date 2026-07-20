@@ -134,10 +134,10 @@ export function TerminalOverlay() {
             "radial-gradient(ellipse at center, black 30%, transparent 80%)",
         }}
       />
-      {/* Scanlines + vignette */}
+      {/* Scanlines + vignette (dark-only) */}
       <div
         aria-hidden
-        className="pointer-events-none fixed inset-0 z-10"
+        className="pointer-events-none fixed inset-0 z-10 hidden dark:block"
         style={{
           background:
             "repeating-linear-gradient(to bottom, transparent 0 2px, rgba(0,0,0,0.28) 3px, transparent 4px)",
@@ -146,7 +146,7 @@ export function TerminalOverlay() {
       />
       <div
         aria-hidden
-        className="pointer-events-none fixed inset-0 z-10"
+        className="pointer-events-none fixed inset-0 z-10 hidden dark:block"
         style={{
           background:
             "radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,0.55) 100%)",
