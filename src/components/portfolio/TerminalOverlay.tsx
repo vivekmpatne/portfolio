@@ -151,13 +151,7 @@ export function TerminalOverlay() {
         }}
       />
 
-      {/* Bottom-left OS label */}
-      <div className="pointer-events-none fixed bottom-4 left-4 z-20 hidden select-none text-[10px] font-medium uppercase tracking-widest text-muted-foreground md:block">
-        <div>
-          <span className="phosphor-glow">●</span> vivek.os
-        </div>
-        <div className="opacity-70">O(log n) · phosphor</div>
-      </div>
+      {/* (Removed OS label watermark) */}
 
       {/* SHELL launcher */}
       {!open && (
