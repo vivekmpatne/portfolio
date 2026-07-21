@@ -12,49 +12,17 @@ import {
   getCodechefActivity,
   getHackerrankActivity,
   getGfgActivity,
-  type ActivityResult,
 } from "@/lib/activity.functions";
+import type { ActivityResult, DayMap, PlatformId } from "@/lib/activity/types";
+import { PLATFORM_LABELS } from "@/lib/activity/types";
+import {
+  buildYearDays,
+  computeStats,
+  mergeCalendars,
+  totalActivity,
+} from "@/lib/activity/streak";
 
-// ----- Types -----
-type DayMap = Record<string, number>;
-const EMPTY: ActivityResult = { calendar: {}, meta: {} };
-
-
-// ----- Aggregation -----
-function mergeMaps(maps: DayMap[]): DayMap {
-  const out: DayMap = {};
-  for (const m of maps) {
-    for (const [k, v] of Object.entries(m)) out[k] = (out[k] ?? 0) + v;
-  }
-  return out;
-}
-
-function buildYearDays(year: number): string[] {
-  const days: string[] = [];
-  const start = new Date(Date.UTC(year, 0, 1));
-  const end = new Date(Date.UTC(year, 11, 31));
-  for (let d = new Date(start); d <= end; d.setUTCDate(d.getUTCDate() + 1)) {
-    days.push(d.toISOString().slice(0, 10));
-  }
-  return days;
-}
-
-function computeStreaks(days: string[], map: DayMap) {
-  let longest = 0, run = 0, totalActive = 0;
-  for (const day of days) {
-    if ((map[day] ?? 0) > 0) { run++; totalActive++; if (run > longest) longest = run; }
-    else run = 0;
-  }
-  // current streak = trailing active days from today backwards (within the dataset)
-  let current = 0;
-  const today = new Date().toISOString().slice(0, 10);
-  for (let i = days.length - 1; i >= 0; i--) {
-    if (days[i] > today) continue;
-    if ((map[days[i]] ?? 0) > 0) current++;
-    else break;
-  }
-  return { longest, current, totalActive };
-}
+const EMPTY: ActivityResult = { calendar: {}, meta: {}, status: "unavailable", fetchedAt: null };
 
 function intensityClass(count: number) {
   if (count === 0) return "bg-muted/60";
@@ -64,14 +32,15 @@ function intensityClass(count: number) {
   return "bg-emerald-600 dark:bg-emerald-400";
 }
 
-const SOURCES = [
-  { key: "github",     name: "GitHub",        icon: SiGithub,        color: "#6e7681" },
-  { key: "leetcode",   name: "LeetCode",      icon: SiLeetcode,      color: "#FFA116" },
-  { key: "codeforces", name: "Codeforces",    icon: SiCodeforces,    color: "#1F8ACB" },
-  { key: "codechef",   name: "CodeChef",      icon: SiCodechef,      color: "#5B4638" },
-  { key: "gfg",        name: "GeeksforGeeks", icon: SiGeeksforgeeks, color: "#2F8D46" },
-  { key: "hackerrank", name: "HackerRank",    icon: SiHackerrank,    color: "#2EC866" },
-] as const;
+type SourceDef = { key: PlatformId; icon: typeof SiGithub; color: string };
+const SOURCES: SourceDef[] = [
+  { key: "github",     icon: SiGithub,        color: "#6e7681" },
+  { key: "leetcode",   icon: SiLeetcode,      color: "#FFA116" },
+  { key: "codeforces", icon: SiCodeforces,    color: "#1F8ACB" },
+  { key: "codechef",   icon: SiCodechef,      color: "#5B4638" },
+  { key: "gfg",        icon: SiGeeksforgeeks, color: "#2F8D46" },
+  { key: "hackerrank", icon: SiHackerrank,    color: "#2EC866" },
+];
 
 export function Consistency() {
   const currentYear = new Date().getFullYear();
@@ -87,77 +56,49 @@ export function Consistency() {
   const hrFn = useServerFn(getHackerrankActivity);
   const gfgFn = useServerFn(getGfgActivity);
 
+  const opts = { staleTime: 10 * 60_000, retry: 1 as const };
   const queries = useQueries({
     queries: [
-      {
-        queryKey: ["activity", "github", github.username, year],
-        queryFn: () => ghFn({ data: { username: github.username, year } }),
-        staleTime: 10 * 60_000,
-        retry: 1,
-      },
-      {
-        queryKey: ["activity", "leetcode", leetcode.username, year],
-        queryFn: () => lcFn({ data: { username: leetcode.username, year } }),
-        staleTime: 10 * 60_000,
-        retry: 1,
-      },
-      {
-        queryKey: ["activity", "codeforces", codeforces.username, year],
-        queryFn: () => cfFn({ data: { username: codeforces.username, year } }),
-        staleTime: 10 * 60_000,
-        retry: 1,
-      },
-      {
-        queryKey: ["activity", "codechef", codechef.username, year],
-        queryFn: () => ccFn({ data: { username: codechef.username, year } }),
-        staleTime: 10 * 60_000,
-        retry: 1,
-      },
-      {
-        queryKey: ["activity", "hackerrank", hackerrank.username, year],
-        queryFn: () => hrFn({ data: { username: hackerrank.username, year } }),
-        staleTime: 10 * 60_000,
-        retry: 1,
-      },
-      {
-        queryKey: ["activity", "gfg", gfg.username, year],
-        queryFn: () => gfgFn({ data: { username: gfg.username, year } }),
-        staleTime: 10 * 60_000,
-        retry: 1,
-      },
+      { queryKey: ["activity", "github", github.username, year],       queryFn: () => ghFn({ data: { username: github.username, year } }), ...opts },
+      { queryKey: ["activity", "leetcode", leetcode.username, year],   queryFn: () => lcFn({ data: { username: leetcode.username, year } }), ...opts },
+      { queryKey: ["activity", "codeforces", codeforces.username, year], queryFn: () => cfFn({ data: { username: codeforces.username, year } }), ...opts },
+      { queryKey: ["activity", "codechef", codechef.username, year],   queryFn: () => ccFn({ data: { username: codechef.username, year } }), ...opts },
+      { queryKey: ["activity", "hackerrank", hackerrank.username, year], queryFn: () => hrFn({ data: { username: hackerrank.username, year } }), ...opts },
+      { queryKey: ["activity", "gfg", gfg.username, year],             queryFn: () => gfgFn({ data: { username: gfg.username, year } }), ...opts },
     ],
   });
 
   const isLoading = queries.some((q) => q.isLoading);
-  const gh = (queries[0].data as ActivityResult | undefined) ?? EMPTY;
-  const lc = (queries[1].data as ActivityResult | undefined) ?? EMPTY;
-  const cf = (queries[2].data as ActivityResult | undefined) ?? EMPTY;
-  const cc = (queries[3].data as ActivityResult | undefined) ?? EMPTY;
-  const hr = (queries[4].data as ActivityResult | undefined) ?? EMPTY;
-  const gg = (queries[5].data as ActivityResult | undefined) ?? EMPTY;
-  const errors = [gh.error, lc.error, cf.error, cc.error, hr.error, gg.error].filter(Boolean) as string[];
+  const results: Record<PlatformId, ActivityResult> = {
+    github:     (queries[0].data as ActivityResult | undefined) ?? EMPTY,
+    leetcode:   (queries[1].data as ActivityResult | undefined) ?? EMPTY,
+    codeforces: (queries[2].data as ActivityResult | undefined) ?? EMPTY,
+    codechef:   (queries[3].data as ActivityResult | undefined) ?? EMPTY,
+    hackerrank: (queries[4].data as ActivityResult | undefined) ?? EMPTY,
+    gfg:        (queries[5].data as ActivityResult | undefined) ?? EMPTY,
+  };
 
-  const sumValues = (m: DayMap) => Object.values(m).reduce((a, b) => a + b, 0);
+  const cachedPlatforms = SOURCES.filter((s) => results[s.key].status === "cached").map((s) => PLATFORM_LABELS[s.key]);
+  const unavailablePlatforms = SOURCES.filter((s) => results[s.key].status === "unavailable").map((s) => PLATFORM_LABELS[s.key]);
 
   const merged = useMemo(
-    () => mergeMaps([gh.calendar, lc.calendar, cf.calendar, cc.calendar, hr.calendar, gg.calendar]),
-    [gh, lc, cf, cc, hr, gg],
+    () => mergeCalendars(SOURCES.map((s) => results[s.key].calendar)),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [queries.map((q) => q.dataUpdatedAt).join(",")],
   );
   const days = useMemo(() => buildYearDays(year), [year]);
-  const stats = useMemo(() => computeStreaks(days, merged), [days, merged]);
+  const stats = useMemo(() => computeStats(merged, year), [merged, year]);
+  const totalContribs = totalActivity(merged);
 
-  const sourceCounts: Record<string, number> = {
-    github: sumValues(gh.calendar),
-    leetcode: sumValues(lc.calendar),
-    codeforces: sumValues(cf.calendar),
-    codechef: sumValues(cc.calendar),
-    gfg: sumValues(gg.calendar),
-    hackerrank: sumValues(hr.calendar),
+  const sourceCounts: Record<PlatformId, number> = {
+    github:     totalActivity(results.github.calendar),
+    leetcode:   totalActivity(results.leetcode.calendar),
+    codeforces: totalActivity(results.codeforces.calendar),
+    codechef:   totalActivity(results.codechef.calendar),
+    gfg:        totalActivity(results.gfg.calendar),
+    hackerrank: totalActivity(results.hackerrank.calendar),
   };
-  const totalContribs = sumValues(merged);
 
-
-  // Build heatmap grid: weeks of 7 days (Sun..Sat)
   const grid = useMemo(() => {
     const first = new Date(`${year}-01-01T00:00:00Z`);
     const startOffset = first.getUTCDay();
@@ -180,11 +121,12 @@ export function Consistency() {
     return { weeks, months };
   }, [days, year]);
 
+  const currentDisplay = stats.current === null ? "—" : stats.current;
   const metrics = [
-    { icon: Flame,    label: "Current Streak",    value: stats.current,     suffix: "days",     color: "text-orange-500" },
-    { icon: Trophy,   label: "Longest Streak",    value: stats.longest,     suffix: "days",     color: "text-amber-500" },
-    { icon: Calendar, label: `Active in ${year}`, value: stats.totalActive, suffix: "days",     color: "text-emerald-500" },
-    { icon: Zap,      label: "Total Activity",    value: totalContribs,     suffix: "contribs", color: "text-indigo-500" },
+    { icon: Flame,    label: "Current Streak",    value: currentDisplay,     suffix: stats.current === null ? "" : "days", color: "text-orange-500" },
+    { icon: Trophy,   label: "Longest Streak",    value: stats.longest,      suffix: "days",     color: "text-amber-500" },
+    { icon: Calendar, label: `Active in ${year}`, value: stats.active,       suffix: "days",     color: "text-emerald-500" },
+    { icon: Zap,      label: "Total Activity",    value: totalContribs,      suffix: "contribs", color: "text-indigo-500" },
   ];
 
   return (
@@ -193,13 +135,25 @@ export function Consistency() {
       <p className="-mt-2 mb-4 max-w-2xl text-muted-foreground">
         Real engineering activity aggregated live from GitHub, LeetCode, Codeforces, CodeChef, HackerRank, and GeeksforGeeks — no manual updates.
       </p>
-      {errors.length > 0 && (
-        <div className="mb-6 flex items-start gap-2 rounded-lg border border-amber-500/30 bg-amber-500/5 px-3 py-2 text-xs text-amber-700 dark:text-amber-400">
-          <AlertCircle className="mt-0.5 h-3.5 w-3.5 shrink-0" />
-          <span>Some sources unavailable: {errors.join(" · ")}</span>
+
+      {(cachedPlatforms.length > 0 || unavailablePlatforms.length > 0) && (
+        <div className="mb-6 space-y-2">
+          {cachedPlatforms.length > 0 && (
+            <div className="flex items-start gap-2 rounded-lg border border-amber-500/30 bg-amber-500/5 px-3 py-2 text-xs text-amber-700 dark:text-amber-400">
+              <AlertCircle className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+              <span>
+                Showing last known data for: {cachedPlatforms.join(", ")}.
+              </span>
+            </div>
+          )}
+          {unavailablePlatforms.length > 0 && (
+            <div className="flex items-start gap-2 rounded-lg border border-rose-500/30 bg-rose-500/5 px-3 py-2 text-xs text-rose-700 dark:text-rose-400">
+              <AlertCircle className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+              <span>Unavailable (no cached snapshot yet): {unavailablePlatforms.join(", ")}.</span>
+            </div>
+          )}
         </div>
       )}
-
 
       <div className="mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {metrics.map((m) => {
@@ -217,7 +171,7 @@ export function Consistency() {
               </div>
               <div className="mt-3 font-display text-3xl font-semibold">
                 {isLoading ? <span className="inline-block h-7 w-12 animate-pulse rounded bg-muted align-middle" /> : m.value}
-                <span className="ml-1.5 text-xs font-normal text-muted-foreground">{m.suffix}</span>
+                {m.suffix && <span className="ml-1.5 text-xs font-normal text-muted-foreground">{m.suffix}</span>}
               </div>
             </div>
           );
@@ -279,30 +233,20 @@ export function Consistency() {
                     const date = week[di];
                     if (!date) return <div key={di} className="h-3 w-3 rounded-sm bg-transparent" />;
                     const count = merged[date] ?? 0;
-                    const ghC = gh.calendar[date] ?? 0;
-                    const lcC = lc.calendar[date] ?? 0;
-                    const cfC = cf.calendar[date] ?? 0;
-                    const ccC = cc.calendar[date] ?? 0;
-                    const hrC = hr.calendar[date] ?? 0;
-                    const ggC = gg.calendar[date] ?? 0;
-                    const parts = [
-                      `${date} — ${count} ${count === 1 ? "contribution" : "contributions"}`,
-                      ghC ? `GitHub: ${ghC}` : null,
-                      lcC ? `LeetCode: ${lcC}` : null,
-                      cfC ? `Codeforces: ${cfC}` : null,
-                      ccC ? `CodeChef: ${ccC}` : null,
-                      hrC ? `HackerRank: ${hrC}` : null,
-                      ggC ? `GeeksforGeeks: ${ggC}` : null,
-                    ].filter(Boolean);
+                    const perPlatform: string[] = [];
+                    for (const s of SOURCES) {
+                      const c = results[s.key].calendar[date] ?? 0;
+                      if (c) perPlatform.push(`${PLATFORM_LABELS[s.key]}: ${c}`);
+                    }
+                    const title = [`${date} — ${count} ${count === 1 ? "contribution" : "contributions"}`, ...perPlatform].join("\n");
                     return (
                       <div
                         key={di}
-                        title={parts.join("\n")}
+                        title={title}
                         className={`h-3 w-3 rounded-sm transition-transform hover:scale-150 ${intensityClass(count)}`}
                       />
                     );
                   })}
-
                 </div>
               ))}
             </div>
@@ -318,8 +262,8 @@ export function Consistency() {
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {SOURCES.map((s) => {
             const Icon = s.icon;
-            const count = sourceCounts[s.key] ?? 0;
-            const tracked = ["github", "leetcode", "codeforces", "codechef", "hackerrank", "gfg"].includes(s.key);
+            const r = results[s.key];
+            const count = sourceCounts[s.key];
             return (
               <div
                 key={s.key}
@@ -327,19 +271,34 @@ export function Consistency() {
               >
                 <div className="flex items-center gap-3">
                   <Icon className="h-5 w-5" style={{ color: s.color }} />
-                  <span className="text-sm font-medium">{s.name}</span>
+                  <span className="text-sm font-medium">{PLATFORM_LABELS[s.key]}</span>
+                  {r.status === "cached" && (
+                    <span className="rounded-full border border-amber-500/40 px-1.5 py-0.5 text-[9px] font-medium uppercase tracking-widest text-amber-600 dark:text-amber-400">
+                      cached
+                    </span>
+                  )}
+                  {r.status === "unavailable" && (
+                    <span className="rounded-full border border-rose-500/40 px-1.5 py-0.5 text-[9px] font-medium uppercase tracking-widest text-rose-600 dark:text-rose-400">
+                      offline
+                    </span>
+                  )}
                 </div>
                 <span className="font-display text-base font-semibold tabular-nums">
-                  {tracked ? count : <span className="text-xs font-normal text-muted-foreground">linked</span>}
+                  {r.status === "unavailable"
+                    ? <span className="text-xs font-normal text-muted-foreground">Unavailable</span>
+                    : count}
                 </span>
               </div>
             );
           })}
         </div>
         <p className="mt-3 text-xs text-muted-foreground">
-          All six platforms feed the heatmap live. GeeksforGeeks activity comes via a community proxy and may lag by a day.
+          All six platforms feed the heatmap live. Last-known-good snapshots are used automatically when a source is temporarily unavailable.
         </p>
       </div>
     </section>
   );
 }
+
+// silence unused-import lint for DayMap (type re-export from types.ts is used via mergeCalendars)
+export type _DayMap = DayMap;
