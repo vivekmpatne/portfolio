@@ -1,4 +1,5 @@
 // Pure streak-logic tests. Run with: `bun test src/lib/activity/streak.test.ts`
+// @ts-expect-error — bun:test types not shipped with @types/bun in this repo
 import { describe, expect, test } from "bun:test";
 import {
   currentStreak,
@@ -96,8 +97,7 @@ describe("streak", () => {
 
   test("duplicate same-day activity does not create multiple streak days", () => {
     const days = buildYearDays(2026);
-    const m = { "2026-03-01": 5, "2026-03-02": 2, "2026-03-02_dup": 0 };
-    delete m["2026-03-02_dup"];
+    const m: Record<string, number> = { "2026-03-01": 5, "2026-03-02": 2 };
     expect(longestStreak(days, m)).toBe(2);
     expect(activeDayCount(days, m)).toBe(2);
   });
