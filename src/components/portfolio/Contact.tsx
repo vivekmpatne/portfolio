@@ -19,7 +19,7 @@ export function Contact() {
     setSending(true);
     try {
       await sendContactEmail({ data: form });
-      toast.success("Message sent! I'll get back to you soon.");
+      toast.success("Message sent successfully! I'll get back to you soon.");
       setForm({ name: "", email: "", message: "" });
     } catch (err) {
       console.error(err);
