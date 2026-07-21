@@ -116,8 +116,12 @@ export function Contact() {
             value={form.message}
             onChange={(e) => setForm({ ...form, message: e.target.value })}
           />
-          <Button type="submit" className="w-full">
-            <Send className="mr-1 h-4 w-4" /> Send via Email
+          <Button type="submit" className="w-full" disabled={sending}>
+            {sending ? (
+              <><Loader2 className="mr-1 h-4 w-4 animate-spin" /> Sending...</>
+            ) : (
+              <><Send className="mr-1 h-4 w-4" /> Send Message</>
+            )}
           </Button>
         </form>
       </div>
