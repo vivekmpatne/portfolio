@@ -1,20 +1,32 @@
 import { useState, type FormEvent } from "react";
-import { Mail, Phone, MapPin, Send, Check } from "lucide-react";
+import { Mail, Phone, MapPin, Send, Check, Loader2 } from "lucide-react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { profile } from "@/data/profile";
 import { SectionHeader } from "./SectionHeader";
 import { SocialIcons } from "./SocialIcons";
+import { sendContactEmail } from "@/lib/contact.functions";
 
 export function Contact() {
   const [form, setForm] = useState({ name: "", email: "", message: "" });
+  const [sending, setSending] = useState(false);
 
-  const onSubmit = (e: FormEvent) => {
+  const onSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    const subject = encodeURIComponent(`Portfolio contact from ${form.name}`);
-    const body = encodeURIComponent(`${form.message}\n\n— ${form.name} (${form.email})`);
-    window.location.href = `mailto:${profile.email}?subject=${subject}&body=${body}`;
+    if (sending) return;
+    setSending(true);
+    try {
+      await sendContactEmail({ data: form });
+      toast.success("Message sent! I'll get back to you soon.");
+      setForm({ name: "", email: "", message: "" });
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to send message. Please try again or email me directly.");
+    } finally {
+      setSending(false);
+    }
   };
 
   const contactItems = [
