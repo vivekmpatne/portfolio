@@ -16,7 +16,9 @@
 // `requireSupabaseAuth` on those specific functions — this test will then
 // allow (but not require) a global attacher to be registered.
 
+// @ts-expect-error — bun:test types not shipped with @types/bun in this repo
 import { describe, it, expect } from "bun:test";
+
 import { readFileSync, readdirSync, statSync } from "node:fs";
 import { join } from "node:path";
 
