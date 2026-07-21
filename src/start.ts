@@ -1,27 +1,25 @@
 import { createStart, createMiddleware } from "@tanstack/react-start";
 
 import { renderErrorPage } from "./lib/error-page";
-import { attachSupabaseAuth } from "@/integrations/supabase/auth-attacher";
 
 // ---------------------------------------------------------------------------
-// IMPORTANT — Supabase auth attachment is intentionally NOT registered here.
+// IMPORTANT — DO NOT register `attachSupabaseAuth` globally.
 //
-// No server function in this project uses `requireSupabaseAuth`. Registering
-// `attachSupabaseAuth` as a global `functionMiddleware` forces the browser
+// The six public activity server functions are unauthenticated. Registering
+// `attachSupabaseAuth` as a global `functionMiddleware` forces the BROWSER
 // Supabase client (`src/integrations/supabase/client.ts`) to initialise on
-// every server-fn call. If that client throws in a given runtime (e.g. a
-// missing VITE_SUPABASE_* variable at build time in a specific deployment),
-// ALL server functions — including the six public activity fetches — fail,
-// and the entire Consistency dashboard collapses to "Unavailable".
+// every server-fn RPC. If `VITE_SUPABASE_URL` / `VITE_SUPABASE_PUBLISHABLE_KEY`
+// are missing from a given deployment's browser bundle, that client throws
+// synchronously and every server-fn call fails before it leaves the browser —
+// collapsing the entire Consistency dashboard to "Unavailable" on any full
+// page reload.
 //
-// If a future feature adds a server function that uses `requireSupabaseAuth`,
-// re-register `attachSupabaseAuth` here (append, don't replace):
-//
-//   import { attachSupabaseAuth } from "@/integrations/supabase/auth-attacher";
-//   functionMiddleware: [attachSupabaseAuth],
-//
-// Public server functions (like the activity adapters) must never depend on
-// this middleware.
+// A structural regression test in `src/start.test.ts` fails the build if the
+// import or middleware is re-added while no server function actually uses
+// `requireSupabaseAuth`. If a future feature genuinely needs authenticated
+// server functions, register a middleware that is resilient to a missing
+// browser client (or scope it to only the protected functions) — never a
+// global that couples public RPCs to browser auth.
 // ---------------------------------------------------------------------------
 
 const errorMiddleware = createMiddleware().server(async ({ next }) => {
@@ -42,6 +40,6 @@ const errorMiddleware = createMiddleware().server(async ({ next }) => {
 });
 
 export const startInstance = createStart(() => ({
-  functionMiddleware: [attachSupabaseAuth],
+  functionMiddleware: [],
   requestMiddleware: [errorMiddleware],
 }));
