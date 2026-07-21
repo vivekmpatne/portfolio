@@ -2,7 +2,7 @@
 
 Personal developer portfolio of **Vivek Patne**, a Computer Science & Engineering (Data Science) student at RNS Institute of Technology, Bengaluru.
 
-Built as a fast, terminal-inspired developer portfolio that goes beyond a static personal site — it aggregates and displays **real, live coding activity** across six platforms through a resilient server-side integration layer with persistent caching and graceful degradation.
+Built as a fast, terminal-inspired developer portfolio that goes beyond a static personal site — it aggregates and displays **real, live coding activity** across six platforms through a resilient server-side integration layer with persistent caching, graceful degradation, and a production email contact system.
 
 **Live Site:** https://vivekpatne.me
 **Source Code:** https://github.com/vivekmpatne/portfolio
@@ -13,7 +13,7 @@ Built as a fast, terminal-inspired developer portfolio that goes beyond a static
 
 Most portfolios display static text. This one runs a small backend system: server-side adapters pull activity from six coding platforms, normalize it into a common format, merge it into a unified contribution heatmap, compute accurate streaks, and fall back to a persistent last-known-good cache when an upstream platform is temporarily unavailable — without ever showing a misleading zero.
 
-The rest of the site (profile, projects, skills, experience) is fully data-driven through a centralized `src/data/` layer, so routine content updates never require touching component code.
+Contact is handled through a real email pipeline on a verified custom domain rather than a `mailto:` link, and the rest of the site (profile, projects, skills, experience) is fully data-driven through a centralized `src/data/` layer, so routine content updates never require touching component code.
 
 ---
 
@@ -24,6 +24,8 @@ The rest of the site (profile, projects, skills, experience) is fully data-drive
 - Interactive shell-style elements and command-based navigation
 - Animated typewriter role display
 - Responsive ASCII portrait generated from a real image
+- Refined spacing, typography, and navigation after a full UI polish pass
+- Smooth animations and enhanced accessibility
 - Light and dark theme support
 - Fully responsive across mobile, tablet, and desktop
 
@@ -39,7 +41,13 @@ The rest of the site (profile, projects, skills, experience) is fully data-drive
 - Persistent last-known-good (LKG) cache backed by Supabase
 - A single platform outage never collapses the whole dashboard
 - Legitimate zero activity is distinguished from an API/network failure
-- Cache survives page reloads, browser restarts, and worker restarts
+- Cache survives page reloads, browser restarts, worker restarts, and deployments
+
+### ✉️ Production Contact Form
+- Real contact form backed by the Resend email API — no email client dependency
+- Server-side email sending, keeping the API key off the client entirely
+- Sends from a verified custom domain (DKIM, SPF, MX, DMARC configured)
+- Success and error states with toast notifications and a loading state while sending
 
 ### 🧩 Data-Driven Projects
 - Centralized project configuration with description, tech stack, status, GitHub link, live link, screenshot, and featured flag
@@ -104,6 +112,8 @@ data        unavailable
 
 A temporary failure in one platform is isolated — it does not affect the other five. Cached values are clearly last-known-good, not claimed as live, and a fresh successful fetch naturally replaces the stored snapshot on the next request.
 
+**Root cause of the earlier zero-activity bug:** a global Supabase auth middleware previously ran ahead of every public server function, including the six activity endpoints. Any browser-side Supabase session issue blocked those RPCs entirely, making all six sources appear unavailable — and in some cases render as 0 — even when valid cached data existed server-side. The fix removed that unnecessary global middleware, added the LKG cache fallback described above, and added a structural regression test (see Testing & Reliability) so it can't silently return.
+
 ---
 
 ## Architecture
@@ -159,8 +169,9 @@ Consistency Dashboard (UI)
 | Data Fetching | TanStack Query |
 | Server Logic | TanStack Server Functions |
 | Persistent Cache | Supabase (`activity_cache` table) |
+| Transactional Email | Resend (custom verified domain, DKIM/SPF/MX/DMARC) |
 | Icons | Lucide React + React Icons |
-| Runtime | Cloudflare/Nitro worker runtime |
+| Hosting | Lovable Hosting |
 | Package Runtime | Bun |
 
 ---
@@ -185,10 +196,12 @@ Create a `.env` file in the project root:
 GITHUB_TOKEN=your_github_token
 SUPABASE_URL=your_supabase_url
 SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+RESEND_API_KEY=your_resend_api_key
 ```
 
 - `GITHUB_TOKEN` is used server-side for GitHub GraphQL requests.
 - Supabase variables are used server-side for the persistent LKG cache.
+- `RESEND_API_KEY` is used server-side to send contact form emails through the verified custom domain.
 - LeetCode and Codeforces integrations do not require authentication.
 
 > Never commit `.env` or real credentials to GitHub.
@@ -224,7 +237,7 @@ portfolio/
 │   │   └── index.tsx              # Main portfolio route
 │   │
 │   ├── components/
-│   │   ├── portfolio/             # Hero, Consistency, Achievements, Skills, Projects, etc.
+│   │   ├── portfolio/             # Hero, Consistency, Achievements, Skills, Projects, Contact, etc.
 │   │   └── ui/                    # shadcn/ui primitives
 │   │
 │   ├── lib/
@@ -322,15 +335,27 @@ This covers the activity/streak/caching subsystem specifically, not full applica
 
 ## Security
 
-- `GITHUB_TOKEN` and Supabase service-role credentials are server-side only and never exposed to client code.
+- `GITHUB_TOKEN`, Supabase service-role credentials, and the `RESEND_API_KEY` are server-side only and never exposed to client code.
 - Public activity server functions do not require browser Supabase authentication to execute.
 - `.env` is gitignored and never committed.
-- Privileged cache read/write operations are isolated to server-only modules.
+- Privileged cache read/write and email-sending operations are isolated to server-only modules.
 
 Before pushing changes, secrets can be checked with:
 ```bash
-git grep -n -E "ghp_|github_pat_|SUPABASE_SERVICE_ROLE|PRIVATE_KEY"
+git grep -n -E "ghp_|github_pat_|SUPABASE_SERVICE_ROLE|PRIVATE_KEY|re_[a-zA-Z0-9]"
 ```
+
+---
+
+## Project Status
+
+**Production Ready**
+
+- Responsive, polished UI with refined spacing, typography, and navigation
+- Multi-platform coding activity dashboard with stable caching
+- Reliable server functions with structural regression protection
+- Professional email contact form on a verified custom domain
+- Deployed and live at vivekpatne.me
 
 ---
 
@@ -345,6 +370,8 @@ RNS Institute of Technology, Bengaluru
 - GitHub: github.com/vivekmpatne
 - LeetCode: leetcode.com/u/vivekpatnem
 - Codeforces: codeforces.com/profile/vivekpatnem
+
+Or use the contact form on the site directly — messages are delivered via a verified custom domain.
 
 ---
 
