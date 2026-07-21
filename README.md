@@ -1,120 +1,148 @@
-# Vivek Patne | Developer Portfolio
+# Vivek Patne | Portfolio
 
-Personal developer portfolio of **Vivek Patne**, a Computer Science & Engineering (Data Science) student at RNS Institute of Technology, Bengaluru, graduating in 2028.
+Personal developer portfolio of **Vivek Patne**, a Computer Science & Engineering (Data Science) student at RNS Institute of Technology, Bengaluru.
 
-Built as a fast, terminal-inspired developer portfolio showcasing my **software engineering journey, projects, technical skills, and live coding activity** across multiple competitive programming and development platforms.
+Built as a fast, terminal-inspired developer portfolio that goes beyond a static personal site — it aggregates and displays **real, live coding activity** across six platforms through a resilient server-side integration layer with persistent caching and graceful degradation.
 
-## Live Portfolio
-
-**Live Website:** https://vivekpatne.me
-
+**Live Site:** https://vivekpatne.me
 **Source Code:** https://github.com/vivekmpatne/portfolio
+
+---
+
+## Overview
+
+Most portfolios display static text. This one runs a small backend system: server-side adapters pull activity from six coding platforms, normalize it into a common format, merge it into a unified contribution heatmap, compute accurate streaks, and fall back to a persistent last-known-good cache when an upstream platform is temporarily unavailable — without ever showing a misleading zero.
+
+The rest of the site (profile, projects, skills, experience) is fully data-driven through a centralized `src/data/` layer, so routine content updates never require touching component code.
 
 ---
 
 ## Features
 
-### Terminal-Inspired Developer UI
-
+### 🖥️ Terminal-Inspired UI
 - Custom terminal and phosphor-inspired visual design
 - Interactive shell-style elements and command-based navigation
 - Animated typewriter role display
 - Responsive ASCII portrait generated from a real image
 - Light and dark theme support
-- Fully responsive layout across mobile, tablet, and desktop
+- Fully responsive across mobile, tablet, and desktop
 
-### Live Coding Profiles
+### 📊 Six-Platform Consistency Dashboard
+- Unified yearly contribution heatmap merging GitHub, LeetCode, Codeforces, CodeChef, GeeksforGeeks, and HackerRank
+- Accurate current streak and longest streak computation
+- Active days and total aggregated activity per year
+- Per-platform status: fresh, cached, or unavailable
+- Year selection with historical accuracy (a past year never shows a false "current" streak)
+- No manual daily updates — everything is fetched and aggregated automatically
 
-The portfolio dynamically retrieves coding statistics instead of relying entirely on manually maintained values.
+### 🔁 Resilient Reliability & Caching
+- Persistent last-known-good (LKG) cache backed by Supabase
+- A single platform outage never collapses the whole dashboard
+- Legitimate zero activity is distinguished from an API/network failure
+- Cache survives page reloads, browser restarts, and worker restarts
 
-- **GitHub**
-  - Public repositories
-  - Followers and following
-  - Contribution activity
-  - Contribution calendar data
+### 🧩 Data-Driven Projects
+- Centralized project configuration with description, tech stack, status, GitHub link, live link, screenshot, and featured flag
+- Missing links or images degrade gracefully instead of rendering broken UI
 
-- **LeetCode**
-  - Contest rating
-  - Total problems solved
-  - Easy / Medium / Hard breakdown
-  - Coding activity
+### 🎯 Recruiter-Focused Sections
+Hero, About, Engineering Consistency, Achievements, Live Coding Profiles, Technical Skills, Featured Projects, Experience, Contact
 
-- **Codeforces**
-  - Current rating
-  - Maximum rating
-  - Rank
-  - Submission activity
+### 🔍 SEO
+Semantic HTML, Open Graph metadata, Twitter card metadata, canonical URL support, structured website metadata
 
-### Engineering Consistency Dashboard
+---
 
-A unified activity dashboard aggregates coding activity across:
+## Consistency Dashboard
 
-- GitHub
-- LeetCode
-- Codeforces
-- CodeChef
-- GeeksforGeeks
-- HackerRank
+| Platform | Integration | Resilience |
+| --- | --- | --- |
+| GitHub | Authenticated GraphQL API | LKG cache fallback |
+| LeetCode | Public GraphQL/data access | LKG cache fallback |
+| Codeforces | Public API | LKG cache fallback |
+| CodeChef | HTML/page-structure dependent | LKG cache fallback, more fragile to upstream changes |
+| GeeksforGeeks | Community stats proxy | LKG cache fallback, may lag |
+| HackerRank | Public profile data | LKG cache fallback |
 
-The dashboard includes:
+Activity from all six sources is normalized into a common date-based representation and merged into one heatmap and one set of streak/activity statistics. Not every platform exposes an official public API — where it doesn't, the integration relies on best-effort data access and is documented as such rather than overstated.
 
-- Unified yearly contribution heatmap
-- Current activity streak
-- Longest streak
-- Active days
-- Total engineering activity
-- Platform-wise contribution counts
-- Year-based activity view
+**Streak logic:**
+- If today has activity, the current streak counts backward from today.
+- If today has no activity yet but yesterday did, the streak stays alive and counts backward from yesterday (so the streak doesn't falsely reset to zero before today's first submission).
+- If neither today nor yesterday has activity, the current streak is 0.
+- All dates are normalized in UTC (`YYYY-MM-DD`) for consistency.
+- Historical years never report a "current" streak.
 
-This provides a broader view of engineering consistency instead of measuring activity from a single platform.
+---
 
-### Projects
+## Reliability & Caching
 
-Projects are managed through a centralized data configuration.
+```
+Upstream fetch succeeds
+        │
+        ▼
+  Return fresh data ──────► Upsert snapshot into
+                             persistent LKG cache
+                             (Supabase: activity_cache)
 
-Each project can include:
+Upstream fetch fails
+        │
+        ▼
+  Read last-known-good snapshot
+    (key: platform + username + year)
+        │
+   ┌────┴────┐
+   ▼         ▼
+Snapshot   No snapshot
+ exists      exists
+   │            │
+   ▼            ▼
+Return      Mark only that
+cached      platform as
+data        unavailable
+```
 
-- Description
-- Technology stack
-- Development status
-- GitHub repository
-- Live deployment
-- Project screenshot
-- Featured project status
+A temporary failure in one platform is isolated — it does not affect the other five. Cached values are clearly last-known-good, not claimed as live, and a fresh successful fetch naturally replaces the stored snapshot on the next request.
 
-Missing repository, deployment, or image links are handled gracefully instead of rendering broken UI.
+---
 
-### Recruiter-Focused Sections
+## Architecture
 
-- Hero / introduction
-- About
-- Engineering consistency
-- Achievements
-- Live coding profiles
-- Technical skills
-- Featured projects
-- Experience
-- Contact and social profiles
+```
+Browser
+  │
+  ▼
+Public TanStack Server Functions   (src/lib/activity.functions.ts)
+  │  thin declarations, dynamically import
+  │  server-only implementation
+  ▼
+Server Activity Orchestration      (src/lib/activity.server.ts)
+  │
+  ▼
+Platform Adapters
+  ├── GitHub
+  ├── LeetCode
+  ├── Codeforces
+  ├── CodeChef
+  ├── GeeksforGeeks
+  └── HackerRank
+  │
+  ▼
+Normalized ActivityResult          (src/lib/activity/types.ts)
+  │
+  ▼
+Aggregation + Streak Engine        (src/lib/activity/streak.ts)
+  │
+  ▼
+Persistent LKG Cache               (src/lib/activity/cache.server.ts → Supabase)
+  │
+  ▼
+Consistency Dashboard (UI)
+```
 
-### Reliability and Performance
+**Why server functions are kept thin:** TanStack server-function code splitting can extract a handler while dropping sibling helper declarations if logic lives directly in the function file. Splitting the thin public declaration (`activity.functions.ts`) from the server-only implementation (`activity.server.ts`) avoids this class of bug.
 
-- Server-side API integrations
-- TanStack Query caching
-- Graceful API failure handling
-- Loading skeletons
-- Missing data shown as `Unavailable` instead of misleading values
-- Environment variables kept server-side
-- Production build validation
-- Responsive image and asset handling
-
-### SEO
-
-- Semantic HTML
-- Metadata configuration
-- Open Graph metadata
-- Twitter card metadata
-- Canonical URL support
-- Structured website metadata
+**Auth isolation for public activity functions:** the six activity server functions do not depend on browser Supabase authentication. `src/start.ts` intentionally does not globally register Supabase auth middleware (`functionMiddleware: []`), because a browser-side `supabase.auth.getSession()` call gating every public RPC previously meant that any browser Supabase session issue would make all six activity sources appear unavailable, even when valid cached data existed server-side. Public activity RPCs reach the server independently of browser auth state; only the cache read/write layer uses privileged, server-only Supabase access.
 
 ---
 
@@ -125,13 +153,14 @@ Missing repository, deployment, or image links are handled gracefully instead of
 | Framework | TanStack Start |
 | Frontend | React 19 |
 | Language | TypeScript |
-| Build Tool | Vite 7 |
+| Build Tool | Vite |
 | Styling | Tailwind CSS v4 |
 | UI Components | shadcn/ui + Radix UI |
 | Data Fetching | TanStack Query |
 | Server Logic | TanStack Server Functions |
+| Persistent Cache | Supabase (`activity_cache` table) |
 | Icons | Lucide React + React Icons |
-| Runtime / Deployment | Vercel |
+| Runtime | Cloudflare/Nitro worker runtime |
 | Package Runtime | Bun |
 
 ---
@@ -139,53 +168,45 @@ Missing repository, deployment, or image links are handled gracefully instead of
 ## Getting Started
 
 ### 1. Clone the repository
-
 ```bash
-git clone <your-repository-url>
+git clone https://github.com/vivekmpatne/portfolio.git
 cd portfolio
 ```
 
 ### 2. Install dependencies
-
 ```bash
 bun install
 ```
 
 ### 3. Configure environment variables
 
-Create a `.env` file in the project root.
-
+Create a `.env` file in the project root:
 ```env
 GITHUB_TOKEN=your_github_token
+SUPABASE_URL=your_supabase_url
+SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
 ```
 
-The GitHub token is used server-side for GitHub GraphQL requests.
+- `GITHUB_TOKEN` is used server-side for GitHub GraphQL requests.
+- Supabase variables are used server-side for the persistent LKG cache.
+- LeetCode and Codeforces integrations do not require authentication.
 
-> Never commit `.env` or real API tokens to GitHub.
-
-LeetCode and Codeforces integrations do not require authentication.
-
-Additional environment variables may be required if optional integrations such as Supabase are enabled.
+> Never commit `.env` or real credentials to GitHub.
 
 ### 4. Start the development server
-
 ```bash
 bun run dev
 ```
 
-The development server will normally be available at:
-
-```text
-http://localhost:8080
+### 5. Run tests
+```bash
+bun test
 ```
 
-### 5. Create a production build
-
+### 6. Create a production build
 ```bash
 bun run build
 ```
-
-A successful build verifies that the application can be compiled for production deployment.
 
 ---
 
@@ -194,252 +215,130 @@ A successful build verifies that the application can be compiled for production 
 ```text
 portfolio/
 ├── public/
-│   ├── projects/
-│   │   └── dsa-tracker.png       # Project screenshots
-│   └── ...                        # Public static assets
+│   ├── projects/                  # Project screenshots
+│   └── ...
 │
 ├── src/
-│   ├── assets/
-│   │   ├── vivek-portrait.png     # Source image for ASCII portrait
-│   │   └── ...                    # Other bundled assets
+│   ├── routes/
+│   │   ├── __root.tsx             # Root layout, SEO, theme bootstrap
+│   │   └── index.tsx              # Main portfolio route
 │   │
 │   ├── components/
-│   │   ├── portfolio/
-│   │   │   ├── Hero.tsx           # Hero and terminal-style introduction
-│   │   │   ├── AsciiPortrait.tsx  # Dynamic ASCII portrait renderer
-│   │   │   ├── About.tsx
-│   │   │   ├── Consistency.tsx    # Engineering activity dashboard
-│   │   │   ├── Achievements.tsx
-│   │   │   ├── LiveStats.tsx      # Live coding profile statistics
-│   │   │   ├── Skills.tsx
-│   │   │   ├── Projects.tsx
-│   │   │   ├── Experience.tsx
-│   │   │   ├── Contact.tsx
-│   │   │   └── ...
-│   │   │
+│   │   ├── portfolio/             # Hero, Consistency, Achievements, Skills, Projects, etc.
 │   │   └── ui/                    # shadcn/ui primitives
 │   │
+│   ├── lib/
+│   │   ├── activity.functions.ts  # Thin public server-function declarations
+│   │   ├── activity.server.ts     # Server-only fetch/orchestration logic
+│   │   ├── activity/
+│   │   │   ├── types.ts           # Shared activity/platform types
+│   │   │   ├── streak.ts          # Pure streak/aggregation computation
+│   │   │   └── cache.server.ts    # Persistent LKG cache read/write
+│   │   └── activity-schemas.ts    # Validation schemas
+│   │
 │   ├── data/
-│   │   ├── profile.ts             # Profile and coding platform usernames
+│   │   ├── profile.ts             # Profile, coding platform usernames, resume config
 │   │   ├── projects.ts            # Project configuration
 │   │   ├── skills.ts              # Technical skills
 │   │   ├── experience.ts          # Experience timeline
 │   │   └── links.ts               # External/social links
 │   │
 │   ├── hooks/
-│   │   └── ...                    # Reusable React hooks
-│   │
-│   ├── integrations/
-│   │   └── supabase/              # Optional Supabase integration
-│   │
-│   ├── lib/
-│   │   └── activity.functions.ts  # Server-side coding platform integrations
-│   │
-│   ├── routes/
-│   │   ├── __root.tsx             # Root layout, SEO and theme bootstrap
-│   │   └── index.tsx              # Main portfolio route
-│   │
-│   ├── routeTree.gen.ts           # Auto-generated TanStack route tree
 │   ├── start.ts                   # TanStack Start configuration
-│   └── styles.css                 # Tailwind v4 and global design tokens
+│   ├── start.test.ts              # Structural regression guards
+│   └── styles.css
 │
-├── .env                           # Local secrets, never committed
+├── .env                            # Local secrets, never committed
 ├── .gitignore
 ├── package.json
 └── README.md
 ```
 
-> `routeTree.gen.ts` is generated automatically by TanStack Router and should generally not be edited manually.
+---
+
+## Configuration / Customization
+
+Most editable content lives in `src/data/` — routine updates should not require touching component logic.
+
+| To change... | Edit |
+| --- | --- |
+| Profile, bio, coding usernames, resume link | `src/data/profile.ts` |
+| Projects | `src/data/projects.ts` |
+| Skills | `src/data/skills.ts` |
+| Experience/education | `src/data/experience.ts` |
+| Social/external links | `src/data/links.ts` |
+
+Project screenshots go in `public/projects/` and are referenced as `/projects/filename.png`. When a project has no repository, live deployment, or screenshot, the corresponding field is set to `null` rather than a fake link — the UI hides that element instead of rendering a broken one.
+
+**Current projects:**
+1. **DSA Tracker** — full-stack MERN consistency tracker, live/deployed, with a project screenshot
+2. **ChefKart** — full-stack food-delivery platform, in progress, with role-based dashboards for user/chef/admin
+3. **Samsung SIC Capstone** — IoT-oriented capstone project (Raspberry Pi, sensors)
 
 ---
 
-## Data Architecture
+## Adding Another Activity Platform
 
-The portfolio keeps most manually maintained information inside `src/data/`, providing a centralized source of truth.
+The activity architecture is designed so a seventh platform can be added with limited, well-scoped work — not zero code changes:
 
-### Profile and Coding Accounts
+1. Add the username/profile configuration to `profile.ts`.
+2. Add a platform ID/label/type.
+3. Add a validation schema if needed (`activity-schemas.ts`).
+4. Implement a platform fetch adapter that returns data in the normalized `ActivityResult` shape.
+5. Expose it through a thin server function reusing the existing LKG cache strategy.
+6. Add platform display metadata to the dashboard.
 
-Edit:
-
-```text
-src/data/profile.ts
-```
-
-This contains:
-
-- Name
-- Bio
-- Location
-- Contact information
-- Coding platform usernames
-- Coding profile URLs
-- Manually maintained statistics
-- Resume configuration
-
-The `codingProfiles` object centralizes platform usernames for integrations such as:
-
-```text
-GitHub
-LinkedIn
-LeetCode
-Codeforces
-CodeChef
-GeeksforGeeks
-HackerRank
-AtCoder
-Codolio
-```
-
-### Projects
-
-Edit:
-
-```text
-src/data/projects.ts
-```
-
-To add a project, append another project object.
-
-Project screenshots should be placed inside:
-
-```text
-public/projects/
-```
-
-Example:
-
-```text
-public/projects/my-project.png
-```
-
-Then reference it as:
-
-```text
-/projects/my-project.png
-```
-
-Set `githubUrl`, `liveUrl`, or `image` to `null` when they are not available.
-
-This prevents fake links and broken image requests.
-
-### Skills
-
-Edit:
-
-```text
-src/data/skills.ts
-```
-
-### Experience
-
-Edit:
-
-```text
-src/data/experience.ts
-```
-
-### External Links
-
-Edit:
-
-```text
-src/data/links.ts
-```
+Caching, aggregation, streak computation, and heatmap merging are shared infrastructure and do not need to be reimplemented per platform.
 
 ---
 
-## Live Integrations
+## Testing & Reliability
 
-Third-party coding platform requests are handled through server-side functions where appropriate.
+`src/start.test.ts` contains automated regression tests, currently **14/14 passing**, covering:
 
-This prevents sensitive credentials such as the GitHub token from being exposed in the browser bundle.
+- Streak computed correctly when today has activity
+- Streak grace period when today is inactive but yesterday is active
+- Current streak = 0 when both today and yesterday are inactive
+- Month/year boundary handling
+- UTC date normalization
+- Multi-platform activity merging with no double counting
+- Historical years never reporting a false "current" streak
+- A structural guard preventing accidental global registration of Supabase auth middleware, since public activity functions do not require it
 
-| Platform | Data | Authentication |
-| --- | --- | --- |
-| GitHub | Profile + contribution activity | GitHub token |
-| LeetCode | Problems, rating and activity | None |
-| Codeforces | Rating, rank and submissions | None |
-| CodeChef | Activity data | Integration dependent |
-| GeeksforGeeks | Activity data | Community/public integration |
-| HackerRank | Activity data | Integration dependent |
-
-The main server-side activity logic lives in:
-
-```text
-src/lib/activity.functions.ts
-```
-
-TanStack Query is used for client-side caching and request state management.
+This covers the activity/streak/caching subsystem specifically, not full application test coverage.
 
 ---
 
-## Error Handling
+## Known Integration Limitations
 
-External APIs are not assumed to be permanently available.
-
-The UI handles failures through:
-
-1. Loading states and skeletons
-2. Cached data where available
-3. Graceful fallback states
-4. `Unavailable` when live statistics cannot be retrieved
-
-The portfolio avoids displaying fabricated or misleading statistics when an API request fails.
+- GitHub requires a server-side `GITHUB_TOKEN` for authenticated GraphQL access.
+- CodeChef data extraction depends on page structure and can be fragile if the site changes.
+- GeeksforGeeks depends on a community stats proxy and may lag or become temporarily unavailable.
+- HackerRank activity depends on available public profile data.
+- LinkedIn is not part of the six-platform automated consistency aggregation; any LinkedIn stats shown elsewhere on the site are manually maintained, not live.
+- The persistent cache reduces the impact of temporary upstream failures but does not make a genuinely unavailable source permanently live.
 
 ---
 
 ## Security
 
-Sensitive credentials are stored using environment variables.
+- `GITHUB_TOKEN` and Supabase service-role credentials are server-side only and never exposed to client code.
+- Public activity server functions do not require browser Supabase authentication to execute.
+- `.env` is gitignored and never committed.
+- Privileged cache read/write operations are isolated to server-only modules.
 
-The `.env` file is excluded through `.gitignore`.
-
-Before publishing changes, secrets can be checked with:
-
+Before pushing changes, secrets can be checked with:
 ```bash
 git grep -n -E "ghp_|github_pat_|SUPABASE_SERVICE_ROLE|PRIVATE_KEY"
 ```
-
-Never commit:
-
-- GitHub personal access tokens
-- Supabase service-role keys
-- Private API keys
-- `.env` files
-
----
-
-## Updating the Portfolio
-
-The normal development workflow is:
-
-```text
-Edit locally
-    ↓
-Test with bun run dev
-    ↓
-Verify production build with bun run build
-    ↓
-git add
-    ↓
-git commit
-    ↓
-git push
-    ↓
-Deployment updates
-```
-
-For most content updates, modify the files inside `src/data/` rather than changing component logic.
 
 ---
 
 ## Contact
 
 **Vivek Patne**
-
 Computer Science & Engineering (Data Science)
 RNS Institute of Technology, Bengaluru
-Graduating 2028
 
 - Email: vivekpatnem@gmail.com
 - LinkedIn: linkedin.com/in/vivekpatnem
