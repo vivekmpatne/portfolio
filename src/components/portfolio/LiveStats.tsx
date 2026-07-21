@@ -7,18 +7,20 @@ import {
   getGithubActivity,
   getLeetcodeActivity,
   getCodeforcesActivity,
-  type ActivityResult,
 } from "@/lib/activity.functions";
+import type { ActivityResult } from "@/lib/activity/types";
 
 function Card({
   icon,
   label,
   brand,
+  cached,
   children,
 }: {
   icon: React.ReactNode;
   label: string;
   brand: string;
+  cached?: boolean;
   children: React.ReactNode;
 }) {
   return (
@@ -29,9 +31,16 @@ function Card({
       />
       <div className="relative flex items-center justify-between">
         <span className="text-2xl" style={{ color: brand }}>{icon}</span>
-        <span className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground">
-          {label}
-        </span>
+        <div className="flex items-center gap-2">
+          {cached && (
+            <span className="rounded-full border border-amber-500/40 px-1.5 py-0.5 text-[9px] font-medium uppercase tracking-widest text-amber-600 dark:text-amber-400">
+              cached
+            </span>
+          )}
+          <span className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground">
+            {label}
+          </span>
+        </div>
       </div>
       <div className="relative mt-4">{children}</div>
     </div>
@@ -59,26 +68,12 @@ export function LiveStats() {
   const lcFn = useServerFn(getLeetcodeActivity);
   const cfFn = useServerFn(getCodeforcesActivity);
 
+  const opts = { staleTime: 10 * 60_000, retry: 1 as const };
   const [ghQ, lcQ, cfQ] = useQueries({
     queries: [
-      {
-        queryKey: ["activity", "github", github.username, year],
-        queryFn: () => ghFn({ data: { username: github.username, year } }),
-        staleTime: 10 * 60_000,
-        retry: 1,
-      },
-      {
-        queryKey: ["activity", "leetcode", leetcode.username, year],
-        queryFn: () => lcFn({ data: { username: leetcode.username, year } }),
-        staleTime: 10 * 60_000,
-        retry: 1,
-      },
-      {
-        queryKey: ["activity", "codeforces", codeforces.username, year],
-        queryFn: () => cfFn({ data: { username: codeforces.username, year } }),
-        staleTime: 10 * 60_000,
-        retry: 1,
-      },
+      { queryKey: ["activity", "github", github.username, year],   queryFn: () => ghFn({ data: { username: github.username, year } }), ...opts },
+      { queryKey: ["activity", "leetcode", leetcode.username, year], queryFn: () => lcFn({ data: { username: leetcode.username, year } }), ...opts },
+      { queryKey: ["activity", "codeforces", codeforces.username, year], queryFn: () => cfFn({ data: { username: codeforces.username, year } }), ...opts },
     ],
   });
 
@@ -86,13 +81,14 @@ export function LiveStats() {
   const lc = lcQ.data as ActivityResult | undefined;
   const cf = cfQ.data as ActivityResult | undefined;
 
-  const ghOk = gh && !gh.error;
-  const lcOk = lc && !lc.error;
-  const cfOk = cf && !cf.error;
+  // Cached and fresh snapshots both carry meta; only "unavailable" means no data at all.
+  const ghOk = gh && gh.status !== "unavailable";
+  const lcOk = lc && lc.status !== "unavailable";
+  const cfOk = cf && cf.status !== "unavailable";
 
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-      <Card icon={<SiLeetcode />} brand="#FFA116" label="LeetCode">
+      <Card icon={<SiLeetcode />} brand="#FFA116" label="LeetCode" cached={lc?.status === "cached"}>
         {lcQ.isLoading ? (
           <Skeleton />
         ) : lcOk ? (
@@ -126,7 +122,7 @@ export function LiveStats() {
         )}
       </Card>
 
-      <Card icon={<SiCodeforces />} brand="#1F8ACB" label="Codeforces">
+      <Card icon={<SiCodeforces />} brand="#1F8ACB" label="Codeforces" cached={cf?.status === "cached"}>
         {cfQ.isLoading ? (
           <Skeleton />
         ) : cfOk ? (
@@ -151,7 +147,7 @@ export function LiveStats() {
         )}
       </Card>
 
-      <Card icon={<SiGithub />} brand="#6e7681" label="GitHub">
+      <Card icon={<SiGithub />} brand="#6e7681" label="GitHub" cached={gh?.status === "cached"}>
         {ghQ.isLoading ? (
           <Skeleton />
         ) : ghOk ? (
