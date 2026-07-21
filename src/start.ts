@@ -1,7 +1,27 @@
 import { createStart, createMiddleware } from "@tanstack/react-start";
 
 import { renderErrorPage } from "./lib/error-page";
-import { attachSupabaseAuth } from "@/integrations/supabase/auth-attacher";
+
+// ---------------------------------------------------------------------------
+// IMPORTANT — Supabase auth attachment is intentionally NOT registered here.
+//
+// No server function in this project uses `requireSupabaseAuth`. Registering
+// `attachSupabaseAuth` as a global `functionMiddleware` forces the browser
+// Supabase client (`src/integrations/supabase/client.ts`) to initialise on
+// every server-fn call. If that client throws in a given runtime (e.g. a
+// missing VITE_SUPABASE_* variable at build time in a specific deployment),
+// ALL server functions — including the six public activity fetches — fail,
+// and the entire Consistency dashboard collapses to "Unavailable".
+//
+// If a future feature adds a server function that uses `requireSupabaseAuth`,
+// re-register `attachSupabaseAuth` here (append, don't replace):
+//
+//   import { attachSupabaseAuth } from "@/integrations/supabase/auth-attacher";
+//   functionMiddleware: [attachSupabaseAuth],
+//
+// Public server functions (like the activity adapters) must never depend on
+// this middleware.
+// ---------------------------------------------------------------------------
 
 const errorMiddleware = createMiddleware().server(async ({ next }) => {
   try {
@@ -21,6 +41,6 @@ const errorMiddleware = createMiddleware().server(async ({ next }) => {
 });
 
 export const startInstance = createStart(() => ({
-  functionMiddleware: [attachSupabaseAuth],
+  functionMiddleware: [],
   requestMiddleware: [errorMiddleware],
 }));
