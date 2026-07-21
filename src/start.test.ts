@@ -39,10 +39,18 @@ const usesRequireAuth = allSrc.some((f) => {
   return /requireSupabaseAuth/.test(readFileSync(f, "utf8"));
 });
 
+// Strip line and block comments so prose references don't trip the guard.
+const startCode = startSrc
+  .replace(/\/\*[\s\S]*?\*\//g, "")
+  .split("\n")
+  .filter((l) => !/^\s*\/\//.test(l))
+  .join("\n");
+
 describe("src/start.ts middleware guard", () => {
-  it("does not import attachSupabaseAuth", () => {
-    expect(startSrc).not.toMatch(/attachSupabaseAuth/);
+  it("does not import or reference attachSupabaseAuth in code", () => {
+    expect(startCode).not.toMatch(/attachSupabaseAuth/);
   });
+
 
   it("does not register global functionMiddleware unless a server fn requires auth", () => {
     if (usesRequireAuth) return; // allowed once real protected fns exist
