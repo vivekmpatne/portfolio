@@ -24,6 +24,19 @@ export function todayInTZ(
   return parts;
 }
 
+// YYYY-MM-DD for an arbitrary Date in the given IANA timezone.
+export function dateInTZ(
+  date: Date,
+  tz: string = "Asia/Kolkata",
+): string {
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: tz,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(date);
+}
+
 export function shiftDay(date: string, delta: number): string {
   const [y, m, d] = date.split("-").map(Number);
   const dt = new Date(Date.UTC(y, m - 1, d));

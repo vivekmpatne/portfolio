@@ -2,6 +2,7 @@ import { createStart, createMiddleware } from "@tanstack/react-start";
 
 import { renderErrorPage } from "./lib/error-page";
 
+
 // ---------------------------------------------------------------------------
 // IMPORTANT — DO NOT register `attachSupabaseAuth` globally, and DO NOT
 // import it here.
