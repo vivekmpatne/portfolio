@@ -7,6 +7,23 @@ export function todayUTC(now: Date = new Date()): string {
   return now.toISOString().slice(0, 10);
 }
 
+// Returns YYYY-MM-DD for `now` in the given IANA timezone (default IST).
+// Streak logic uses this so a commit made after local midnight (but still
+// before UTC midnight) counts as "today" for the user.
+export function todayInTZ(
+  tz: string = "Asia/Kolkata",
+  now: Date = new Date(),
+): string {
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: tz,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(now);
+  // en-CA formats as YYYY-MM-DD already.
+  return parts;
+}
+
 export function shiftDay(date: string, delta: number): string {
   const [y, m, d] = date.split("-").map(Number);
   const dt = new Date(Date.UTC(y, m - 1, d));
@@ -95,9 +112,10 @@ export function computeStats(
   map: DayMap,
   year: number,
   now: Date = new Date(),
+  tz: string = "Asia/Kolkata",
 ) {
   const days = buildYearDays(year);
-  const today = todayUTC(now);
+  const today = todayInTZ(tz, now);
   const nowYear = Number(today.slice(0, 4));
   return {
     longest: longestStreak(days, map),
