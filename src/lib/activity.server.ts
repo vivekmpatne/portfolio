@@ -195,11 +195,12 @@ export async function fetchCodeforces(username: string, year: number): Promise<F
   }
   const status: any = await statusRes.json();
   const info: any = infoRes && infoRes.ok ? await infoRes.json() : null;
+  const { dateInTZ } = await import("./activity/streak");
   const calendar: DayMap = {};
   for (const s of status.result ?? []) {
     const d = new Date(s.creationTimeSeconds * 1000);
-    if (d.getUTCFullYear() !== year) continue;
-    const key = d.toISOString().slice(0, 10);
+    const key = dateInTZ(d);
+    if (Number(key.slice(0, 4)) !== year) continue;
     calendar[key] = (calendar[key] ?? 0) + 1;
   }
   const u = info?.result?.[0];
