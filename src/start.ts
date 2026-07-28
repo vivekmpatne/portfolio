@@ -1,10 +1,10 @@
 import { createStart, createMiddleware } from "@tanstack/react-start";
 
 import { renderErrorPage } from "./lib/error-page";
-import { attachSupabaseAuth } from "@/integrations/supabase/auth-attacher";
 
 // ---------------------------------------------------------------------------
-// IMPORTANT — DO NOT register `attachSupabaseAuth` globally.
+// IMPORTANT — DO NOT register `attachSupabaseAuth` globally, and DO NOT
+// import it here.
 //
 // The six public activity server functions are unauthenticated. Registering
 // `attachSupabaseAuth` as a global `functionMiddleware` forces the BROWSER
@@ -41,6 +41,6 @@ const errorMiddleware = createMiddleware().server(async ({ next }) => {
 });
 
 export const startInstance = createStart(() => ({
-  functionMiddleware: [attachSupabaseAuth],
+  functionMiddleware: [],
   requestMiddleware: [errorMiddleware],
 }));
