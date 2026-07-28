@@ -3,7 +3,8 @@ import { createStart, createMiddleware } from "@tanstack/react-start";
 import { renderErrorPage } from "./lib/error-page";
 
 // ---------------------------------------------------------------------------
-// IMPORTANT — DO NOT register `attachSupabaseAuth` globally.
+// IMPORTANT — DO NOT register `attachSupabaseAuth` globally, and DO NOT
+// import it here.
 //
 // The six public activity server functions are unauthenticated. Registering
 // `attachSupabaseAuth` as a global `functionMiddleware` forces the BROWSER
