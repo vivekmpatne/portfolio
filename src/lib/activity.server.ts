@@ -147,11 +147,12 @@ export async function fetchLeetcode(username: string, year: number): Promise<Fet
   const raw = user.userCalendar?.submissionCalendar ?? "{}";
   const parsed: Record<string, number> =
     typeof raw === "string" ? JSON.parse(raw) : raw;
+  const { dateInTZ } = await import("./activity/streak");
   const calendar: DayMap = {};
   for (const [ts, count] of Object.entries(parsed)) {
     const d = new Date(Number(ts) * 1000);
-    if (d.getUTCFullYear() !== year) continue;
-    const key = d.toISOString().slice(0, 10);
+    const key = dateInTZ(d);
+    if (Number(key.slice(0, 4)) !== year) continue;
     calendar[key] = (calendar[key] ?? 0) + Number(count);
   }
   const ac = user.submitStatsGlobal?.acSubmissionNum ?? [];
