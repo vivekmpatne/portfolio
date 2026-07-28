@@ -19,7 +19,7 @@ export const timeline: TimelineEntry[] = [
     organization: "RNS Institute of Technology (RNSIT), Bengaluru",
     duration: "Sept 2024 — May 2028",
     details:
-      "CGPA: 8.48 / 10.0 | Relevant Coursework: DSA, DBMS, OS, Computer Networks",
+      "CGPA: 8.35 / 10.0 (4th Sem) | Relevant Coursework: DSA, DBMS, OS, Computer Networks",
   },
 
   // ────────────────────────────────────────────────────────────

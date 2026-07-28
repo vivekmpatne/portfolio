@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Moon, Sun, FileText, Menu, X } from "lucide-react";
 import { profile } from "@/data/profile";
 import { useResumeAvailable } from "@/hooks/use-resume-available";
@@ -15,7 +15,13 @@ const sections = [
 ];
 
 export function Nav() {
-  const [dark, setDark] = useState(true);
+  // Lazy-init from the DOM class set by the pre-hydration script in __root.tsx.
+  // This keeps React state in sync with the class already on <html> and avoids
+  // a light/dark flash on reload or navigation.
+  const [dark, setDark] = useState<boolean>(() => {
+    if (typeof document === "undefined") return true;
+    return document.documentElement.classList.contains("dark");
+  });
   const [scrolled, setScrolled] = useState(false);
   const [progress, setProgress] = useState(0);
   const [open, setOpen] = useState(false);
@@ -35,17 +41,14 @@ export function Nav() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // Initialize from localStorage (default: dark) — runs once after mount.
+  // Sync DOM + storage only when the user toggles the theme. We skip the very
+  // first run so we don't override the pre-hydration script's decision.
+  const mountedRef = useRef(false);
   useEffect(() => {
-    try {
-      const stored = localStorage.getItem("theme");
-      setDark(stored ? stored === "dark" : true);
-    } catch {
-      setDark(true);
+    if (!mountedRef.current) {
+      mountedRef.current = true;
+      return;
     }
-  }, []);
-
-  useEffect(() => {
     document.documentElement.classList.toggle("dark", dark);
     try {
       localStorage.setItem("theme", dark ? "dark" : "light");

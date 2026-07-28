@@ -241,24 +241,25 @@ export function Shell({ onClose }: { onClose: () => void }) {
 
   return (
     <div
-      className="flex flex-1 flex-col bg-black/70 font-mono text-[13px] leading-relaxed"
+      className="flex flex-1 flex-col bg-[#05100a] font-mono text-[13px] leading-relaxed text-[color:var(--phosphor)]"
       onClick={() => inputRef.current?.focus()}
     >
       <div
         ref={scrollRef}
-        className="flex-1 overflow-y-auto p-3 text-foreground/90"
+        className="flex-1 overflow-y-auto p-3"
+        style={{ color: "var(--phosphor)" }}
       >
         {history.map((l, i) => (
           <pre
             key={i}
             className={`whitespace-pre-wrap break-words ${
               l.kind === "in"
-                ? "text-[var(--phosphor)]"
+                ? "text-[color:var(--phosphor)] opacity-90"
                 : l.kind === "err"
                   ? "text-red-400"
                   : l.kind === "banner"
-                    ? "text-[var(--phosphor)] phosphor-glow"
-                    : "text-foreground/85"
+                    ? "text-[color:var(--phosphor)] phosphor-glow"
+                    : "text-[color:var(--phosphor)]/85"
             }`}
           >
             {l.text}
@@ -266,7 +267,7 @@ export function Shell({ onClose }: { onClose: () => void }) {
         ))}
         {/* Input line */}
         <div className="mt-1 flex items-center gap-2">
-          <span className="text-[var(--phosphor)]">{prompt}</span>
+          <span className="text-[color:var(--phosphor)]">{prompt}</span>
           <input
             ref={inputRef}
             value={value}
@@ -275,7 +276,7 @@ export function Shell({ onClose }: { onClose: () => void }) {
             spellCheck={false}
             autoCapitalize="off"
             autoComplete="off"
-            className="flex-1 bg-transparent text-foreground caret-[var(--phosphor)] outline-none"
+            className="flex-1 bg-transparent text-[color:var(--phosphor)] caret-[var(--phosphor)] outline-none"
             aria-label="Shell input"
           />
         </div>
