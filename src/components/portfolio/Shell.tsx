@@ -241,33 +241,36 @@ export function Shell({ onClose }: { onClose: () => void }) {
 
   return (
     <div
-      className="flex flex-1 flex-col bg-[#05100a] font-mono text-[13px] leading-relaxed text-[color:var(--phosphor)]"
+      className="flex flex-1 flex-col bg-[#0d1f16] font-mono text-[13px] leading-relaxed"
+      style={{ color: "#a8ffbe" }}
       onClick={() => inputRef.current?.focus()}
     >
       <div
         ref={scrollRef}
         className="flex-1 overflow-y-auto p-3"
-        style={{ color: "var(--phosphor)" }}
+        style={{ color: "#a8ffbe" }}
       >
         {history.map((l, i) => (
           <pre
             key={i}
             className={`whitespace-pre-wrap break-words ${
               l.kind === "in"
-                ? "text-[color:var(--phosphor)] opacity-90"
+                ? ""
                 : l.kind === "err"
                   ? "text-red-400"
                   : l.kind === "banner"
-                    ? "text-[color:var(--phosphor)] phosphor-glow"
-                    : "text-[color:var(--phosphor)]/85"
+                    ? "phosphor-glow"
+                    : ""
             }`}
+            style={l.kind === "err" ? undefined : { color: l.kind === "banner" ? "#b8ffcc" : "#a8ffbe", textShadow: l.kind === "banner" ? "0 0 8px rgba(120,255,160,0.5)" : "0 0 4px rgba(120,255,160,0.25)" }}
           >
             {l.text}
           </pre>
         ))}
+
         {/* Input line */}
         <div className="mt-1 flex items-center gap-2">
-          <span className="text-[color:var(--phosphor)]">{prompt}</span>
+          <span style={{ color: "#a8ffbe" }}>{prompt}</span>
           <input
             ref={inputRef}
             value={value}
@@ -276,10 +279,12 @@ export function Shell({ onClose }: { onClose: () => void }) {
             spellCheck={false}
             autoCapitalize="off"
             autoComplete="off"
-            className="flex-1 bg-transparent text-[color:var(--phosphor)] caret-[var(--phosphor)] outline-none"
+            className="flex-1 bg-transparent outline-none"
+            style={{ color: "#a8ffbe", caretColor: "#a8ffbe" }}
             aria-label="Shell input"
           />
         </div>
+
       </div>
     </div>
   );
