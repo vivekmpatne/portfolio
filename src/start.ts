@@ -42,5 +42,6 @@ const errorMiddleware = createMiddleware().server(async ({ next }) => {
 });
 
 export const startInstance = createStart(() => ({
+  functionMiddleware: [],
   requestMiddleware: [errorMiddleware],
 }));
