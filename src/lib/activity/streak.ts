@@ -112,9 +112,10 @@ export function computeStats(
   map: DayMap,
   year: number,
   now: Date = new Date(),
+  tz: string = "Asia/Kolkata",
 ) {
   const days = buildYearDays(year);
-  const today = todayUTC(now);
+  const today = todayInTZ(tz, now);
   const nowYear = Number(today.slice(0, 4));
   return {
     longest: longestStreak(days, map),
