@@ -241,13 +241,13 @@ export function Shell({ onClose }: { onClose: () => void }) {
 
   return (
     <div
-      className="flex flex-1 flex-col bg-[#0d1f16] font-mono text-[13px] leading-relaxed"
+      className="flex min-h-0 flex-1 flex-col bg-[#0d1f16] font-mono text-[13px] leading-relaxed"
       style={{ color: "#a8ffbe" }}
       onClick={() => inputRef.current?.focus()}
     >
       <div
         ref={scrollRef}
-        className="flex-1 overflow-y-auto p-3"
+        className="term-scroll min-h-0 flex-1 overflow-y-auto p-3"
         style={{ color: "#a8ffbe" }}
       >
         {history.map((l, i) => (
