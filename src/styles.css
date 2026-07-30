@@ -244,3 +244,26 @@
   text-align: left;
   animation: loading-dots-anim 1.2s steps(1) infinite;
 }
+
+/* Always-visible phosphor scrollbar inside the interactive shell */
+.term-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: #3ddc84 #0d1f16;
+  overflow-y: scroll;
+}
+.term-scroll::-webkit-scrollbar {
+  width: 10px;
+}
+.term-scroll::-webkit-scrollbar-track {
+  background: #0d1f16;
+  border-left: 1px solid rgba(120, 255, 160, 0.25);
+}
+.term-scroll::-webkit-scrollbar-thumb {
+  background: rgba(120, 255, 160, 0.45);
+  border: 2px solid #0d1f16;
+  border-radius: 6px;
+}
+.term-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(150, 255, 185, 0.75);
+}
+
