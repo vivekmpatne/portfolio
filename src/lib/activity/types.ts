@@ -25,6 +25,7 @@ export const PLATFORM_IDS = [
   "codechef",
   "hackerrank",
   "gfg",
+  "tuf",
 ] as const;
 
 export type PlatformId = (typeof PLATFORM_IDS)[number];
