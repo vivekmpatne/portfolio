@@ -45,6 +45,7 @@ export const profile = {
     gfg:         { username: "vivekpcom8",   url: "https://www.geeksforgeeks.org/user/vivekpcom8" },
     hackerrank:  { username: "vivekpatnem",  url: "https://www.hackerrank.com/profile/vivekpatnem" },
     atcoder:     { username: "vivekpatnem",  url: "https://atcoder.jp/users/vivekpatnem" },
+    tuf:         { username: "Vivek_paten_25", url: "https://takeuforward.org/profile/Vivek_paten_25" },
     codolio:     { username: "Viwake",       url: "https://codolio.com/profile/Viwake" },
   },
   // Resume PDF / Google Drive public link. Paste the URL here when ready.

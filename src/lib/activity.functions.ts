@@ -10,6 +10,7 @@ import {
   codechefInput,
   hackerrankInput,
   gfgInput,
+  tufInput,
 } from "./activity-schemas";
 
 export type { ActivityResult } from "./activity/types";
@@ -65,5 +66,14 @@ export const getGfgActivity = createServerFn({ method: "GET" })
     const { withCache, fetchGfg } = await import("./activity.server");
     return withCache("gfg", data.username, data.year, () =>
       fetchGfg(data.username, data.year),
+    );
+  });
+
+export const getTufActivity = createServerFn({ method: "GET" })
+  .inputValidator((data: unknown) => tufInput.parse(data))
+  .handler(async ({ data }) => {
+    const { withCache, fetchTuf } = await import("./activity.server");
+    return withCache("tuf", data.username, data.year, () =>
+      fetchTuf(data.username, data.year),
     );
   });

@@ -287,3 +287,62 @@ export async function fetchGfg(username: string, year: number): Promise<FetchOut
     },
   };
 }
+
+// ---------- TUF+ (takeuforward.org) ----------
+// Public heatmap endpoint used by takeuforward.org itself. It rejects requests
+// without an Origin header, so we always send one. Returns per-day activity
+// bucketed by category (dsa_practice_problem, core_concepts, sql_practice_problem, ...).
+const TUF_LABELS: Record<string, string> = {
+  dsa_practice_problem: "DSA Practice Problem",
+  dsa_theory: "DSA Theory",
+  dsa_sheet_checked: "DSA Sheet",
+  core_concepts: "Core Concepts",
+  core_quiz: "Core Quiz",
+  design_theory: "Design Theory",
+  sql_practice_problem: "SQL Practice Problem",
+};
+
+export async function fetchTuf(username: string, year: number): Promise<FetchOutcome> {
+  const res = await fetch(
+    `https://backend-go.takeuforward.org/api/v1/streak/heatmap/${encodeURIComponent(username)}?year=${year}`,
+    {
+      headers: {
+        Origin: "https://takeuforward.org",
+        Referer: "https://takeuforward.org/",
+        "User-Agent": "Mozilla/5.0 (compatible; lovable-portfolio/1.0)",
+      },
+    },
+  );
+  if (!res.ok) return { ok: false, error: "TUF+ temporarily unavailable" };
+  const json: any = await res.json();
+  if (!json?.success || !json?.data) return { ok: false, error: "TUF+ temporarily unavailable" };
+
+  const calendar: DayMap = {};
+  const breakdown: Record<string, Record<string, number>> = {};
+  const months: Record<string, Record<string, Record<string, number>>> = json.data.months ?? {};
+  for (const [mo, daysObj] of Object.entries(months)) {
+    for (const [day, entry] of Object.entries(daysObj ?? {})) {
+      const key = `${year}-${String(Number(mo)).padStart(2, "0")}-${String(Number(day)).padStart(2, "0")}`;
+      const total = Number((entry as any).total ?? 0);
+      if (!total) continue;
+      calendar[key] = (calendar[key] ?? 0) + total;
+      const parts: Record<string, number> = {};
+      for (const [cat, n] of Object.entries(entry as Record<string, number>)) {
+        if (cat === "total") continue;
+        parts[TUF_LABELS[cat] ?? cat] = Number(n);
+      }
+      breakdown[key] = parts;
+    }
+  }
+
+  const activeDays = Object.keys(calendar).length;
+  return {
+    ok: true,
+    calendar,
+    meta: {
+      totalSubmissions: Number(json.data.total ?? 0),
+      totalActiveDays: activeDays,
+      breakdown: JSON.stringify(breakdown),
+    },
+  };
+}
