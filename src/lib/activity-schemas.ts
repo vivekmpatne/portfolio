@@ -10,6 +10,7 @@ export const ALLOWED_USERNAMES = {
   codechef: new Set(["vivekpatnem"]),
   hackerrank: new Set(["vivekpatnem"]),
   gfg: new Set(["vivekpcom8"]),
+  tuf: new Set(["Vivek_paten_25"]),
 } as const;
 
 const makeSchema = (allowed: ReadonlySet<string>) =>
@@ -26,3 +27,4 @@ export const codeforcesInput = makeSchema(ALLOWED_USERNAMES.codeforces);
 export const codechefInput = makeSchema(ALLOWED_USERNAMES.codechef);
 export const hackerrankInput = makeSchema(ALLOWED_USERNAMES.hackerrank);
 export const gfgInput = makeSchema(ALLOWED_USERNAMES.gfg);
+export const tufInput = makeSchema(ALLOWED_USERNAMES.tuf);

@@ -25,6 +25,7 @@ export const PLATFORM_IDS = [
   "codechef",
   "hackerrank",
   "gfg",
+  "tuf",
 ] as const;
 
 export type PlatformId = (typeof PLATFORM_IDS)[number];
@@ -36,4 +37,5 @@ export const PLATFORM_LABELS: Record<PlatformId, string> = {
   codechef: "CodeChef",
   hackerrank: "HackerRank",
   gfg: "GeeksforGeeks",
+  tuf: "TUF+",
 };
