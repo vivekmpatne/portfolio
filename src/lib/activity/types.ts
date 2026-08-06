@@ -37,4 +37,5 @@ export const PLATFORM_LABELS: Record<PlatformId, string> = {
   codechef: "CodeChef",
   hackerrank: "HackerRank",
   gfg: "GeeksforGeeks",
+  tuf: "TUF+",
 };
