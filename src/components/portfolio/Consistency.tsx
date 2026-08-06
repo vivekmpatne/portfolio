@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { useQueries } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Flame, Trophy, Calendar, Zap, ChevronDown, AlertCircle } from "lucide-react";
+import { Flame, Trophy, Calendar, Zap, ChevronDown, AlertCircle, BookOpenCheck } from "lucide-react";
 import { SiGithub, SiLeetcode, SiCodeforces, SiCodechef, SiGeeksforgeeks, SiHackerrank } from "react-icons/si";
 import { profile } from "@/data/profile";
 import { SectionHeader } from "./SectionHeader";
@@ -12,6 +12,7 @@ import {
   getCodechefActivity,
   getHackerrankActivity,
   getGfgActivity,
+  getTufActivity,
 } from "@/lib/activity.functions";
 import type { ActivityResult, DayMap, PlatformId } from "@/lib/activity/types";
 import { PLATFORM_LABELS } from "@/lib/activity/types";
@@ -32,7 +33,11 @@ function intensityClass(count: number) {
   return "bg-emerald-600 dark:bg-emerald-400";
 }
 
-type SourceDef = { key: PlatformId; icon: typeof SiGithub; color: string };
+type SourceDef = {
+  key: PlatformId;
+  icon: React.ComponentType<{ className?: string; style?: React.CSSProperties }>;
+  color: string;
+};
 const SOURCES: SourceDef[] = [
   { key: "github",     icon: SiGithub,        color: "#6e7681" },
   { key: "leetcode",   icon: SiLeetcode,      color: "#FFA116" },
@@ -40,6 +45,7 @@ const SOURCES: SourceDef[] = [
   { key: "codechef",   icon: SiCodechef,      color: "#5B4638" },
   { key: "gfg",        icon: SiGeeksforgeeks, color: "#2F8D46" },
   { key: "hackerrank", icon: SiHackerrank,    color: "#2EC866" },
+  { key: "tuf",        icon: BookOpenCheck,   color: "#F97316" },
 ];
 
 export function Consistency() {
@@ -47,7 +53,7 @@ export function Consistency() {
   const years = [currentYear, currentYear - 1, currentYear - 2];
   const [year, setYear] = useState(currentYear);
 
-  const { github, leetcode, codeforces, codechef, hackerrank, gfg } = profile.codingProfiles;
+  const { github, leetcode, codeforces, codechef, hackerrank, gfg, tuf } = profile.codingProfiles;
 
   const ghFn = useServerFn(getGithubActivity);
   const lcFn = useServerFn(getLeetcodeActivity);
@@ -55,6 +61,7 @@ export function Consistency() {
   const ccFn = useServerFn(getCodechefActivity);
   const hrFn = useServerFn(getHackerrankActivity);
   const gfgFn = useServerFn(getGfgActivity);
+  const tufFn = useServerFn(getTufActivity);
 
   const opts = { staleTime: 10 * 60_000, retry: 1 as const };
   const queries = useQueries({
@@ -65,6 +72,7 @@ export function Consistency() {
       { queryKey: ["activity", "codechef", codechef.username, year],   queryFn: () => ccFn({ data: { username: codechef.username, year } }), ...opts },
       { queryKey: ["activity", "hackerrank", hackerrank.username, year], queryFn: () => hrFn({ data: { username: hackerrank.username, year } }), ...opts },
       { queryKey: ["activity", "gfg", gfg.username, year],             queryFn: () => gfgFn({ data: { username: gfg.username, year } }), ...opts },
+      { queryKey: ["activity", "tuf", tuf.username, year],             queryFn: () => tufFn({ data: { username: tuf.username, year } }), ...opts },
     ],
   });
 
@@ -76,6 +84,7 @@ export function Consistency() {
     codechef:   (queries[3].data as ActivityResult | undefined) ?? EMPTY,
     hackerrank: (queries[4].data as ActivityResult | undefined) ?? EMPTY,
     gfg:        (queries[5].data as ActivityResult | undefined) ?? EMPTY,
+    tuf:        (queries[6].data as ActivityResult | undefined) ?? EMPTY,
   };
 
   const cachedPlatforms = SOURCES.filter((s) => results[s.key].status === "cached").map((s) => PLATFORM_LABELS[s.key]);
@@ -86,6 +95,16 @@ export function Consistency() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [queries.map((q) => q.dataUpdatedAt).join(",")],
   );
+  const tufBreakdown = useMemo<Record<string, Record<string, number>>>(() => {
+    const raw = results.tuf.meta.breakdown;
+    if (typeof raw !== "string") return {};
+    try {
+      return JSON.parse(raw) as Record<string, Record<string, number>>;
+    } catch {
+      return {};
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [results.tuf.meta.breakdown]);
   const days = useMemo(() => buildYearDays(year), [year]);
   const stats = useMemo(() => computeStats(merged, year), [merged, year]);
   const totalContribs = totalActivity(merged);
@@ -97,6 +116,7 @@ export function Consistency() {
     codechef:   totalActivity(results.codechef.calendar),
     gfg:        totalActivity(results.gfg.calendar),
     hackerrank: totalActivity(results.hackerrank.calendar),
+    tuf:        totalActivity(results.tuf.calendar),
   };
 
   const grid = useMemo(() => {
@@ -133,7 +153,7 @@ export function Consistency() {
     <section id="consistency" className="mx-auto max-w-6xl px-6 py-20">
       <SectionHeader title="Consistency Dashboard" />
       <p className="-mt-2 mb-4 max-w-2xl text-muted-foreground">
-        Real engineering activity aggregated live from GitHub, LeetCode, Codeforces, CodeChef, HackerRank, and GeeksforGeeks — no manual updates.
+        Real engineering activity aggregated live from GitHub, LeetCode, Codeforces, CodeChef, HackerRank, GeeksforGeeks, and TUF+ — no manual updates.
       </p>
 
       {(cachedPlatforms.length > 0 || unavailablePlatforms.length > 0) && (
@@ -236,7 +256,13 @@ export function Consistency() {
                     const perPlatform: string[] = [];
                     for (const s of SOURCES) {
                       const c = results[s.key].calendar[date] ?? 0;
-                      if (c) perPlatform.push(`${PLATFORM_LABELS[s.key]}: ${c}`);
+                      if (!c) continue;
+                      perPlatform.push(`${PLATFORM_LABELS[s.key]}: ${c}`);
+                      if (s.key === "tuf") {
+                        for (const [cat, n] of Object.entries(tufBreakdown[date] ?? {})) {
+                          perPlatform.push(`  • ${cat}: ${n}`);
+                        }
+                      }
                     }
                     const title = [`${date} — ${count} ${count === 1 ? "contribution" : "contributions"}`, ...perPlatform].join("\n");
                     return (
@@ -293,7 +319,7 @@ export function Consistency() {
           })}
         </div>
         <p className="mt-3 text-xs text-muted-foreground">
-          All six platforms feed the heatmap live. Last-known-good snapshots are used automatically when a source is temporarily unavailable.
+          All seven platforms feed the heatmap live. Last-known-good snapshots are used automatically when a source is temporarily unavailable.
         </p>
       </div>
     </section>
