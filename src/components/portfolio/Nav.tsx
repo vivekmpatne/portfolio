@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Moon, Sun, FileText, Menu, X } from "lucide-react";
+import { Moon, Sun, FileText, Menu, X, Monitor } from "lucide-react";
 import { profile } from "@/data/profile";
 import { useResumeAvailable } from "@/hooks/use-resume-available";
 
@@ -26,8 +26,13 @@ export function Nav() {
   const [progress, setProgress] = useState(0);
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState("home");
+  const [mounted, setMounted] = useState(false);
   const resumeUrl = profile.resumeUrl;
   const resumeAvailable = useResumeAvailable();
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     const onScroll = () => {
@@ -151,7 +156,13 @@ export function Nav() {
             aria-label="Toggle theme"
             className="rounded-md border border-border bg-card p-2 shadow-card transition-colors hover:bg-accent"
           >
-            {dark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+            {!mounted ? (
+              <Monitor className="h-4 w-4" />
+            ) : dark ? (
+              <Sun className="h-4 w-4" />
+            ) : (
+              <Moon className="h-4 w-4" />
+            )}
           </button>
           <button
             onClick={() => setOpen((o) => !o)}
