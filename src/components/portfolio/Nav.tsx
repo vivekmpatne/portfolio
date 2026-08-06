@@ -156,7 +156,13 @@ export function Nav() {
             aria-label="Toggle theme"
             className="rounded-md border border-border bg-card p-2 shadow-card transition-colors hover:bg-accent"
           >
-            {dark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+            {!mounted ? (
+              <Monitor className="h-4 w-4" />
+            ) : dark ? (
+              <Sun className="h-4 w-4" />
+            ) : (
+              <Moon className="h-4 w-4" />
+            )}
           </button>
           <button
             onClick={() => setOpen((o) => !o)}
