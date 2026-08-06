@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Moon, Sun, FileText, Menu, X } from "lucide-react";
+import { Moon, Sun, FileText, Menu, X, Monitor } from "lucide-react";
 import { profile } from "@/data/profile";
 import { useResumeAvailable } from "@/hooks/use-resume-available";
 
