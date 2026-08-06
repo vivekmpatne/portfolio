@@ -26,8 +26,13 @@ export function Nav() {
   const [progress, setProgress] = useState(0);
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState("home");
+  const [mounted, setMounted] = useState(false);
   const resumeUrl = profile.resumeUrl;
   const resumeAvailable = useResumeAvailable();
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     const onScroll = () => {
