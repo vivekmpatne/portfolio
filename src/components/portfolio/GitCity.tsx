@@ -4,7 +4,7 @@ import { PLATFORM_LABELS } from "@/lib/activity/types";
 
 const CELL = 12; // px footprint
 const GAP = 3;
-const UNIT = 7; // px height per contribution
+const UNIT = 5; // px height per contribution
 
 type Props = {
   weeks: Array<Array<string | null>>;
