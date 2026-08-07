@@ -231,7 +231,24 @@ export function Consistency() {
           </div>
         </div>
 
+        {view === "city" ? (
+          <GitCity
+            weeks={grid.weeks}
+            merged={merged}
+            calendars={{
+              github: results.github.calendar,
+              leetcode: results.leetcode.calendar,
+              codeforces: results.codeforces.calendar,
+              codechef: results.codechef.calendar,
+              gfg: results.gfg.calendar,
+              hackerrank: results.hackerrank.calendar,
+              tuf: results.tuf.calendar,
+            }}
+            colors={Object.fromEntries(SOURCES.map((s) => [s.key, s.color])) as Record<PlatformId, string>}
+          />
+        ) : (
         <div className="overflow-x-auto">
+
           <div className="inline-block min-w-full">
             <div className="relative ml-7 h-4 text-[10px] text-muted-foreground">
               {grid.months.map((m) => (
