@@ -67,18 +67,15 @@ export function GitCity({ weeks, merged, calendars, colors }: Props) {
 
   return (
     <div className="relative overflow-x-auto pb-4">
-      <div
-        className="mx-auto"
-        style={{ perspective: "1400px", width: "100%", minHeight: planeW * 0.62 + 140 }}
-      >
+      <div className="mx-auto" style={{ width: "100%", minHeight: planeW * 0.55 + 200 }}>
         <div
           className="relative mx-auto"
           style={{
             transformStyle: "preserve-3d",
-            transform: "rotateX(58deg) rotateZ(-45deg)",
+            transform: "rotateX(60deg) rotateZ(-45deg)",
             width: planeW,
             height: planeH,
-            marginTop: planeW * 0.28 + 40,
+            marginTop: planeW * 0.3 + 60,
           }}
         >
           {/* ground plate */}
@@ -87,7 +84,7 @@ export function GitCity({ weeks, merged, calendars, colors }: Props) {
             style={{ left: -8, top: -8, width: planeW + 16, height: planeH + 16 }}
           />
           {buildings.map((b) => {
-            const h = Math.min(b.count, 24) * UNIT + 4;
+            const h = Math.min(b.count, 20) * UNIT + 4;
             return (
               <div
                 key={b.date}
@@ -99,32 +96,32 @@ export function GitCity({ weeks, merged, calendars, colors }: Props) {
                 {/* roof */}
                 <div
                   className="absolute inset-0 rounded-[2px]"
-                  style={{ background: b.color, transform: `translateZ(${h}px)`, boxShadow: `0 0 10px ${b.color}66` }}
+                  style={{ background: b.color, transform: `translateZ(${h}px)` }}
                 />
-                {/* front face */}
+                {/* front face (south) */}
                 <div
                   className="absolute left-0 rounded-[1px]"
                   style={{
                     width: CELL,
                     height: h,
-                    bottom: 0,
+                    top: CELL,
                     background: b.color,
-                    filter: "brightness(0.65)",
-                    transformOrigin: "bottom",
-                    transform: `rotateX(-90deg) translateY(${CELL}px)`,
+                    filter: "brightness(0.6)",
+                    transformOrigin: "top",
+                    transform: "rotateX(-90deg)",
                   }}
                 />
-                {/* side face */}
+                {/* side face (east) */}
                 <div
                   className="absolute top-0 rounded-[1px]"
                   style={{
                     width: h,
                     height: CELL,
-                    right: 0,
+                    left: CELL,
                     background: b.color,
-                    filter: "brightness(0.45)",
-                    transformOrigin: "right",
-                    transform: `rotateY(90deg) translateX(${h}px)`,
+                    filter: "brightness(0.4)",
+                    transformOrigin: "left",
+                    transform: "rotateY(-90deg)",
                   }}
                 />
               </div>
@@ -132,6 +129,7 @@ export function GitCity({ weeks, merged, calendars, colors }: Props) {
           })}
         </div>
       </div>
+
 
       <div className="mt-2 min-h-[52px] rounded-lg border border-border bg-background/60 px-3 py-2 text-xs">
         {hover ? (
