@@ -295,6 +295,8 @@ export function Consistency() {
             </div>
           </div>
         </div>
+        )}
+
       </div>
 
       {/* Activity breakdown */}
