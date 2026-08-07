@@ -108,7 +108,7 @@ export function GitCity({ weeks, merged, calendars, colors }: Props) {
                     background: b.color,
                     filter: "brightness(0.6)",
                     transformOrigin: "top",
-                    transform: "rotateX(-90deg)",
+                    transform: "rotateX(90deg)",
                   }}
                 />
                 {/* side face (east) */}
