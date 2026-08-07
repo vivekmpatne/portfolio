@@ -212,7 +212,22 @@ export function Consistency() {
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <div className="hidden items-center gap-1.5 text-[11px] text-muted-foreground sm:flex">
+            <div className="flex rounded-lg border border-border p-0.5 text-xs font-medium">
+              {(["grid", "city"] as const).map((v) => (
+                <button
+                  key={v}
+                  type="button"
+                  onClick={() => setView(v)}
+                  className={`rounded-md px-2.5 py-1 transition-colors ${
+                    view === v ? "bg-foreground text-background" : "text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  {v === "grid" ? "Heatmap" : "Git City"}
+                </button>
+              ))}
+            </div>
+            <div className={`hidden items-center gap-1.5 text-[11px] text-muted-foreground ${view === "grid" ? "sm:flex" : ""}`}>
+
               <span>Less</span>
               {[0, 1, 3, 6, 9].map((n) => (
                 <span key={n} className={`h-2.5 w-2.5 rounded-sm ${intensityClass(n)}`} />
