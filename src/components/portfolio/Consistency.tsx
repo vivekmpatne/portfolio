@@ -54,6 +54,8 @@ export function Consistency() {
   const currentYear = new Date().getFullYear();
   const years = [currentYear, currentYear - 1, currentYear - 2];
   const [year, setYear] = useState(currentYear);
+  const [view, setView] = useState<"grid" | "city">("grid");
+
 
   const { github, leetcode, codeforces, codechef, hackerrank, gfg, tuf } = profile.codingProfiles;
 
