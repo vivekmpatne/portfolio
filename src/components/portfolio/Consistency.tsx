@@ -5,6 +5,8 @@ import { Flame, Trophy, Calendar, Zap, ChevronDown, AlertCircle, BookOpenCheck }
 import { SiGithub, SiLeetcode, SiCodeforces, SiCodechef, SiGeeksforgeeks, SiHackerrank } from "react-icons/si";
 import { profile } from "@/data/profile";
 import { SectionHeader } from "./SectionHeader";
+import { GitCity } from "./GitCity";
+
 import {
   getGithubActivity,
   getLeetcodeActivity,
