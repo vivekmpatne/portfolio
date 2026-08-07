@@ -5,6 +5,8 @@ import { Flame, Trophy, Calendar, Zap, ChevronDown, AlertCircle, BookOpenCheck }
 import { SiGithub, SiLeetcode, SiCodeforces, SiCodechef, SiGeeksforgeeks, SiHackerrank } from "react-icons/si";
 import { profile } from "@/data/profile";
 import { SectionHeader } from "./SectionHeader";
+import { GitCity } from "./GitCity";
+
 import {
   getGithubActivity,
   getLeetcodeActivity,
@@ -52,6 +54,8 @@ export function Consistency() {
   const currentYear = new Date().getFullYear();
   const years = [currentYear, currentYear - 1, currentYear - 2];
   const [year, setYear] = useState(currentYear);
+  const [view, setView] = useState<"grid" | "city">("grid");
+
 
   const { github, leetcode, codeforces, codechef, hackerrank, gfg, tuf } = profile.codingProfiles;
 
@@ -208,7 +212,22 @@ export function Consistency() {
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <div className="hidden items-center gap-1.5 text-[11px] text-muted-foreground sm:flex">
+            <div className="flex rounded-lg border border-border p-0.5 text-xs font-medium">
+              {(["grid", "city"] as const).map((v) => (
+                <button
+                  key={v}
+                  type="button"
+                  onClick={() => setView(v)}
+                  className={`rounded-md px-2.5 py-1 transition-colors ${
+                    view === v ? "bg-foreground text-background" : "text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  {v === "grid" ? "Heatmap" : "Git City"}
+                </button>
+              ))}
+            </div>
+            <div className={`hidden items-center gap-1.5 text-[11px] text-muted-foreground ${view === "grid" ? "sm:flex" : ""}`}>
+
               <span>Less</span>
               {[0, 1, 3, 6, 9].map((n) => (
                 <span key={n} className={`h-2.5 w-2.5 rounded-sm ${intensityClass(n)}`} />
@@ -231,7 +250,24 @@ export function Consistency() {
           </div>
         </div>
 
+        {view === "city" ? (
+          <GitCity
+            weeks={grid.weeks}
+            merged={merged}
+            calendars={{
+              github: results.github.calendar,
+              leetcode: results.leetcode.calendar,
+              codeforces: results.codeforces.calendar,
+              codechef: results.codechef.calendar,
+              gfg: results.gfg.calendar,
+              hackerrank: results.hackerrank.calendar,
+              tuf: results.tuf.calendar,
+            }}
+            colors={Object.fromEntries(SOURCES.map((s) => [s.key, s.color])) as Record<PlatformId, string>}
+          />
+        ) : (
         <div className="overflow-x-auto">
+
           <div className="inline-block min-w-full">
             <div className="relative ml-7 h-4 text-[10px] text-muted-foreground">
               {grid.months.map((m) => (
@@ -278,6 +314,8 @@ export function Consistency() {
             </div>
           </div>
         </div>
+        )}
+
       </div>
 
       {/* Activity breakdown */}
