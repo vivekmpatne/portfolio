@@ -346,3 +346,48 @@ export async function fetchTuf(username: string, year: number): Promise<FetchOut
     },
   };
 }
+
+// ---------- LeetCode topic-wise (tag) breakdown ----------
+export type TopicRow = { tag: string; solved: number; level: "fundamental" | "intermediate" | "advanced" };
+export type TopicsResult = { topics: TopicRow[]; status: "fresh" | "unavailable"; error?: string };
+
+export async function fetchLeetcodeTopics(username: string): Promise<TopicsResult> {
+  const query = `
+    query topics($username: String!) {
+      matchedUser(username: $username) {
+        tagProblemCounts {
+          advanced { tagName problemsSolved }
+          intermediate { tagName problemsSolved }
+          fundamental { tagName problemsSolved }
+        }
+      }
+    }`;
+  try {
+    const res = await fetch("https://leetcode.com/graphql", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "User-Agent": "Mozilla/5.0 (compatible; lovable-portfolio/1.0)",
+        Referer: `https://leetcode.com/u/${username}/`,
+      },
+      body: JSON.stringify({ query, variables: { username } }),
+    });
+    if (!res.ok) return { topics: [], status: "unavailable", error: "LeetCode temporarily unavailable" };
+    const json: any = await res.json();
+    const t = json?.data?.matchedUser?.tagProblemCounts;
+    if (!t) return { topics: [], status: "unavailable", error: "LeetCode temporarily unavailable" };
+    const levels: Array<TopicRow["level"]> = ["fundamental", "intermediate", "advanced"];
+    const topics: TopicRow[] = [];
+    for (const level of levels) {
+      for (const row of t[level] ?? []) {
+        if (!row?.problemsSolved) continue;
+        topics.push({ tag: String(row.tagName), solved: Number(row.problemsSolved), level });
+      }
+    }
+    topics.sort((a, b) => b.solved - a.solved);
+    return { topics, status: "fresh" };
+  } catch (e) {
+    console.error("[activity/leetcode-topics] failed", e);
+    return { topics: [], status: "unavailable", error: "LeetCode temporarily unavailable" };
+  }
+}

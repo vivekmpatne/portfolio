@@ -6,6 +6,8 @@ import { SiGithub, SiLeetcode, SiCodeforces, SiCodechef, SiGeeksforgeeks, SiHack
 import { profile } from "@/data/profile";
 import { SectionHeader } from "./SectionHeader";
 import { GitCity } from "./GitCity";
+import { TopicBreakdown } from "./TopicBreakdown";
+
 
 import {
   getGithubActivity,
@@ -360,7 +362,10 @@ export function Consistency() {
           All seven platforms feed the heatmap live. Last-known-good snapshots are used automatically when a source is temporarily unavailable.
         </p>
       </div>
+
+      <TopicBreakdown />
     </section>
+
   );
 }
 
