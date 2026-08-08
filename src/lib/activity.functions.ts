@@ -77,3 +77,10 @@ export const getTufActivity = createServerFn({ method: "GET" })
       fetchTuf(data.username, data.year),
     );
   });
+
+export const getLeetcodeTopics = createServerFn({ method: "GET" })
+  .inputValidator((data: unknown) => leetcodeTopicsInput.parse(data))
+  .handler(async ({ data }) => {
+    const { fetchLeetcodeTopics } = await import("./activity.server");
+    return fetchLeetcodeTopics(data.username);
+  });
