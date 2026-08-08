@@ -360,7 +360,10 @@ export function Consistency() {
           All seven platforms feed the heatmap live. Last-known-good snapshots are used automatically when a source is temporarily unavailable.
         </p>
       </div>
+
+      <TopicBreakdown />
     </section>
+
   );
 }
 
