@@ -222,7 +222,7 @@ export function Consistency() {
                     view === v ? "bg-foreground text-background" : "text-muted-foreground hover:text-foreground"
                   }`}
                 >
-                  {v === "grid" ? "Heatmap" : "Git City"}
+                  {v === "grid" ? "Heatmap" : "3D City"}
                 </button>
               ))}
             </div>
