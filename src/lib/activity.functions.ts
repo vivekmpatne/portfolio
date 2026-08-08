@@ -11,6 +11,8 @@ import {
   hackerrankInput,
   gfgInput,
   tufInput,
+  leetcodeTopicsInput,
+
 } from "./activity-schemas";
 
 export type { ActivityResult } from "./activity/types";
