@@ -144,7 +144,7 @@ function Scene({
         minDistance={12}
         maxDistance={140}
         maxPolarAngle={Math.PI / 2.15}
-        target={[0, 0, 0]}
+        target={[0, 3, 0]}
       />
     </>
   );
@@ -189,7 +189,7 @@ export default function GitCity3D({ weeks, merged, calendars, colors }: Props) {
         style={{ background: "linear-gradient(180deg,#08150f 0%,#0d1f16 100%)" }}
       >
         <Canvas
-          camera={{ position: [0, 26, 46], fov: 42 }}
+          camera={{ position: [22, 24, 40], fov: 45 }}
           dpr={[1, 1.8]}
           gl={{ antialias: true }}
           onPointerMissed={() => setHover(null)}
