@@ -240,18 +240,33 @@ export default function GitCity3D({ weeks, merged, calendars, colors }: Props) {
         </div>
 
         {hover ? (
-          <div className="pointer-events-none absolute bottom-3 left-3 max-w-[70%] rounded-md border border-emerald-500/30 bg-black/70 px-3 py-2 font-mono text-[11px] text-emerald-200">
+          <div className="pointer-events-none absolute bottom-3 left-3 max-w-[75%] rounded-md border border-emerald-500/30 bg-black/75 px-3 py-2 font-mono text-[11px] text-emerald-200">
             <div className="font-semibold">
               {hover.date} — {hover.count} {hover.count === 1 ? "contribution" : "contributions"}
             </div>
-            <div className="text-emerald-300/70">{hover.parts.join(" · ")}</div>
+            <div className="mt-1 space-y-0.5">
+              {hover.segments.map((s) => (
+                <div key={s.platform} className="flex items-center gap-2">
+                  <span
+                    className="inline-block h-2 w-2 rounded-[2px]"
+                    style={{ background: s.color }}
+                  />
+                  <span className="text-emerald-100/90">{PLATFORM_LABELS[s.platform]}</span>
+                  <span className="text-emerald-300/70">
+                    {s.count} · {Math.round((s.count / hover.count) * 100)}%
+                  </span>
+                </div>
+              ))}
+            </div>
           </div>
         ) : null}
       </div>
 
       <div className="mt-2 text-xs text-muted-foreground">
-        Each tower is one day — height = contributions, colour = most active platform.
+        Each tower is one day — height = total contributions, and every floor band is a platform
+        sized by its share of that day.
       </div>
+
     </div>
   );
 }
