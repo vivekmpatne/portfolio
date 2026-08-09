@@ -172,23 +172,45 @@ export default function GitCity3D({ weeks, merged, calendars, colors }: Props) {
         if (!date) return;
         const count = merged[date] ?? 0;
         if (count === 0) return;
-        const top = dominant(date, calendars);
-        const parts: string[] = [];
+
+        const per: Array<{ platform: PlatformId; count: number }> = [];
         for (const key of Object.keys(calendars) as PlatformId[]) {
           const c = calendars[key][date] ?? 0;
-          if (c) parts.push(`${PLATFORM_LABELS[key]}: ${c}`);
+          if (c) per.push({ platform: key, count: c });
         }
+        per.sort((a, b) => b.count - a.count);
+
+        const parts = per.map((p) => `${PLATFORM_LABELS[p.platform]}: ${p.count}`);
+        const total = per.reduce((s, p) => s + p.count, 0) || 1;
+        const h = Math.min(count, 24) * UNIT + 0.25;
+
+        const segments: Segment[] = [];
+        let y = 0;
+        for (const p of per) {
+          const sh = (p.count / total) * h;
+          segments.push({
+            platform: p.platform,
+            count: p.count,
+            h: sh,
+            y: y + sh / 2,
+            color: colors[p.platform] ?? "#3ddc84",
+          });
+          y += sh;
+        }
+
         out.push({
           date,
           x: wi * STEP - w / 2,
           z: di * STEP - d / 2,
-          h: Math.min(count, 24) * UNIT + 0.25,
+          h,
           count,
-          color: top ? colors[top] : "#3ddc84",
+          color: per[0] ? (colors[per[0].platform] ?? "#3ddc84") : "#3ddc84",
           parts,
+          segments,
         });
       });
     });
+
     return { buildings: out, width: w, depth: d };
   }, [weeks, merged, calendars, colors]);
 
