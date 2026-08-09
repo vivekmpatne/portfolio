@@ -209,8 +209,8 @@ function WindowLights({
           <Instance
             key={w.id}
             position={w.position}
-            scale={isActive ? [1.35, 1.35, 1.35] : [1, 1, 1]}
-            color={isActive ? lighten(w.color, 0.45) : w.color}
+            scale={isActive ? [1.55, 1.55, 1.55] : [1, 1, 1]}
+            color={isActive ? lighten(w.color, 0.55) : w.color}
           />
         );
       })}
