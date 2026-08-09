@@ -337,14 +337,14 @@ function Scene({
   return (
     <>
       <color attach="background" args={["#08150f"]} />
-      <fog attach="fog" args={["#08150f", 28, 95]} />
-      <Environment preset="city" />
-      <Stars radius={120} depth={60} count={2500} factor={4} saturation={0} fade speed={0.6} />
+      <fog attach="fog" args={["#08150f", 32, 90]} />
+      <Environment preset="night" />
+      <Stars radius={140} depth={70} count={3000} factor={4} saturation={0} fade speed={0.5} />
 
-      <ambientLight intensity={0.35} />
+      <ambientLight intensity={0.45} />
       <directionalLight
         position={[22, 40, 18]}
-        intensity={1.2}
+        intensity={1.35}
         castShadow
         shadow-mapSize={[2048, 2048]}
         shadow-camera-far={120}
@@ -353,22 +353,22 @@ function Scene({
         shadow-camera-top={60}
         shadow-camera-bottom={-60}
       />
-      <directionalLight position={[-18, 12, -12]} intensity={0.35} color="#3ddc84" />
-      <pointLight position={[0, 18, 0]} intensity={0.6} color="#a8ffbe" distance={60} decay={2} />
+      <directionalLight position={[-18, 12, -12]} intensity={0.45} color="#3ddc84" />
+      <pointLight position={[0, 20, 0]} intensity={0.9} color="#a8ffbe" distance={70} decay={2} />
 
       {/* reflective ground */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.08, 0]} receiveShadow>
         <planeGeometry args={[width + 10, depth + 10]} />
         <MeshReflectorMaterial
-          blur={[300, 120]}
+          blur={[400, 160]}
           resolution={1024}
-          mixBlur={0.8}
-          mixStrength={0.45}
-          roughness={0.65}
-          depthScale={1}
-          color="#0d1f16"
-          metalness={0.2}
-          mirror={0.55}
+          mixBlur={0.9}
+          mixStrength={0.28}
+          roughness={0.85}
+          depthScale={0.8}
+          color="#0a1a12"
+          metalness={0.15}
+          mirror={0.35}
         />
       </mesh>
 
