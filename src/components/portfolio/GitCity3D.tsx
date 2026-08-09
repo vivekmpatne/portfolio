@@ -136,16 +136,16 @@ function Scene({
         infiniteGrid={false}
       />
 
-      {buildings.map((b, i) => (
+      {buildings.map((b) => (
         <Tower
           key={b.date}
           b={b}
-          index={i}
           active={hoverDate === b.date}
           onHover={onHover}
           onLeave={() => onHover(null)}
         />
       ))}
+
 
       <OrbitControls
         makeDefault
