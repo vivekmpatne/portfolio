@@ -11,8 +11,6 @@ import {
   hackerrankInput,
   gfgInput,
   tufInput,
-  leetcodeTopicsInput,
-
 } from "./activity-schemas";
 
 export type { ActivityResult } from "./activity/types";
@@ -80,9 +78,3 @@ export const getTufActivity = createServerFn({ method: "GET" })
     );
   });
 
-export const getLeetcodeTopics = createServerFn({ method: "GET" })
-  .inputValidator((data: unknown) => leetcodeTopicsInput.parse(data))
-  .handler(async ({ data }) => {
-    const { fetchLeetcodeTopics } = await import("./activity.server");
-    return fetchLeetcodeTopics(data.username);
-  });

@@ -29,8 +29,3 @@ export const hackerrankInput = makeSchema(ALLOWED_USERNAMES.hackerrank);
 export const gfgInput = makeSchema(ALLOWED_USERNAMES.gfg);
 export const tufInput = makeSchema(ALLOWED_USERNAMES.tuf);
 
-export const leetcodeTopicsInput = z.object({
-  username: z.string().min(1).max(64).refine((u) => ALLOWED_USERNAMES.leetcode.has(u as never), {
-    message: "Username not allowed",
-  }),
-});
