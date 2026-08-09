@@ -17,6 +17,14 @@ type Props = {
   colors: Record<PlatformId, string>;
 };
 
+type Segment = {
+  platform: PlatformId;
+  count: number;
+  h: number;
+  y: number; // center y
+  color: string;
+};
+
 type Building = {
   date: string;
   x: number;
@@ -25,70 +33,72 @@ type Building = {
   count: number;
   color: string;
   parts: string[];
+  segments: Segment[];
 };
-
-function dominant(date: string, calendars: Record<PlatformId, DayMap>) {
-  let best: PlatformId | null = null;
-  let bestCount = 0;
-  for (const key of Object.keys(calendars) as PlatformId[]) {
-    const c = calendars[key][date] ?? 0;
-    if (c > bestCount) {
-      bestCount = c;
-      best = key;
-    }
-  }
-  return best;
-}
 
 function Tower({
   b,
   active,
   onHover,
   onLeave,
-  index,
 }: {
   b: Building;
   active: boolean;
   onHover: (b: Building) => void;
   onLeave: () => void;
-  index: number;
 }) {
-  const ref = useRef<THREE.Mesh>(null);
+  const ref = useRef<THREE.Group>(null);
   const grown = useRef(0);
 
   useFrame((_, delta) => {
-    const mesh = ref.current;
-    if (!mesh) return;
-    // staggered grow-in animation
-    const target = 1;
-    const start = index * 0.0015;
-    grown.current = Math.min(target, grown.current + delta * (0.9 + start * 0));
-    const s = Math.max(0.001, grown.current);
-    mesh.scale.y = s;
-    mesh.position.y = (b.h * s) / 2;
+    const g = ref.current;
+    if (!g) return;
+    grown.current = Math.min(1, grown.current + delta * 0.9);
+    g.scale.y = Math.max(0.001, grown.current);
   });
 
   return (
-    <mesh
+    <group
       ref={ref}
-      position={[b.x, b.h / 2, b.z]}
+      position={[b.x, 0, b.z]}
       onPointerOver={(e) => {
         e.stopPropagation();
         onHover(b);
       }}
       onPointerOut={() => onLeave()}
     >
-      <boxGeometry args={[CELL, b.h, CELL]} />
-      <meshStandardMaterial
-        color={b.color}
-        emissive={b.color}
-        emissiveIntensity={active ? 0.9 : 0.22}
-        roughness={0.35}
-        metalness={0.15}
-      />
-    </mesh>
+      {b.segments.map((s, i) => (
+        <mesh key={s.platform} position={[0, s.y, 0]}>
+          <boxGeometry args={[CELL, s.h, CELL]} />
+          <meshStandardMaterial
+            color={s.color}
+            emissive={s.color}
+            emissiveIntensity={active ? 0.95 : 0.22}
+            roughness={0.35}
+            metalness={0.15}
+          />
+          {/* thin divider between floors */}
+          {i < b.segments.length - 1 ? (
+            <mesh position={[0, s.h / 2, 0]}>
+              <boxGeometry args={[CELL * 1.06, 0.035, CELL * 1.06]} />
+              <meshStandardMaterial color="#04120b" roughness={1} />
+            </mesh>
+          ) : null}
+        </mesh>
+      ))}
+      {/* rooftop marker in dominant platform colour */}
+      <mesh position={[0, b.h + 0.06, 0]}>
+        <boxGeometry args={[CELL * 0.35, 0.12, CELL * 0.35]} />
+        <meshStandardMaterial
+          color={b.color}
+          emissive={b.color}
+          emissiveIntensity={active ? 1.4 : 0.7}
+        />
+      </mesh>
+    </group>
   );
 }
+
 
 function Scene({
   buildings,
