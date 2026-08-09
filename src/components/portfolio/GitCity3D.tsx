@@ -17,6 +17,14 @@ type Props = {
   colors: Record<PlatformId, string>;
 };
 
+type Segment = {
+  platform: PlatformId;
+  count: number;
+  h: number;
+  y: number; // center y
+  color: string;
+};
+
 type Building = {
   date: string;
   x: number;
@@ -25,70 +33,72 @@ type Building = {
   count: number;
   color: string;
   parts: string[];
+  segments: Segment[];
 };
-
-function dominant(date: string, calendars: Record<PlatformId, DayMap>) {
-  let best: PlatformId | null = null;
-  let bestCount = 0;
-  for (const key of Object.keys(calendars) as PlatformId[]) {
-    const c = calendars[key][date] ?? 0;
-    if (c > bestCount) {
-      bestCount = c;
-      best = key;
-    }
-  }
-  return best;
-}
 
 function Tower({
   b,
   active,
   onHover,
   onLeave,
-  index,
 }: {
   b: Building;
   active: boolean;
   onHover: (b: Building) => void;
   onLeave: () => void;
-  index: number;
 }) {
-  const ref = useRef<THREE.Mesh>(null);
+  const ref = useRef<THREE.Group>(null);
   const grown = useRef(0);
 
   useFrame((_, delta) => {
-    const mesh = ref.current;
-    if (!mesh) return;
-    // staggered grow-in animation
-    const target = 1;
-    const start = index * 0.0015;
-    grown.current = Math.min(target, grown.current + delta * (0.9 + start * 0));
-    const s = Math.max(0.001, grown.current);
-    mesh.scale.y = s;
-    mesh.position.y = (b.h * s) / 2;
+    const g = ref.current;
+    if (!g) return;
+    grown.current = Math.min(1, grown.current + delta * 0.9);
+    g.scale.y = Math.max(0.001, grown.current);
   });
 
   return (
-    <mesh
+    <group
       ref={ref}
-      position={[b.x, b.h / 2, b.z]}
+      position={[b.x, 0, b.z]}
       onPointerOver={(e) => {
         e.stopPropagation();
         onHover(b);
       }}
       onPointerOut={() => onLeave()}
     >
-      <boxGeometry args={[CELL, b.h, CELL]} />
-      <meshStandardMaterial
-        color={b.color}
-        emissive={b.color}
-        emissiveIntensity={active ? 0.9 : 0.22}
-        roughness={0.35}
-        metalness={0.15}
-      />
-    </mesh>
+      {b.segments.map((s, i) => (
+        <mesh key={s.platform} position={[0, s.y, 0]}>
+          <boxGeometry args={[CELL, s.h, CELL]} />
+          <meshStandardMaterial
+            color={s.color}
+            emissive={s.color}
+            emissiveIntensity={active ? 0.95 : 0.22}
+            roughness={0.35}
+            metalness={0.15}
+          />
+          {/* thin divider between floors */}
+          {i < b.segments.length - 1 ? (
+            <mesh position={[0, s.h / 2, 0]}>
+              <boxGeometry args={[CELL * 1.06, 0.035, CELL * 1.06]} />
+              <meshStandardMaterial color="#04120b" roughness={1} />
+            </mesh>
+          ) : null}
+        </mesh>
+      ))}
+      {/* rooftop marker in dominant platform colour */}
+      <mesh position={[0, b.h + 0.06, 0]}>
+        <boxGeometry args={[CELL * 0.35, 0.12, CELL * 0.35]} />
+        <meshStandardMaterial
+          color={b.color}
+          emissive={b.color}
+          emissiveIntensity={active ? 1.4 : 0.7}
+        />
+      </mesh>
+    </group>
   );
 }
+
 
 function Scene({
   buildings,
@@ -126,16 +136,16 @@ function Scene({
         infiniteGrid={false}
       />
 
-      {buildings.map((b, i) => (
+      {buildings.map((b) => (
         <Tower
           key={b.date}
           b={b}
-          index={i}
           active={hoverDate === b.date}
           onHover={onHover}
           onLeave={() => onHover(null)}
         />
       ))}
+
 
       <OrbitControls
         makeDefault
@@ -162,23 +172,45 @@ export default function GitCity3D({ weeks, merged, calendars, colors }: Props) {
         if (!date) return;
         const count = merged[date] ?? 0;
         if (count === 0) return;
-        const top = dominant(date, calendars);
-        const parts: string[] = [];
+
+        const per: Array<{ platform: PlatformId; count: number }> = [];
         for (const key of Object.keys(calendars) as PlatformId[]) {
           const c = calendars[key][date] ?? 0;
-          if (c) parts.push(`${PLATFORM_LABELS[key]}: ${c}`);
+          if (c) per.push({ platform: key, count: c });
         }
+        per.sort((a, b) => b.count - a.count);
+
+        const parts = per.map((p) => `${PLATFORM_LABELS[p.platform]}: ${p.count}`);
+        const total = per.reduce((s, p) => s + p.count, 0) || 1;
+        const h = Math.min(count, 24) * UNIT + 0.25;
+
+        const segments: Segment[] = [];
+        let y = 0;
+        for (const p of per) {
+          const sh = (p.count / total) * h;
+          segments.push({
+            platform: p.platform,
+            count: p.count,
+            h: sh,
+            y: y + sh / 2,
+            color: colors[p.platform] ?? "#3ddc84",
+          });
+          y += sh;
+        }
+
         out.push({
           date,
           x: wi * STEP - w / 2,
           z: di * STEP - d / 2,
-          h: Math.min(count, 24) * UNIT + 0.25,
+          h,
           count,
-          color: top ? colors[top] : "#3ddc84",
+          color: per[0] ? (colors[per[0].platform] ?? "#3ddc84") : "#3ddc84",
           parts,
+          segments,
         });
       });
     });
+
     return { buildings: out, width: w, depth: d };
   }, [weeks, merged, calendars, colors]);
 
@@ -208,18 +240,33 @@ export default function GitCity3D({ weeks, merged, calendars, colors }: Props) {
         </div>
 
         {hover ? (
-          <div className="pointer-events-none absolute bottom-3 left-3 max-w-[70%] rounded-md border border-emerald-500/30 bg-black/70 px-3 py-2 font-mono text-[11px] text-emerald-200">
+          <div className="pointer-events-none absolute bottom-3 left-3 max-w-[75%] rounded-md border border-emerald-500/30 bg-black/75 px-3 py-2 font-mono text-[11px] text-emerald-200">
             <div className="font-semibold">
               {hover.date} — {hover.count} {hover.count === 1 ? "contribution" : "contributions"}
             </div>
-            <div className="text-emerald-300/70">{hover.parts.join(" · ")}</div>
+            <div className="mt-1 space-y-0.5">
+              {hover.segments.map((s) => (
+                <div key={s.platform} className="flex items-center gap-2">
+                  <span
+                    className="inline-block h-2 w-2 rounded-[2px]"
+                    style={{ background: s.color }}
+                  />
+                  <span className="text-emerald-100/90">{PLATFORM_LABELS[s.platform]}</span>
+                  <span className="text-emerald-300/70">
+                    {s.count} · {Math.round((s.count / hover.count) * 100)}%
+                  </span>
+                </div>
+              ))}
+            </div>
           </div>
         ) : null}
       </div>
 
       <div className="mt-2 text-xs text-muted-foreground">
-        Each tower is one day — height = contributions, colour = most active platform.
+        Each tower is one day — height = total contributions, and every floor band is a platform
+        sized by its share of that day.
       </div>
+
     </div>
   );
 }
