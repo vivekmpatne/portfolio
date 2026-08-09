@@ -19,9 +19,9 @@ const GAP = 0.35;
 const STEP = CELL + GAP;
 const UNIT = 0.35; // height per contribution
 
-const WINDOW_W = 0.13;
-const WINDOW_H = 0.13;
-const WINDOW_D = 0.025;
+const WINDOW_W = 0.16;
+const WINDOW_H = 0.16;
+const WINDOW_D = 0.035;
 
 function lighten(hex: string, amount = 0.28) {
   const c = new THREE.Color(hex);
