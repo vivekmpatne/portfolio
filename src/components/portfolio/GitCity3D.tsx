@@ -342,8 +342,6 @@ function Scene({
           mixStrength={0.45}
           roughness={0.65}
           depthScale={1}
-          minDepthRatio={0.4}
-          maxDepthRatio={1.25}
           color="#0d1f16"
           metalness={0.2}
           mirror={0.55}
