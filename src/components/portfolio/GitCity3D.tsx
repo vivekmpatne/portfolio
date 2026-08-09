@@ -1,6 +1,15 @@
 import { useMemo, useRef, useState } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { OrbitControls, Grid } from "@react-three/drei";
+import {
+  OrbitControls,
+  Grid,
+  RoundedBox,
+  MeshReflectorMaterial,
+  Stars,
+  Instances,
+  Instance,
+  Environment,
+} from "@react-three/drei";
 import * as THREE from "three";
 import type { DayMap, PlatformId } from "@/lib/activity/types";
 import { PLATFORM_LABELS } from "@/lib/activity/types";
@@ -9,6 +18,16 @@ const CELL = 1; // world units per day footprint
 const GAP = 0.35;
 const STEP = CELL + GAP;
 const UNIT = 0.35; // height per contribution
+
+const WINDOW_W = 0.16;
+const WINDOW_H = 0.16;
+const WINDOW_D = 0.035;
+
+function lighten(hex: string, amount = 0.28) {
+  const c = new THREE.Color(hex);
+  c.offsetHSL(0, 0, amount);
+  return `#${c.getHexString()}`;
+}
 
 type Props = {
   weeks: Array<Array<string | null>>;
@@ -36,6 +55,13 @@ type Building = {
   segments: Segment[];
 };
 
+type WindowLight = {
+  id: string;
+  position: [number, number, number];
+  color: string;
+  scale: number;
+};
+
 function Tower({
   b,
   active,
@@ -54,7 +80,13 @@ function Tower({
     const g = ref.current;
     if (!g) return;
     grown.current = Math.min(1, grown.current + delta * 0.9);
-    g.scale.y = Math.max(0.001, grown.current);
+    const ease = 1 - Math.pow(1 - grown.current, 3);
+    g.scale.y = Math.max(0.001, ease);
+
+    // subtle hover pop
+    const targetXZ = active ? 1.06 : 1.0;
+    g.scale.x = THREE.MathUtils.lerp(g.scale.x, targetXZ, delta * 6);
+    g.scale.z = THREE.MathUtils.lerp(g.scale.z, targetXZ, delta * 6);
   });
 
   return (
@@ -67,38 +99,164 @@ function Tower({
       }}
       onPointerOut={() => onLeave()}
     >
+      {/* foundation plinth */}
+      <mesh position={[0, 0.04, 0]} receiveShadow castShadow>
+        <boxGeometry args={[CELL * 1.12, 0.08, CELL * 1.12]} />
+        <meshStandardMaterial color="#05140d" roughness={0.9} metalness={0.1} />
+      </mesh>
+
       {b.segments.map((s, i) => (
-        <mesh key={s.platform} position={[0, s.y, 0]}>
-          <boxGeometry args={[CELL, s.h, CELL]} />
-          <meshStandardMaterial
-            color={s.color}
-            emissive={s.color}
-            emissiveIntensity={active ? 0.95 : 0.22}
-            roughness={0.35}
-            metalness={0.15}
-          />
+        <group key={s.platform} position={[0, s.y, 0]}>
+          <RoundedBox
+            args={[CELL, s.h, CELL]}
+            radius={0.05}
+            smoothness={2}
+            castShadow
+            receiveShadow
+          >
+            <meshStandardMaterial
+              color={s.color}
+              emissive={s.color}
+              emissiveIntensity={active ? 0.72 : 0.24}
+              roughness={0.22}
+              metalness={0.25}
+            />
+          </RoundedBox>
           {/* thin divider between floors */}
           {i < b.segments.length - 1 ? (
-            <mesh position={[0, s.h / 2, 0]}>
-              <boxGeometry args={[CELL * 1.06, 0.035, CELL * 1.06]} />
+            <mesh position={[0, s.h / 2 + 0.02, 0]} castShadow>
+              <boxGeometry args={[CELL * 1.08, 0.04, CELL * 1.08]} />
               <meshStandardMaterial color="#04120b" roughness={1} />
             </mesh>
           ) : null}
-        </mesh>
+        </group>
       ))}
+
       {/* rooftop marker in dominant platform colour */}
-      <mesh position={[0, b.h + 0.06, 0]}>
-        <boxGeometry args={[CELL * 0.35, 0.12, CELL * 0.35]} />
+      <RoundedBox
+        args={[CELL * 0.35, 0.16, CELL * 0.35]}
+        radius={0.03}
+        smoothness={2}
+        position={[0, b.h + 0.08, 0]}
+        castShadow
+      >
         <meshStandardMaterial
           color={b.color}
           emissive={b.color}
-          emissiveIntensity={active ? 1.4 : 0.7}
+          emissiveIntensity={active ? 1.8 : 0.95}
+          roughness={0.2}
+          metalness={0.3}
+        />
+      </RoundedBox>
+
+      {/* antenna */}
+      <mesh position={[0.18, b.h + 0.45, 0.18]} castShadow>
+        <cylinderGeometry args={[0.025, 0.025, 0.7, 8]} />
+        <meshStandardMaterial color="#8aa" metalness={0.8} roughness={0.2} />
+      </mesh>
+
+      {/* blinking beacon */}
+      <Beacon position={[0.18, b.h + 0.85, 0.18]} color={b.color} active={active} />
+    </group>
+  );
+}
+
+function Beacon({
+  position,
+  color,
+  active,
+}: {
+  position: [number, number, number];
+  color: string;
+  active: boolean;
+}) {
+  const ref = useRef<THREE.Mesh>(null);
+  useFrame(({ clock }) => {
+    if (!ref.current) return;
+    const pulse = active
+      ? 1.4 + Math.sin(clock.getElapsedTime() * 8) * 0.6
+      : 0.55 + Math.sin(clock.getElapsedTime() * 3 + position[0]) * 0.15;
+    const mat = ref.current.material as THREE.MeshStandardMaterial;
+    mat.emissiveIntensity = pulse;
+  });
+  return (
+    <mesh ref={ref} position={position}>
+      <sphereGeometry args={[0.07, 16, 16]} />
+      <meshStandardMaterial
+        color={color}
+        emissive={color}
+        emissiveIntensity={0.55}
+        toneMapped={false}
+      />
+    </mesh>
+  );
+}
+
+function WindowLights({
+  windows,
+  activeIds,
+}: {
+  windows: WindowLight[];
+  activeIds: Set<string>;
+}) {
+  return (
+    <Instances limit={windows.length}>
+      <boxGeometry args={[WINDOW_W, WINDOW_H, WINDOW_D]} />
+      <meshBasicMaterial toneMapped={false} />
+      {windows.map((w) => {
+        const isActive = activeIds.has(w.id);
+        return (
+          <Instance
+            key={w.id}
+            position={w.position}
+            scale={isActive ? [1.55, 1.55, 1.55] : [1, 1, 1]}
+            color={isActive ? lighten(w.color, 0.55) : w.color}
+          />
+        );
+      })}
+    </Instances>
+  );
+}
+
+function ActiveGlow({
+  building,
+}: {
+  building: Building | null;
+}) {
+  const lightRef = useRef<THREE.PointLight>(null);
+  const beamRef = useRef<THREE.Mesh>(null);
+
+  useFrame(({ clock }) => {
+    if (!lightRef.current || !building) return;
+    const pulse = 1.2 + Math.sin(clock.getElapsedTime() * 6) * 0.5;
+    lightRef.current.intensity = pulse * 3.5;
+    lightRef.current.color.set(building.color);
+  });
+
+  if (!building) return null;
+  return (
+    <group position={[building.x, 0, building.z]}>
+      <pointLight
+        ref={lightRef}
+        position={[0, building.h + 1.4, 0]}
+        distance={10}
+        decay={2}
+        color={building.color}
+        intensity={4}
+      />
+      <mesh ref={beamRef} position={[0, building.h / 2 + 0.5, 0]}>
+        <cylinderGeometry args={[0.12, 0.35, building.h + 1.2, 16, 1, true]} />
+        <meshBasicMaterial
+          color={building.color}
+          transparent
+          opacity={0.08}
+          side={THREE.DoubleSide}
+          depthWrite={false}
         />
       </mesh>
     </group>
   );
 }
-
 
 function Scene({
   buildings,
@@ -113,20 +271,110 @@ function Scene({
   onHover: (b: Building | null) => void;
   hoverDate: string | null;
 }) {
+  const windows = useMemo<WindowLight[]>(() => {
+    const out: WindowLight[] = [];
+    let id = 0;
+    for (const b of buildings) {
+      for (const s of b.segments) {
+        const rows = Math.min(Math.max(Math.round(s.h / 0.32), 1), 6);
+        const cols = 2;
+        const startY = s.y - s.h / 2 + 0.12;
+        const stepY = rows > 1 ? (s.h - 0.24) / (rows - 1) : 0;
+        const startX = -CELL * 0.22;
+        const stepX = CELL * 0.44;
+        for (let r = 0; r < rows; r++) {
+          for (let c = 0; c < cols; c++) {
+            // skip some windows randomly for a lived-in look
+            if (Math.random() > 0.78) continue;
+            const y = rows === 1 ? s.y : startY + r * stepY;
+            // front face windows
+            out.push({
+              id: `${b.date}-${s.platform}-f-${id++}`,
+              position: [
+                b.x + startX + c * stepX,
+                y,
+                b.z + CELL / 2 + 0.045,
+              ],
+              color: lighten(s.color, 0.35),
+              scale: 1,
+            });
+            // right face windows
+            out.push({
+              id: `${b.date}-${s.platform}-r-${id++}`,
+              position: [
+                b.x + CELL / 2 + 0.045,
+                y,
+                b.z + startX + c * stepX,
+              ],
+              color: lighten(s.color, 0.28),
+              scale: 1,
+            });
+          }
+        }
+      }
+    }
+    return out;
+  }, [buildings]);
+
+  const activeIds = useMemo(() => {
+    const set = new Set<string>();
+    if (!hoverDate) return set;
+    const b = buildings.find((x) => x.date === hoverDate);
+    if (!b) return set;
+    for (const s of b.segments) {
+      for (const w of windows) {
+        if (w.id.startsWith(`${b.date}-${s.platform}-`)) set.add(w.id);
+      }
+    }
+    return set;
+  }, [buildings, hoverDate, windows]);
+
+  const hoverBuilding = useMemo(
+    () => buildings.find((b) => b.date === hoverDate) ?? null,
+    [buildings, hoverDate],
+  );
+
   return (
     <>
-      <ambientLight intensity={0.55} />
-      <directionalLight position={[20, 35, 15]} intensity={1.15} />
-      <directionalLight position={[-18, 12, -12]} intensity={0.35} color="#3ddc84" />
+      <color attach="background" args={["#08150f"]} />
+      <fog attach="fog" args={["#08150f", 32, 90]} />
+      <Environment preset="night" />
+      <Stars radius={140} depth={70} count={3000} factor={4} saturation={0} fade speed={0.5} />
 
-      {/* ground plate */}
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.06, 0]} receiveShadow>
-        <planeGeometry args={[width + 4, depth + 4]} />
-        <meshStandardMaterial color="#0d1f16" roughness={1} />
+      <ambientLight intensity={0.45} />
+      <directionalLight
+        position={[22, 40, 18]}
+        intensity={1.35}
+        castShadow
+        shadow-mapSize={[2048, 2048]}
+        shadow-camera-far={120}
+        shadow-camera-left={-60}
+        shadow-camera-right={60}
+        shadow-camera-top={60}
+        shadow-camera-bottom={-60}
+      />
+      <directionalLight position={[-18, 12, -12]} intensity={0.45} color="#3ddc84" />
+      <pointLight position={[0, 20, 0]} intensity={0.9} color="#a8ffbe" distance={70} decay={2} />
+
+      {/* reflective ground */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.08, 0]} receiveShadow>
+        <planeGeometry args={[width + 10, depth + 10]} />
+        <MeshReflectorMaterial
+          blur={[400, 160]}
+          resolution={1024}
+          mixBlur={0.9}
+          mixStrength={0.28}
+          roughness={0.85}
+          depthScale={0.8}
+          color="#0a1a12"
+          metalness={0.15}
+          mirror={0.35}
+        />
       </mesh>
+
       <Grid
-        position={[0, -0.04, 0]}
-        args={[width + 4, depth + 4]}
+        position={[0, -0.06, 0]}
+        args={[width + 10, depth + 10]}
         cellSize={STEP}
         cellColor="#1f5c3c"
         sectionSize={STEP * 7}
@@ -146,6 +394,8 @@ function Scene({
         />
       ))}
 
+      <WindowLights windows={windows} activeIds={activeIds} />
+      <ActiveGlow building={hoverBuilding} />
 
       <OrbitControls
         makeDefault
@@ -221,9 +471,10 @@ export default function GitCity3D({ weeks, merged, calendars, colors }: Props) {
         style={{ background: "linear-gradient(180deg,#08150f 0%,#0d1f16 100%)" }}
       >
         <Canvas
-          camera={{ position: [16, 20, 30], fov: 45 }}
-          dpr={[1, 1.8]}
-          gl={{ antialias: true }}
+          camera={{ position: [18, 22, 34], fov: 42 }}
+          dpr={[1, 1.6]}
+          gl={{ antialias: true, alpha: false }}
+          shadows
           onPointerMissed={() => setHover(null)}
         >
           <Scene
@@ -266,7 +517,6 @@ export default function GitCity3D({ weeks, merged, calendars, colors }: Props) {
         Each tower is one day — height = total contributions, and every floor band is a platform
         sized by its share of that day.
       </div>
-
     </div>
   );
 }
