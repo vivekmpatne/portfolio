@@ -99,6 +99,12 @@ function Tower({
       }}
       onPointerOut={() => onLeave()}
     >
+      {/* foundation plinth */}
+      <mesh position={[0, 0.04, 0]} receiveShadow castShadow>
+        <boxGeometry args={[CELL * 1.12, 0.08, CELL * 1.12]} />
+        <meshStandardMaterial color="#05140d" roughness={0.9} metalness={0.1} />
+      </mesh>
+
       {b.segments.map((s, i) => (
         <group key={s.platform} position={[0, s.y, 0]}>
           <RoundedBox
@@ -111,9 +117,9 @@ function Tower({
             <meshStandardMaterial
               color={s.color}
               emissive={s.color}
-              emissiveIntensity={active ? 0.55 : 0.18}
-              roughness={0.25}
-              metalness={0.2}
+              emissiveIntensity={active ? 0.72 : 0.24}
+              roughness={0.22}
+              metalness={0.25}
             />
           </RoundedBox>
           {/* thin divider between floors */}
@@ -127,16 +133,21 @@ function Tower({
       ))}
 
       {/* rooftop marker in dominant platform colour */}
-      <mesh position={[0, b.h + 0.08, 0]} castShadow>
-        <boxGeometry args={[CELL * 0.35, 0.16, CELL * 0.35]} />
+      <RoundedBox
+        args={[CELL * 0.35, 0.16, CELL * 0.35]}
+        radius={0.03}
+        smoothness={2}
+        position={[0, b.h + 0.08, 0]}
+        castShadow
+      >
         <meshStandardMaterial
           color={b.color}
           emissive={b.color}
-          emissiveIntensity={active ? 1.6 : 0.8}
+          emissiveIntensity={active ? 1.8 : 0.95}
           roughness={0.2}
           metalness={0.3}
         />
-      </mesh>
+      </RoundedBox>
 
       {/* antenna */}
       <mesh position={[0.18, b.h + 0.45, 0.18]} castShadow>
