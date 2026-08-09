@@ -276,24 +276,37 @@ function Scene({
     let id = 0;
     for (const b of buildings) {
       for (const s of b.segments) {
-        const rows = Math.min(Math.max(Math.round(s.h / 0.34), 1), 5);
+        const rows = Math.min(Math.max(Math.round(s.h / 0.32), 1), 6);
         const cols = 2;
         const startY = s.y - s.h / 2 + 0.12;
-        const stepY = (s.h - 0.24) / Math.max(rows - 1, 1);
+        const stepY = rows > 1 ? (s.h - 0.24) / (rows - 1) : 0;
         const startX = -CELL * 0.22;
         const stepX = CELL * 0.44;
         for (let r = 0; r < rows; r++) {
           for (let c = 0; c < cols; c++) {
             // skip some windows randomly for a lived-in look
-            if (Math.random() > 0.82) continue;
+            if (Math.random() > 0.78) continue;
+            const y = rows === 1 ? s.y : startY + r * stepY;
+            // front face windows
             out.push({
-              id: `${b.date}-${s.platform}-${id++}`,
+              id: `${b.date}-${s.platform}-f-${id++}`,
               position: [
                 b.x + startX + c * stepX,
-                startY + r * stepY,
-                b.z + CELL / 2 + 0.035,
+                y,
+                b.z + CELL / 2 + 0.045,
               ],
-              color: lighten(s.color, 0.22),
+              color: lighten(s.color, 0.35),
+              scale: 1,
+            });
+            // right face windows
+            out.push({
+              id: `${b.date}-${s.platform}-r-${id++}`,
+              position: [
+                b.x + CELL / 2 + 0.045,
+                y,
+                b.z + startX + c * stepX,
+              ],
+              color: lighten(s.color, 0.28),
               scale: 1,
             });
           }
