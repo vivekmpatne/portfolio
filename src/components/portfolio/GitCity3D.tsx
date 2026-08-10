@@ -650,6 +650,7 @@ function Scene({
         zoomSpeed={0.5}
         panSpeed={0.5}
         screenSpacePanning={false}
+        touches={{ ONE: THREE.TOUCH.ROTATE, TWO: THREE.TOUCH.DOLLY_PAN }}
         minDistance={16}
         maxDistance={Math.max(70, width * 0.9)}
         minPolarAngle={0.18}
@@ -764,7 +765,7 @@ export default function GitCity3D({ weeks, merged, calendars, colors }: Props) {
   return (
     <div>
       <div
-        className="relative h-[420px] w-full touch-none overflow-hidden rounded-xl border border-emerald-500/25"
+        className="relative h-[420px] w-full overflow-hidden [touch-action:pan-y] rounded-xl border border-emerald-500/25"
         style={{ background: "linear-gradient(180deg,#08150f 0%,#0d1f16 100%)" }}
         onPointerDown={(e) => {
           downRef.current = { x: e.clientX, y: e.clientY };
