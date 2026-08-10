@@ -68,11 +68,13 @@ function Tower({
   active,
   onHover,
   onLeave,
+  dragRef,
 }: {
   b: Building;
   active: boolean;
   onHover: (b: Building) => void;
   onLeave: () => void;
+  dragRef: MutableRefObject<boolean>;
 }) {
   const ref = useRef<THREE.Group>(null);
   const grown = useRef(0);
@@ -96,10 +98,18 @@ function Tower({
       position={[b.x, 0, b.z]}
       onPointerOver={(e) => {
         e.stopPropagation();
+        // ignore hover while the camera is being dragged
+        if (dragRef.current) return;
         onHover(b);
+      }}
+      onPointerMove={(e) => {
+        e.stopPropagation();
+        if (dragRef.current) return;
+        if (!active) onHover(b);
       }}
       onPointerOut={() => onLeave()}
     >
+
       {/* foundation plinth */}
       <mesh position={[0, 0.04, 0]} receiveShadow castShadow>
         <boxGeometry args={[CELL * 1.12, 0.08, CELL * 1.12]} />
