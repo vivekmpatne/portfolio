@@ -107,6 +107,7 @@ function Tower({
 
       {b.segments.map((s, i) => (
         <group key={s.platform} position={[0, s.y, 0]}>
+          {/* glass facade shell */}
           <RoundedBox
             args={[CELL, s.h, CELL]}
             radius={0.05}
@@ -114,14 +115,30 @@ function Tower({
             castShadow
             receiveShadow
           >
-            <meshStandardMaterial
+            <meshPhysicalMaterial
               color={s.color}
               emissive={s.color}
-              emissiveIntensity={active ? 0.72 : 0.24}
-              roughness={0.22}
-              metalness={0.25}
+              emissiveIntensity={active ? 0.62 : 0.16}
+              roughness={0.12}
+              metalness={0.35}
+              transmission={0.35}
+              thickness={0.6}
+              transparent
+              opacity={active ? 0.68 : 0.55}
+              depthWrite={false}
             />
           </RoundedBox>
+          {/* inner structural core so the tower still reads as solid */}
+          <mesh position={[0, 0, 0]}>
+            <boxGeometry args={[CELL * 0.52, Math.max(s.h * 0.9, 0.02), CELL * 0.52]} />
+            <meshStandardMaterial
+              color="#06170f"
+              emissive={s.color}
+              emissiveIntensity={active ? 0.32 : 0.1}
+              roughness={0.65}
+              metalness={0.3}
+            />
+          </mesh>
           {/* thin divider between floors */}
           {i < b.segments.length - 1 ? (
             <mesh position={[0, s.h / 2 + 0.02, 0]} castShadow>
@@ -131,6 +148,7 @@ function Tower({
           ) : null}
         </group>
       ))}
+
 
       {/* rooftop marker in dominant platform colour */}
       <RoundedBox
@@ -217,6 +235,122 @@ function WindowLights({
     </Instances>
   );
 }
+
+type FacadeBand = {
+  key: string;
+  date: string;
+  position: [number, number, number];
+  color: string;
+};
+
+/** Thin horizontal floor bands + vertical mullions, all instanced (2 draw calls). */
+function FacadeGrid({
+  bands,
+  mullions,
+  hoverDate,
+}: {
+  bands: FacadeBand[];
+  mullions: FacadeBand[];
+  hoverDate: string | null;
+}) {
+  return (
+    <>
+      <Instances limit={Math.max(bands.length, 1)} frustumCulled={false}>
+        <boxGeometry args={[CELL * 1.015, 0.014, CELL * 1.015]} />
+        <meshBasicMaterial toneMapped={false} transparent opacity={0.5} />
+        {bands.map((f) => (
+          <Instance
+            key={f.key}
+            position={f.position}
+            color={hoverDate === f.date ? lighten(f.color, 0.45) : f.color}
+          />
+        ))}
+      </Instances>
+      <Instances limit={Math.max(mullions.length, 1)} frustumCulled={false}>
+        <boxGeometry args={[0.035, 1, 0.035]} />
+        <meshBasicMaterial toneMapped={false} transparent opacity={0.42} />
+        {mullions.map((m) => (
+          <Instance
+            key={m.key}
+            position={m.position}
+            scale={[1, m.position[1] * 2, 1]}
+            color={hoverDate === m.date ? lighten(m.color, 0.4) : m.color}
+          />
+        ))}
+      </Instances>
+    </>
+  );
+}
+
+type Prop3D = { x: number; z: number };
+type CarProp = { x: number; z: number; axis: "x" | "z"; dir: 1 | -1; speed: number; color: string };
+
+/** Tiny street lights: shared pole geometry + emissive head, instanced. */
+function StreetLights({ spots }: { spots: Prop3D[] }) {
+  return (
+    <>
+      <Instances limit={Math.max(spots.length, 1)}>
+        <cylinderGeometry args={[0.018, 0.024, 0.9, 6]} />
+        <meshStandardMaterial color="#123a29" metalness={0.6} roughness={0.4} />
+        {spots.map((s, i) => (
+          <Instance key={`p${i}`} position={[s.x, 0.45, s.z]} />
+        ))}
+      </Instances>
+      <Instances limit={Math.max(spots.length, 1)}>
+        <sphereGeometry args={[0.05, 8, 8]} />
+        <meshBasicMaterial color="#bdffd6" toneMapped={false} />
+        {spots.map((s, i) => (
+          <Instance key={`h${i}`} position={[s.x, 0.94, s.z]} />
+        ))}
+      </Instances>
+    </>
+  );
+}
+
+/** A handful of tiny vehicles gliding along empty lanes (one instanced mesh). */
+function Cars({ cars, span }: { cars: CarProp[]; span: number }) {
+  const ref = useRef<THREE.InstancedMesh>(null);
+  const dummy = useMemo(() => new THREE.Object3D(), []);
+  const offsets = useRef<number[]>(cars.map(() => Math.random() * span));
+
+  useFrame((_, delta) => {
+    const mesh = ref.current;
+    if (!mesh) return;
+    cars.forEach((c, i) => {
+      let o = (offsets.current[i] ?? 0) + delta * c.speed;
+      if (o > span) o -= span;
+      offsets.current[i] = o;
+      const t = -span / 2 + o;
+      if (c.axis === "x") {
+        dummy.position.set(c.dir === 1 ? t : -t, 0.09, c.z);
+        dummy.rotation.set(0, 0, 0);
+      } else {
+        dummy.position.set(c.x, 0.09, c.dir === 1 ? t : -t);
+        dummy.rotation.set(0, Math.PI / 2, 0);
+      }
+      dummy.updateMatrix();
+      mesh.setMatrixAt(i, dummy.matrix);
+    });
+    mesh.instanceMatrix.needsUpdate = true;
+  });
+
+  if (!cars.length) return null;
+  return (
+    <instancedMesh ref={ref} args={[undefined, undefined, cars.length]} frustumCulled={false}>
+      <boxGeometry args={[0.26, 0.09, 0.13]} />
+      <meshStandardMaterial
+        color="#6df3a6"
+        emissive="#6df3a6"
+        emissiveIntensity={0.9}
+        toneMapped={false}
+        roughness={0.3}
+        metalness={0.4}
+      />
+    </instancedMesh>
+  );
+}
+
+
 
 function ActiveGlow({
   building,
@@ -316,6 +450,82 @@ function Scene({
     return out;
   }, [buildings]);
 
+  // Facade floor bands + corner mullions (2 instanced draw calls total).
+  const { bands, mullions } = useMemo(() => {
+    const bandOut: FacadeBand[] = [];
+    const mullOut: FacadeBand[] = [];
+    for (const b of buildings) {
+      for (const s of b.segments) {
+        const floors = Math.min(Math.max(Math.round(s.h / 0.42), 1), 8);
+        const top = s.y + s.h / 2;
+        const step = s.h / floors;
+        for (let f = 1; f < floors; f++) {
+          bandOut.push({
+            key: `${b.date}-${s.platform}-b${f}`,
+            date: b.date,
+            position: [b.x, top - f * step, b.z],
+            color: lighten(s.color, 0.18),
+          });
+        }
+      }
+      const half = CELL / 2 + 0.012;
+      const corners: Array<[number, number]> = [
+        [-half, -half],
+        [half, -half],
+        [-half, half],
+        [half, half],
+      ];
+      corners.forEach(([dx, dz], i) => {
+        mullOut.push({
+          key: `${b.date}-m${i}`,
+          date: b.date,
+          position: [b.x + dx, b.h / 2, b.z + dz],
+          color: lighten(b.color, 0.1),
+        });
+      });
+    }
+    return { bands: bandOut, mullions: mullOut };
+  }, [buildings]);
+
+  // Small city props placed only on genuinely empty grid cells.
+  const { lights, cars } = useMemo(() => {
+    const occupied = new Set(
+      buildings.map((b) => `${Math.round(b.x / STEP)}|${Math.round(b.z / STEP)}`),
+    );
+    const cols = Math.round(width / STEP);
+    const rows = 7;
+    const free: Prop3D[] = [];
+    for (let wi = 0; wi < cols; wi++) {
+      for (let di = 0; di < rows; di++) {
+        const x = wi * STEP - width / 2;
+        const z = di * STEP - depth / 2;
+        if (occupied.has(`${Math.round(x / STEP)}|${Math.round(z / STEP)}`)) continue;
+        free.push({ x, z });
+      }
+    }
+    // keep it sparse: at most ~14 lights, evenly sampled
+    const maxLights = Math.min(14, Math.floor(free.length / 6));
+    const stride = maxLights > 0 ? Math.floor(free.length / maxLights) : 0;
+    const lightOut: Prop3D[] = [];
+    for (let i = 0; stride > 0 && i < free.length && lightOut.length < maxLights; i += stride) {
+      const cell = free[i];
+      if (cell) lightOut.push({ x: cell.x + STEP * 0.32, z: cell.z + STEP * 0.32 });
+    }
+
+    // a few vehicles gliding along the outer lanes only
+    const laneZ = depth / 2 + STEP * 0.9;
+    const carOut: CarProp[] = [
+      { x: 0, z: -laneZ, axis: "x", dir: 1, speed: 2.4, color: "#6df3a6" },
+      { x: 0, z: -laneZ + 0.3, axis: "x", dir: -1, speed: 1.9, color: "#6df3a6" },
+      { x: 0, z: laneZ, axis: "x", dir: -1, speed: 2.1, color: "#6df3a6" },
+      { x: 0, z: laneZ - 0.3, axis: "x", dir: 1, speed: 1.6, color: "#6df3a6" },
+      { x: -width / 2 - STEP * 0.9, z: 0, axis: "z", dir: 1, speed: 1.7, color: "#6df3a6" },
+      { x: width / 2 + STEP * 0.9, z: 0, axis: "z", dir: -1, speed: 2.0, color: "#6df3a6" },
+    ];
+    return { lights: lightOut, cars: carOut };
+  }, [buildings, width, depth]);
+
+
   const activeIds = useMemo(() => {
     const set = new Set<string>();
     if (!hoverDate) return set;
@@ -394,8 +604,12 @@ function Scene({
         />
       ))}
 
+      <FacadeGrid bands={bands} mullions={mullions} hoverDate={hoverDate} />
       <WindowLights windows={windows} activeIds={activeIds} />
+      <StreetLights spots={lights} />
+      <Cars cars={cars} span={width + STEP * 4} />
       <ActiveGlow building={hoverBuilding} />
+
 
       <OrbitControls
         makeDefault
