@@ -403,19 +403,35 @@ function ActiveGlow({
   );
 }
 
+const DEFAULT_CAM: [number, number, number] = [18, 22, 34];
+const DEFAULT_TARGET: [number, number, number] = [0, 1, 0];
+
+type OrbitLike = {
+  target: THREE.Vector3;
+  object: THREE.Camera;
+  update: () => void;
+};
+
 function Scene({
   buildings,
   width,
   depth,
   onHover,
   hoverDate,
+  dragRef,
+  zoomEnabled,
+  controlsRef,
 }: {
   buildings: Building[];
   width: number;
   depth: number;
   onHover: (b: Building | null) => void;
   hoverDate: string | null;
+  dragRef: MutableRefObject<boolean>;
+  zoomEnabled: boolean;
+  controlsRef: MutableRefObject<OrbitLike | null>;
 }) {
+
   const windows = useMemo<WindowLight[]>(() => {
     const out: WindowLight[] = [];
     let id = 0;
