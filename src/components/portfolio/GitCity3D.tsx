@@ -450,6 +450,82 @@ function Scene({
     return out;
   }, [buildings]);
 
+  // Facade floor bands + corner mullions (2 instanced draw calls total).
+  const { bands, mullions } = useMemo(() => {
+    const bandOut: FacadeBand[] = [];
+    const mullOut: FacadeBand[] = [];
+    for (const b of buildings) {
+      for (const s of b.segments) {
+        const floors = Math.min(Math.max(Math.round(s.h / 0.42), 1), 8);
+        const top = s.y + s.h / 2;
+        const step = s.h / floors;
+        for (let f = 1; f < floors; f++) {
+          bandOut.push({
+            key: `${b.date}-${s.platform}-b${f}`,
+            date: b.date,
+            position: [b.x, top - f * step, b.z],
+            color: lighten(s.color, 0.18),
+          });
+        }
+      }
+      const half = CELL / 2 + 0.012;
+      const corners: Array<[number, number]> = [
+        [-half, -half],
+        [half, -half],
+        [-half, half],
+        [half, half],
+      ];
+      corners.forEach(([dx, dz], i) => {
+        mullOut.push({
+          key: `${b.date}-m${i}`,
+          date: b.date,
+          position: [b.x + dx, b.h / 2, b.z + dz],
+          color: lighten(b.color, 0.1),
+        });
+      });
+    }
+    return { bands: bandOut, mullions: mullOut };
+  }, [buildings]);
+
+  // Small city props placed only on genuinely empty grid cells.
+  const { lights, cars } = useMemo(() => {
+    const occupied = new Set(
+      buildings.map((b) => `${Math.round(b.x / STEP)}|${Math.round(b.z / STEP)}`),
+    );
+    const cols = Math.round(width / STEP);
+    const rows = 7;
+    const free: Prop3D[] = [];
+    for (let wi = 0; wi < cols; wi++) {
+      for (let di = 0; di < rows; di++) {
+        const x = wi * STEP - width / 2;
+        const z = di * STEP - depth / 2;
+        if (occupied.has(`${Math.round(x / STEP)}|${Math.round(z / STEP)}`)) continue;
+        free.push({ x, z });
+      }
+    }
+    // keep it sparse: at most ~14 lights, evenly sampled
+    const maxLights = Math.min(14, Math.floor(free.length / 6));
+    const stride = maxLights > 0 ? Math.floor(free.length / maxLights) : 0;
+    const lightOut: Prop3D[] = [];
+    for (let i = 0; stride > 0 && i < free.length && lightOut.length < maxLights; i += stride) {
+      const cell = free[i];
+      if (cell) lightOut.push({ x: cell.x + STEP * 0.32, z: cell.z + STEP * 0.32 });
+    }
+
+    // a few vehicles gliding along the outer lanes only
+    const laneZ = depth / 2 + STEP * 0.9;
+    const carOut: CarProp[] = [
+      { x: 0, z: -laneZ, axis: "x", dir: 1, speed: 2.4, color: "#6df3a6" },
+      { x: 0, z: -laneZ + 0.3, axis: "x", dir: -1, speed: 1.9, color: "#6df3a6" },
+      { x: 0, z: laneZ, axis: "x", dir: -1, speed: 2.1, color: "#6df3a6" },
+      { x: 0, z: laneZ - 0.3, axis: "x", dir: 1, speed: 1.6, color: "#6df3a6" },
+      { x: -width / 2 - STEP * 0.9, z: 0, axis: "z", dir: 1, speed: 1.7, color: "#6df3a6" },
+      { x: width / 2 + STEP * 0.9, z: 0, axis: "z", dir: -1, speed: 2.0, color: "#6df3a6" },
+    ];
+    return { lights: lightOut, cars: carOut };
+  }, [buildings, width, depth]);
+
+
   const activeIds = useMemo(() => {
     const set = new Set<string>();
     if (!hoverDate) return set;
