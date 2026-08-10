@@ -107,6 +107,7 @@ function Tower({
 
       {b.segments.map((s, i) => (
         <group key={s.platform} position={[0, s.y, 0]}>
+          {/* glass facade shell */}
           <RoundedBox
             args={[CELL, s.h, CELL]}
             radius={0.05}
@@ -114,14 +115,30 @@ function Tower({
             castShadow
             receiveShadow
           >
-            <meshStandardMaterial
+            <meshPhysicalMaterial
               color={s.color}
               emissive={s.color}
-              emissiveIntensity={active ? 0.72 : 0.24}
-              roughness={0.22}
-              metalness={0.25}
+              emissiveIntensity={active ? 0.62 : 0.16}
+              roughness={0.12}
+              metalness={0.35}
+              transmission={0.35}
+              thickness={0.6}
+              transparent
+              opacity={active ? 0.68 : 0.55}
+              depthWrite={false}
             />
           </RoundedBox>
+          {/* inner structural core so the tower still reads as solid */}
+          <mesh position={[0, 0, 0]}>
+            <boxGeometry args={[CELL * 0.52, Math.max(s.h * 0.9, 0.02), CELL * 0.52]} />
+            <meshStandardMaterial
+              color="#06170f"
+              emissive={s.color}
+              emissiveIntensity={active ? 0.32 : 0.1}
+              roughness={0.65}
+              metalness={0.3}
+            />
+          </mesh>
           {/* thin divider between floors */}
           {i < b.segments.length - 1 ? (
             <mesh position={[0, s.h / 2 + 0.02, 0]} castShadow>
@@ -131,6 +148,7 @@ function Tower({
           ) : null}
         </group>
       ))}
+
 
       {/* rooftop marker in dominant platform colour */}
       <RoundedBox
