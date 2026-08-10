@@ -1,4 +1,5 @@
-import { useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import type { MutableRefObject } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import {
   OrbitControls,
@@ -67,11 +68,13 @@ function Tower({
   active,
   onHover,
   onLeave,
+  dragRef,
 }: {
   b: Building;
   active: boolean;
   onHover: (b: Building) => void;
   onLeave: () => void;
+  dragRef: MutableRefObject<boolean>;
 }) {
   const ref = useRef<THREE.Group>(null);
   const grown = useRef(0);
@@ -95,10 +98,18 @@ function Tower({
       position={[b.x, 0, b.z]}
       onPointerOver={(e) => {
         e.stopPropagation();
+        // ignore hover while the camera is being dragged
+        if (dragRef.current) return;
         onHover(b);
+      }}
+      onPointerMove={(e) => {
+        e.stopPropagation();
+        if (dragRef.current) return;
+        if (!active) onHover(b);
       }}
       onPointerOut={() => onLeave()}
     >
+
       {/* foundation plinth */}
       <mesh position={[0, 0.04, 0]} receiveShadow castShadow>
         <boxGeometry args={[CELL * 1.12, 0.08, CELL * 1.12]} />
@@ -392,19 +403,35 @@ function ActiveGlow({
   );
 }
 
+const DEFAULT_CAM: [number, number, number] = [18, 22, 34];
+const DEFAULT_TARGET: [number, number, number] = [0, 1, 0];
+
+type OrbitLike = {
+  target: THREE.Vector3;
+  object: THREE.Camera;
+  update: () => void;
+};
+
 function Scene({
   buildings,
   width,
   depth,
   onHover,
   hoverDate,
+  dragRef,
+  zoomEnabled,
+  controlsRef,
 }: {
   buildings: Building[];
   width: number;
   depth: number;
   onHover: (b: Building | null) => void;
   hoverDate: string | null;
+  dragRef: MutableRefObject<boolean>;
+  zoomEnabled: boolean;
+  controlsRef: MutableRefObject<OrbitLike | null>;
 }) {
+
   const windows = useMemo<WindowLight[]>(() => {
     const out: WindowLight[] = [];
     let id = 0;
@@ -601,6 +628,7 @@ function Scene({
           active={hoverDate === b.date}
           onHover={onHover}
           onLeave={() => onHover(null)}
+          dragRef={dragRef}
         />
       ))}
 
@@ -613,13 +641,41 @@ function Scene({
 
       <OrbitControls
         makeDefault
+        ref={controlsRef as never}
         enablePan
-        enableZoom
-        minDistance={12}
-        maxDistance={140}
+        enableZoom={zoomEnabled}
+        enableDamping
+        dampingFactor={0.08}
+        rotateSpeed={0.55}
+        zoomSpeed={0.5}
+        panSpeed={0.5}
+        screenSpacePanning={false}
+        touches={{ ONE: THREE.TOUCH.ROTATE, TWO: THREE.TOUCH.DOLLY_PAN }}
+        minDistance={16}
+        maxDistance={Math.max(70, width * 0.9)}
+        minPolarAngle={0.18}
         maxPolarAngle={Math.PI / 2.15}
-        target={[0, 1, 0]}
+        target={DEFAULT_TARGET}
+        onChange={() => {
+          const c = controlsRef.current;
+          if (!c) return;
+          const limX = width / 2 + 4;
+          const limZ = depth / 2 + 6;
+          const t = c.target;
+          const nx = THREE.MathUtils.clamp(t.x, -limX, limX);
+          const ny = THREE.MathUtils.clamp(t.y, 0, 8);
+          const nz = THREE.MathUtils.clamp(t.z, -limZ, limZ);
+          if (nx !== t.x || ny !== t.y || nz !== t.z) {
+            c.object.position.x += nx - t.x;
+            c.object.position.y += ny - t.y;
+            c.object.position.z += nz - t.z;
+            t.set(nx, ny, nz);
+          }
+          // never let the camera dip below the ground plane
+          if (c.object.position.y < 1.5) c.object.position.y = 1.5;
+        }}
       />
+
     </>
   );
 }
@@ -678,14 +734,63 @@ export default function GitCity3D({ weeks, merged, calendars, colors }: Props) {
     return { buildings: out, width: w, depth: d };
   }, [weeks, merged, calendars, colors]);
 
+  const controlsRef = useRef<OrbitLike | null>(null);
+  const dragRef = useRef(false);
+  const downRef = useRef<{ x: number; y: number } | null>(null);
+  const [zoomEnabled, setZoomEnabled] = useState(false);
+
+  const endDrag = useCallback(() => {
+    downRef.current = null;
+    // clear on the next frame so the pending click/hover events are ignored
+    requestAnimationFrame(() => {
+      dragRef.current = false;
+    });
+  }, []);
+
+  const resetCamera = useCallback(() => {
+    const c = controlsRef.current;
+    if (!c) return;
+    c.object.position.set(...DEFAULT_CAM);
+    c.target.set(...DEFAULT_TARGET);
+    c.update();
+  }, []);
+
+  // release the wheel back to the page whenever the pointer leaves the canvas
+  useEffect(() => {
+    const onBlur = () => setZoomEnabled(false);
+    window.addEventListener("blur", onBlur);
+    return () => window.removeEventListener("blur", onBlur);
+  }, []);
+
   return (
     <div>
       <div
-        className="relative h-[420px] w-full overflow-hidden rounded-xl border border-emerald-500/25"
+        className="relative h-[420px] w-full overflow-hidden [touch-action:pan-y] rounded-xl border border-emerald-500/25"
         style={{ background: "linear-gradient(180deg,#08150f 0%,#0d1f16 100%)" }}
+        onPointerDown={(e) => {
+          downRef.current = { x: e.clientX, y: e.clientY };
+          dragRef.current = false;
+          setZoomEnabled(true);
+        }}
+        onPointerMove={(e) => {
+          const d = downRef.current;
+          if (!d || dragRef.current) return;
+          if (Math.hypot(e.clientX - d.x, e.clientY - d.y) > 5) {
+            dragRef.current = true;
+            setHover(null);
+          }
+        }}
+        onPointerUp={endDrag}
+        onPointerCancel={endDrag}
+        onPointerLeave={() => {
+          endDrag();
+          setHover(null);
+          setZoomEnabled(false);
+        }}
+        onDoubleClick={resetCamera}
       >
         <Canvas
-          camera={{ position: [18, 22, 34], fov: 42 }}
+          camera={{ position: DEFAULT_CAM, fov: 42 }}
           dpr={[1, 1.6]}
           gl={{ antialias: true, alpha: false }}
           shadows
@@ -697,12 +802,18 @@ export default function GitCity3D({ weeks, merged, calendars, colors }: Props) {
             depth={depth}
             onHover={setHover}
             hoverDate={hover?.date ?? null}
+            dragRef={dragRef}
+            zoomEnabled={zoomEnabled}
+            controlsRef={controlsRef}
           />
         </Canvas>
 
         <div className="pointer-events-none absolute left-3 top-3 rounded-md border border-emerald-500/25 bg-black/40 px-2 py-1 font-mono text-[10px] text-emerald-300/80">
-          drag = rotate · scroll = zoom · right-drag = pan
+          {zoomEnabled
+            ? "drag = rotate · scroll = zoom · right-drag = pan · double-click = reset"
+            : "click the city to enable zoom · drag = rotate"}
         </div>
+
 
         {hover ? (
           <div className="pointer-events-none absolute bottom-3 left-3 max-w-[75%] rounded-md border border-emerald-500/30 bg-black/75 px-3 py-2 font-mono text-[11px] text-emerald-200">
