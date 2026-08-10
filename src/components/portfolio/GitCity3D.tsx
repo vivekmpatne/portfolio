@@ -733,14 +733,63 @@ export default function GitCity3D({ weeks, merged, calendars, colors }: Props) {
     return { buildings: out, width: w, depth: d };
   }, [weeks, merged, calendars, colors]);
 
+  const controlsRef = useRef<OrbitLike | null>(null);
+  const dragRef = useRef(false);
+  const downRef = useRef<{ x: number; y: number } | null>(null);
+  const [zoomEnabled, setZoomEnabled] = useState(false);
+
+  const endDrag = useCallback(() => {
+    downRef.current = null;
+    // clear on the next frame so the pending click/hover events are ignored
+    requestAnimationFrame(() => {
+      dragRef.current = false;
+    });
+  }, []);
+
+  const resetCamera = useCallback(() => {
+    const c = controlsRef.current;
+    if (!c) return;
+    c.object.position.set(...DEFAULT_CAM);
+    c.target.set(...DEFAULT_TARGET);
+    c.update();
+  }, []);
+
+  // release the wheel back to the page whenever the pointer leaves the canvas
+  useEffect(() => {
+    const onBlur = () => setZoomEnabled(false);
+    window.addEventListener("blur", onBlur);
+    return () => window.removeEventListener("blur", onBlur);
+  }, []);
+
   return (
     <div>
       <div
-        className="relative h-[420px] w-full overflow-hidden rounded-xl border border-emerald-500/25"
+        className="relative h-[420px] w-full touch-none overflow-hidden rounded-xl border border-emerald-500/25"
         style={{ background: "linear-gradient(180deg,#08150f 0%,#0d1f16 100%)" }}
+        onPointerDown={(e) => {
+          downRef.current = { x: e.clientX, y: e.clientY };
+          dragRef.current = false;
+          setZoomEnabled(true);
+        }}
+        onPointerMove={(e) => {
+          const d = downRef.current;
+          if (!d || dragRef.current) return;
+          if (Math.hypot(e.clientX - d.x, e.clientY - d.y) > 5) {
+            dragRef.current = true;
+            setHover(null);
+          }
+        }}
+        onPointerUp={endDrag}
+        onPointerCancel={endDrag}
+        onPointerLeave={() => {
+          endDrag();
+          setHover(null);
+          setZoomEnabled(false);
+        }}
+        onDoubleClick={resetCamera}
       >
         <Canvas
-          camera={{ position: [18, 22, 34], fov: 42 }}
+          camera={{ position: DEFAULT_CAM, fov: 42 }}
           dpr={[1, 1.6]}
           gl={{ antialias: true, alpha: false }}
           shadows
@@ -752,12 +801,18 @@ export default function GitCity3D({ weeks, merged, calendars, colors }: Props) {
             depth={depth}
             onHover={setHover}
             hoverDate={hover?.date ?? null}
+            dragRef={dragRef}
+            zoomEnabled={zoomEnabled}
+            controlsRef={controlsRef}
           />
         </Canvas>
 
         <div className="pointer-events-none absolute left-3 top-3 rounded-md border border-emerald-500/25 bg-black/40 px-2 py-1 font-mono text-[10px] text-emerald-300/80">
-          drag = rotate · scroll = zoom · right-drag = pan
+          {zoomEnabled
+            ? "drag = rotate · scroll = zoom · right-drag = pan · double-click = reset"
+            : "click the city to enable zoom · drag = rotate"}
         </div>
+
 
         {hover ? (
           <div className="pointer-events-none absolute bottom-3 left-3 max-w-[75%] rounded-md border border-emerald-500/30 bg-black/75 px-3 py-2 font-mono text-[11px] text-emerald-200">
