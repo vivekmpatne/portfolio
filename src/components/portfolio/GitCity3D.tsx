@@ -604,8 +604,12 @@ function Scene({
         />
       ))}
 
+      <FacadeGrid bands={bands} mullions={mullions} hoverDate={hoverDate} />
       <WindowLights windows={windows} activeIds={activeIds} />
+      <StreetLights spots={lights} />
+      <Cars cars={cars} span={width + STEP * 4} />
       <ActiveGlow building={hoverBuilding} />
+
 
       <OrbitControls
         makeDefault
