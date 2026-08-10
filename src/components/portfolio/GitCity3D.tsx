@@ -236,6 +236,122 @@ function WindowLights({
   );
 }
 
+type FacadeBand = {
+  key: string;
+  date: string;
+  position: [number, number, number];
+  color: string;
+};
+
+/** Thin horizontal floor bands + vertical mullions, all instanced (2 draw calls). */
+function FacadeGrid({
+  bands,
+  mullions,
+  hoverDate,
+}: {
+  bands: FacadeBand[];
+  mullions: FacadeBand[];
+  hoverDate: string | null;
+}) {
+  return (
+    <>
+      <Instances limit={Math.max(bands.length, 1)} frustumCulled={false}>
+        <boxGeometry args={[CELL * 1.015, 0.014, CELL * 1.015]} />
+        <meshBasicMaterial toneMapped={false} transparent opacity={0.5} />
+        {bands.map((f) => (
+          <Instance
+            key={f.key}
+            position={f.position}
+            color={hoverDate === f.date ? lighten(f.color, 0.45) : f.color}
+          />
+        ))}
+      </Instances>
+      <Instances limit={Math.max(mullions.length, 1)} frustumCulled={false}>
+        <boxGeometry args={[0.035, 1, 0.035]} />
+        <meshBasicMaterial toneMapped={false} transparent opacity={0.42} />
+        {mullions.map((m) => (
+          <Instance
+            key={m.key}
+            position={m.position}
+            scale={[1, m.position[1] * 2, 1]}
+            color={hoverDate === m.date ? lighten(m.color, 0.4) : m.color}
+          />
+        ))}
+      </Instances>
+    </>
+  );
+}
+
+type Prop3D = { x: number; z: number };
+type CarProp = { x: number; z: number; axis: "x" | "z"; dir: 1 | -1; speed: number; color: string };
+
+/** Tiny street lights: shared pole geometry + emissive head, instanced. */
+function StreetLights({ spots }: { spots: Prop3D[] }) {
+  return (
+    <>
+      <Instances limit={Math.max(spots.length, 1)}>
+        <cylinderGeometry args={[0.018, 0.024, 0.9, 6]} />
+        <meshStandardMaterial color="#123a29" metalness={0.6} roughness={0.4} />
+        {spots.map((s, i) => (
+          <Instance key={`p${i}`} position={[s.x, 0.45, s.z]} />
+        ))}
+      </Instances>
+      <Instances limit={Math.max(spots.length, 1)}>
+        <sphereGeometry args={[0.05, 8, 8]} />
+        <meshBasicMaterial color="#bdffd6" toneMapped={false} />
+        {spots.map((s, i) => (
+          <Instance key={`h${i}`} position={[s.x, 0.94, s.z]} />
+        ))}
+      </Instances>
+    </>
+  );
+}
+
+/** A handful of tiny vehicles gliding along empty lanes (one instanced mesh). */
+function Cars({ cars, span }: { cars: CarProp[]; span: number }) {
+  const ref = useRef<THREE.InstancedMesh>(null);
+  const dummy = useMemo(() => new THREE.Object3D(), []);
+  const offsets = useRef<number[]>(cars.map(() => Math.random() * span));
+
+  useFrame((_, delta) => {
+    const mesh = ref.current;
+    if (!mesh) return;
+    cars.forEach((c, i) => {
+      let o = (offsets.current[i] ?? 0) + delta * c.speed;
+      if (o > span) o -= span;
+      offsets.current[i] = o;
+      const t = -span / 2 + o;
+      if (c.axis === "x") {
+        dummy.position.set(c.dir === 1 ? t : -t, 0.09, c.z);
+        dummy.rotation.set(0, 0, 0);
+      } else {
+        dummy.position.set(c.x, 0.09, c.dir === 1 ? t : -t);
+        dummy.rotation.set(0, Math.PI / 2, 0);
+      }
+      dummy.updateMatrix();
+      mesh.setMatrixAt(i, dummy.matrix);
+    });
+    mesh.instanceMatrix.needsUpdate = true;
+  });
+
+  if (!cars.length) return null;
+  return (
+    <instancedMesh ref={ref} args={[undefined, undefined, cars.length]} frustumCulled={false}>
+      <boxGeometry args={[0.26, 0.09, 0.13]} />
+      <meshStandardMaterial
+        color="#6df3a6"
+        emissive="#6df3a6"
+        emissiveIntensity={0.9}
+        toneMapped={false}
+        roughness={0.3}
+        metalness={0.4}
+      />
+    </instancedMesh>
+  );
+}
+
+
+
 function ActiveGlow({
   building,
 }: {
