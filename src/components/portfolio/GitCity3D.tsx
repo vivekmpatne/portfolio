@@ -628,6 +628,7 @@ function Scene({
           active={hoverDate === b.date}
           onHover={onHover}
           onLeave={() => onHover(null)}
+          dragRef={dragRef}
         />
       ))}
 
@@ -640,13 +641,40 @@ function Scene({
 
       <OrbitControls
         makeDefault
+        ref={controlsRef as never}
         enablePan
-        enableZoom
-        minDistance={12}
-        maxDistance={140}
+        enableZoom={zoomEnabled}
+        enableDamping
+        dampingFactor={0.08}
+        rotateSpeed={0.55}
+        zoomSpeed={0.5}
+        panSpeed={0.5}
+        screenSpacePanning={false}
+        minDistance={16}
+        maxDistance={Math.max(70, width * 0.9)}
+        minPolarAngle={0.18}
         maxPolarAngle={Math.PI / 2.15}
-        target={[0, 1, 0]}
+        target={DEFAULT_TARGET}
+        onChange={() => {
+          const c = controlsRef.current;
+          if (!c) return;
+          const limX = width / 2 + 4;
+          const limZ = depth / 2 + 6;
+          const t = c.target;
+          const nx = THREE.MathUtils.clamp(t.x, -limX, limX);
+          const ny = THREE.MathUtils.clamp(t.y, 0, 8);
+          const nz = THREE.MathUtils.clamp(t.z, -limZ, limZ);
+          if (nx !== t.x || ny !== t.y || nz !== t.z) {
+            c.object.position.x += nx - t.x;
+            c.object.position.y += ny - t.y;
+            c.object.position.z += nz - t.z;
+            t.set(nx, ny, nz);
+          }
+          // never let the camera dip below the ground plane
+          if (c.object.position.y < 1.5) c.object.position.y = 1.5;
+        }}
       />
+
     </>
   );
 }
