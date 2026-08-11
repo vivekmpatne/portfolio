@@ -79,18 +79,23 @@ function Tower({
   const ref = useRef<THREE.Group>(null);
   const grown = useRef(0);
 
-  useFrame((_, delta) => {
+  useFrame((_, rawDelta) => {
     const g = ref.current;
     if (!g) return;
+    // clamp delta: a tab switch / GC pause can deliver a huge delta which used
+    // to make the lerp alpha exceed 1 and blow the tower scale up
+    const delta = Math.min(rawDelta, 1 / 30);
     grown.current = Math.min(1, grown.current + delta * 0.9);
     const ease = 1 - Math.pow(1 - grown.current, 3);
     g.scale.y = Math.max(0.001, ease);
 
-    // subtle hover pop
+    // subtle hover pop (exponential smoothing, always stable)
     const targetXZ = active ? 1.06 : 1.0;
-    g.scale.x = THREE.MathUtils.lerp(g.scale.x, targetXZ, delta * 6);
-    g.scale.z = THREE.MathUtils.lerp(g.scale.z, targetXZ, delta * 6);
+    const a = 1 - Math.exp(-6 * delta);
+    g.scale.x = THREE.MathUtils.clamp(THREE.MathUtils.lerp(g.scale.x, targetXZ, a), 0.9, 1.1);
+    g.scale.z = THREE.MathUtils.clamp(THREE.MathUtils.lerp(g.scale.z, targetXZ, a), 0.9, 1.1);
   });
+
 
   return (
     <group
