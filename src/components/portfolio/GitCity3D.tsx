@@ -329,12 +329,14 @@ function Cars({ cars, span }: { cars: CarProp[]; span: number }) {
   const dummy = useMemo(() => new THREE.Object3D(), []);
   const offsets = useRef<number[]>(cars.map(() => Math.random() * span));
 
-  useFrame((_, delta) => {
+  useFrame((_, rawDelta) => {
     const mesh = ref.current;
     if (!mesh) return;
+    const delta = Math.min(rawDelta, 1 / 30);
     cars.forEach((c, i) => {
       let o = (offsets.current[i] ?? 0) + delta * c.speed;
-      if (o > span) o -= span;
+      while (o > span) o -= span;
+
       offsets.current[i] = o;
       const t = -span / 2 + o;
       if (c.axis === "x") {
