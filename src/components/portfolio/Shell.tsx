@@ -14,7 +14,7 @@ const BANNER = String.raw`
     \_/  |_| \_/ \___||_|\_\    v2.1
 
   Welcome to vivek.os — Interactive Shell.
-  Type 'help' for commands. Press ` + "`" + ` to close.
+  Type 'help' for commands. Press ESC (or type 'exit') to close.
 `;
 
 const HELP = [
