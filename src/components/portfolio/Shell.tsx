@@ -14,7 +14,7 @@ const BANNER = String.raw`
     \_/  |_| \_/ \___||_|\_\    v2.1
 
   Welcome to vivek.os — Interactive Shell.
-  Type 'help' for commands. Press ` + "`" + ` to close.
+  Type 'help' for commands. Press ESC (or type 'exit') to close.
 `;
 
 const HELP = [
@@ -177,7 +177,17 @@ export function Shell({ onClose }: { onClose: () => void }) {
           push([err(`open: unknown target '${target || "-"}'`), out(`available: ${Object.keys(OPEN_TARGETS).join(", ")}`)]);
         } else {
           push([out(`opening ${target} → ${url}`)]);
-          window.open(url, "_blank", "noopener,noreferrer");
+          if (url.startsWith("mailto:")) {
+            // mailto: is handled by the OS mail client — window.open leaves a blank tab
+            const a = document.createElement("a");
+            a.href = url;
+            a.rel = "noopener noreferrer";
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+          } else {
+            window.open(url, "_blank", "noopener,noreferrer");
+          }
         }
         break;
       }
