@@ -1,16 +1,7 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import type { MutableRefObject } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import {
-  OrbitControls,
-  Grid,
-  RoundedBox,
-  MeshReflectorMaterial,
-  Stars,
-  Instances,
-  Instance,
-  Environment,
-} from "@react-three/drei";
+import { OrbitControls, Grid, Stars, AdaptiveDpr, AdaptiveEvents } from "@react-three/drei";
 import * as THREE from "three";
 import type { DayMap, PlatformId } from "@/lib/activity/types";
 import { PLATFORM_LABELS } from "@/lib/activity/types";
@@ -20,14 +11,10 @@ const GAP = 0.35;
 const STEP = CELL + GAP;
 const UNIT = 0.35; // height per contribution
 
-const WINDOW_W = 0.16;
-const WINDOW_H = 0.16;
-const WINDOW_D = 0.035;
-
 function lighten(hex: string, amount = 0.28) {
   const c = new THREE.Color(hex);
   c.offsetHSL(0, 0, amount);
-  return `#${c.getHexString()}`;
+  return c;
 }
 
 type Props = {
@@ -52,361 +39,238 @@ type Building = {
   h: number;
   count: number;
   color: string;
-  parts: string[];
   segments: Segment[];
 };
 
-type WindowLight = {
-  id: string;
-  position: [number, number, number];
-  color: string;
-  scale: number;
-};
+type CarProp = { x: number; z: number; axis: "x" | "z"; dir: 1 | -1; speed: number };
 
-function Tower({
-  b,
-  active,
+const tmpObj = new THREE.Object3D();
+const tmpColor = new THREE.Color();
+
+/** All building floors in a single instanced draw call. */
+function Towers({
+  buildings,
+  hoverDate,
   onHover,
-  onLeave,
   dragRef,
 }: {
-  b: Building;
-  active: boolean;
-  onHover: (b: Building) => void;
-  onLeave: () => void;
+  buildings: Building[];
+  hoverDate: string | null;
+  onHover: (b: Building | null) => void;
   dragRef: MutableRefObject<boolean>;
 }) {
-  const ref = useRef<THREE.Group>(null);
-  const grown = useRef(0);
+  const ref = useRef<THREE.InstancedMesh>(null);
 
-  useFrame((_, rawDelta) => {
-    const g = ref.current;
-    if (!g) return;
-    // clamp delta: a tab switch / GC pause can deliver a huge delta which used
-    // to make the lerp alpha exceed 1 and blow the tower scale up
-    const delta = Math.min(rawDelta, 1 / 30);
-    grown.current = Math.min(1, grown.current + delta * 0.9);
-    const ease = 1 - Math.pow(1 - grown.current, 3);
-    g.scale.y = Math.max(0.001, ease);
+  // flat segment list + which building each instance belongs to
+  const { flat, owner, count } = useMemo(() => {
+    const f: Array<{ b: Building; s: Segment }> = [];
+    for (const b of buildings) for (const s of b.segments) f.push({ b, s });
+    return { flat: f, owner: f.map((x) => x.b), count: Math.max(f.length, 1) };
+  }, [buildings]);
 
-    // subtle hover pop (exponential smoothing, always stable)
-    const targetXZ = active ? 1.06 : 1.0;
-    const a = 1 - Math.exp(-6 * delta);
-    g.scale.x = THREE.MathUtils.clamp(THREE.MathUtils.lerp(g.scale.x, targetXZ, a), 0.9, 1.1);
-    g.scale.z = THREE.MathUtils.clamp(THREE.MathUtils.lerp(g.scale.z, targetXZ, a), 0.9, 1.1);
-  });
+  useLayoutEffect(() => {
+    const mesh = ref.current;
+    if (!mesh) return;
+    flat.forEach(({ b, s }, i) => {
+      tmpObj.position.set(b.x, s.y, b.z);
+      tmpObj.scale.set(CELL, Math.max(s.h, 0.02), CELL);
+      tmpObj.rotation.set(0, 0, 0);
+      tmpObj.updateMatrix();
+      mesh.setMatrixAt(i, tmpObj.matrix);
+      mesh.setColorAt(i, tmpColor.set(s.color));
+    });
+    mesh.count = flat.length;
+    mesh.instanceMatrix.needsUpdate = true;
+    if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
+  }, [flat]);
 
+  // hover highlight = recolour only the hovered day's instances
+  const prev = useRef<number[]>([]);
+  useEffect(() => {
+    const mesh = ref.current;
+    if (!mesh || !mesh.instanceColor) return;
+    for (const i of prev.current) {
+      const seg = flat[i];
+      if (seg) mesh.setColorAt(i, tmpColor.set(seg.s.color));
+    }
+    prev.current = [];
+    if (hoverDate) {
+      flat.forEach(({ b, s }, i) => {
+        if (b.date !== hoverDate) return;
+        mesh.setColorAt(i, lighten(s.color, 0.28));
+        prev.current.push(i);
+      });
+    }
+    mesh.instanceColor.needsUpdate = true;
+  }, [hoverDate, flat]);
 
   return (
-    <group
+    <instancedMesh
       ref={ref}
-      position={[b.x, 0, b.z]}
-      onPointerOver={(e) => {
-        e.stopPropagation();
-        // ignore hover while the camera is being dragged
-        if (dragRef.current) return;
-        onHover(b);
-      }}
+      args={[undefined, undefined, count]}
+      frustumCulled={false}
       onPointerMove={(e) => {
         e.stopPropagation();
         if (dragRef.current) return;
-        if (!active) onHover(b);
+        const id = e.instanceId;
+        if (id == null) return;
+        const b = owner[id];
+        if (b && b.date !== hoverDate) onHover(b);
       }}
-      onPointerOut={() => onLeave()}
+      onPointerOut={() => onHover(null)}
     >
+      <boxGeometry args={[1, 1, 1]} />
+      <meshStandardMaterial roughness={0.32} metalness={0.28} />
+    </instancedMesh>
+  );
+}
 
-      {/* foundation plinth */}
-      <mesh position={[0, 0.04, 0]} receiveShadow castShadow>
-        <boxGeometry args={[CELL * 1.12, 0.08, CELL * 1.12]} />
-        <meshStandardMaterial color="#05140d" roughness={0.9} metalness={0.1} />
-      </mesh>
+/** Rooftop caps + thin floor bands, each one instanced draw call. */
+function Details({ buildings }: { buildings: Building[] }) {
+  const roofRef = useRef<THREE.InstancedMesh>(null);
+  const bandRef = useRef<THREE.InstancedMesh>(null);
 
-      {b.segments.map((s, i) => (
-        <group key={s.platform} position={[0, s.y, 0]}>
-          {/* glass facade shell */}
-          <RoundedBox
-            args={[CELL, s.h, CELL]}
-            radius={0.05}
-            smoothness={2}
-            castShadow
-            receiveShadow
-          >
-            <meshPhysicalMaterial
-              color={s.color}
-              emissive={s.color}
-              emissiveIntensity={active ? 0.62 : 0.16}
-              roughness={0.12}
-              metalness={0.35}
-              transmission={0.35}
-              thickness={0.6}
-              transparent
-              opacity={active ? 0.68 : 0.55}
-              depthWrite={false}
-            />
-          </RoundedBox>
-          {/* inner structural core so the tower still reads as solid */}
-          <mesh position={[0, 0, 0]}>
-            <boxGeometry args={[CELL * 0.52, Math.max(s.h * 0.9, 0.02), CELL * 0.52]} />
-            <meshStandardMaterial
-              color="#06170f"
-              emissive={s.color}
-              emissiveIntensity={active ? 0.32 : 0.1}
-              roughness={0.65}
-              metalness={0.3}
-            />
-          </mesh>
-          {/* thin divider between floors */}
-          {i < b.segments.length - 1 ? (
-            <mesh position={[0, s.h / 2 + 0.02, 0]} castShadow>
-              <boxGeometry args={[CELL * 1.08, 0.04, CELL * 1.08]} />
-              <meshStandardMaterial color="#04120b" roughness={1} />
-            </mesh>
-          ) : null}
-        </group>
-      ))}
+  const bands = useMemo(() => {
+    const out: Array<{ x: number; y: number; z: number; color: string }> = [];
+    for (const b of buildings) {
+      for (const s of b.segments) {
+        const floors = Math.min(Math.max(Math.round(s.h / 0.5), 1), 5);
+        const top = s.y + s.h / 2;
+        const step = s.h / floors;
+        for (let f = 1; f < floors; f++) {
+          out.push({ x: b.x, y: top - f * step, z: b.z, color: s.color });
+        }
+      }
+    }
+    return out;
+  }, [buildings]);
 
+  useLayoutEffect(() => {
+    const roof = roofRef.current;
+    if (roof) {
+      buildings.forEach((b, i) => {
+        tmpObj.position.set(b.x, b.h + 0.07, b.z);
+        tmpObj.scale.set(1, 1, 1);
+        tmpObj.rotation.set(0, 0, 0);
+        tmpObj.updateMatrix();
+        roof.setMatrixAt(i, tmpObj.matrix);
+        roof.setColorAt(i, lighten(b.color, 0.2));
+      });
+      roof.count = buildings.length;
+      roof.instanceMatrix.needsUpdate = true;
+      if (roof.instanceColor) roof.instanceColor.needsUpdate = true;
+    }
+    const band = bandRef.current;
+    if (band) {
+      bands.forEach((f, i) => {
+        tmpObj.position.set(f.x, f.y, f.z);
+        tmpObj.scale.set(1, 1, 1);
+        tmpObj.rotation.set(0, 0, 0);
+        tmpObj.updateMatrix();
+        band.setMatrixAt(i, tmpObj.matrix);
+        band.setColorAt(i, lighten(f.color, 0.42));
+      });
+      band.count = bands.length;
+      band.instanceMatrix.needsUpdate = true;
+      if (band.instanceColor) band.instanceColor.needsUpdate = true;
+    }
+  }, [buildings, bands]);
 
-      {/* rooftop marker in dominant platform colour */}
-      <RoundedBox
-        args={[CELL * 0.35, 0.16, CELL * 0.35]}
-        radius={0.03}
-        smoothness={2}
-        position={[0, b.h + 0.08, 0]}
-        castShadow
+  return (
+    <>
+      <instancedMesh
+        ref={roofRef}
+        args={[undefined, undefined, Math.max(buildings.length, 1)]}
+        frustumCulled={false}
+        raycast={() => null}
       >
-        <meshStandardMaterial
-          color={b.color}
-          emissive={b.color}
-          emissiveIntensity={active ? 1.8 : 0.95}
-          roughness={0.2}
-          metalness={0.3}
-        />
-      </RoundedBox>
-
-      {/* antenna */}
-      <mesh position={[0.18, b.h + 0.45, 0.18]} castShadow>
-        <cylinderGeometry args={[0.025, 0.025, 0.7, 8]} />
-        <meshStandardMaterial color="#8aa" metalness={0.8} roughness={0.2} />
-      </mesh>
-
-      {/* blinking beacon */}
-      <Beacon position={[0.18, b.h + 0.85, 0.18]} color={b.color} active={active} />
-    </group>
-  );
-}
-
-function Beacon({
-  position,
-  color,
-  active,
-}: {
-  position: [number, number, number];
-  color: string;
-  active: boolean;
-}) {
-  const ref = useRef<THREE.Mesh>(null);
-  useFrame(({ clock }) => {
-    if (!ref.current) return;
-    const pulse = active
-      ? 1.4 + Math.sin(clock.getElapsedTime() * 8) * 0.6
-      : 0.55 + Math.sin(clock.getElapsedTime() * 3 + position[0]) * 0.15;
-    const mat = ref.current.material as THREE.MeshStandardMaterial;
-    mat.emissiveIntensity = pulse;
-  });
-  return (
-    <mesh ref={ref} position={position}>
-      <sphereGeometry args={[0.07, 16, 16]} />
-      <meshStandardMaterial
-        color={color}
-        emissive={color}
-        emissiveIntensity={0.55}
-        toneMapped={false}
-      />
-    </mesh>
-  );
-}
-
-function WindowLights({
-  windows,
-  activeIds,
-}: {
-  windows: WindowLight[];
-  activeIds: Set<string>;
-}) {
-  return (
-    <Instances limit={windows.length}>
-      <boxGeometry args={[WINDOW_W, WINDOW_H, WINDOW_D]} />
-      <meshBasicMaterial toneMapped={false} />
-      {windows.map((w) => {
-        const isActive = activeIds.has(w.id);
-        return (
-          <Instance
-            key={w.id}
-            position={w.position}
-            scale={isActive ? [1.55, 1.55, 1.55] : [1, 1, 1]}
-            color={isActive ? lighten(w.color, 0.55) : w.color}
-          />
-        );
-      })}
-    </Instances>
-  );
-}
-
-type FacadeBand = {
-  key: string;
-  date: string;
-  position: [number, number, number];
-  color: string;
-};
-
-/** Thin horizontal floor bands + vertical mullions, all instanced (2 draw calls). */
-function FacadeGrid({
-  bands,
-  mullions,
-  hoverDate,
-}: {
-  bands: FacadeBand[];
-  mullions: FacadeBand[];
-  hoverDate: string | null;
-}) {
-  return (
-    <>
-      <Instances limit={Math.max(bands.length, 1)} frustumCulled={false}>
-        <boxGeometry args={[CELL * 1.015, 0.014, CELL * 1.015]} />
-        <meshBasicMaterial toneMapped={false} transparent opacity={0.5} />
-        {bands.map((f) => (
-          <Instance
-            key={f.key}
-            position={f.position}
-            color={hoverDate === f.date ? lighten(f.color, 0.45) : f.color}
-          />
-        ))}
-      </Instances>
-      <Instances limit={Math.max(mullions.length, 1)} frustumCulled={false}>
-        <boxGeometry args={[0.035, 1, 0.035]} />
-        <meshBasicMaterial toneMapped={false} transparent opacity={0.42} />
-        {mullions.map((m) => (
-          <Instance
-            key={m.key}
-            position={m.position}
-            scale={[1, m.position[1] * 2, 1]}
-            color={hoverDate === m.date ? lighten(m.color, 0.4) : m.color}
-          />
-        ))}
-      </Instances>
+        <boxGeometry args={[CELL * 0.4, 0.14, CELL * 0.4]} />
+        <meshBasicMaterial toneMapped={false} />
+      </instancedMesh>
+      <instancedMesh
+        ref={bandRef}
+        args={[undefined, undefined, Math.max(bands.length, 1)]}
+        frustumCulled={false}
+        raycast={() => null}
+      >
+        <boxGeometry args={[CELL * 1.03, 0.02, CELL * 1.03]} />
+        <meshBasicMaterial toneMapped={false} transparent opacity={0.45} />
+      </instancedMesh>
     </>
   );
 }
 
-type Prop3D = { x: number; z: number };
-type CarProp = { x: number; z: number; axis: "x" | "z"; dir: 1 | -1; speed: number; color: string };
-
-/** Tiny street lights: shared pole geometry + emissive head, instanced. */
-function StreetLights({ spots }: { spots: Prop3D[] }) {
-  return (
-    <>
-      <Instances limit={Math.max(spots.length, 1)}>
-        <cylinderGeometry args={[0.018, 0.024, 0.9, 6]} />
-        <meshStandardMaterial color="#123a29" metalness={0.6} roughness={0.4} />
-        {spots.map((s, i) => (
-          <Instance key={`p${i}`} position={[s.x, 0.45, s.z]} />
-        ))}
-      </Instances>
-      <Instances limit={Math.max(spots.length, 1)}>
-        <sphereGeometry args={[0.05, 8, 8]} />
-        <meshBasicMaterial color="#bdffd6" toneMapped={false} />
-        {spots.map((s, i) => (
-          <Instance key={`h${i}`} position={[s.x, 0.94, s.z]} />
-        ))}
-      </Instances>
-    </>
-  );
-}
-
-/** A handful of tiny vehicles gliding along empty lanes (one instanced mesh). */
+/** A few tiny vehicles gliding along the outer lanes (one instanced mesh). */
 function Cars({ cars, span }: { cars: CarProp[]; span: number }) {
   const ref = useRef<THREE.InstancedMesh>(null);
-  const dummy = useMemo(() => new THREE.Object3D(), []);
-  const offsets = useRef<number[]>(cars.map(() => Math.random() * span));
+  const offsets = useRef<number[]>(cars.map((_, i) => (i / cars.length) * span));
 
   useFrame((_, rawDelta) => {
     const mesh = ref.current;
     if (!mesh) return;
     const delta = Math.min(rawDelta, 1 / 30);
-    cars.forEach((c, i) => {
+    for (let i = 0; i < cars.length; i++) {
+      const c = cars[i]!;
       let o = (offsets.current[i] ?? 0) + delta * c.speed;
       while (o > span) o -= span;
-
       offsets.current[i] = o;
       const t = -span / 2 + o;
       if (c.axis === "x") {
-        dummy.position.set(c.dir === 1 ? t : -t, 0.09, c.z);
-        dummy.rotation.set(0, 0, 0);
+        tmpObj.position.set(c.dir === 1 ? t : -t, 0.09, c.z);
+        tmpObj.rotation.set(0, 0, 0);
       } else {
-        dummy.position.set(c.x, 0.09, c.dir === 1 ? t : -t);
-        dummy.rotation.set(0, Math.PI / 2, 0);
+        tmpObj.position.set(c.x, 0.09, c.dir === 1 ? t : -t);
+        tmpObj.rotation.set(0, Math.PI / 2, 0);
       }
-      dummy.updateMatrix();
-      mesh.setMatrixAt(i, dummy.matrix);
-    });
+      tmpObj.scale.set(1, 1, 1);
+      tmpObj.updateMatrix();
+      mesh.setMatrixAt(i, tmpObj.matrix);
+    }
     mesh.instanceMatrix.needsUpdate = true;
   });
 
   if (!cars.length) return null;
   return (
-    <instancedMesh ref={ref} args={[undefined, undefined, cars.length]} frustumCulled={false}>
+    <instancedMesh
+      ref={ref}
+      args={[undefined, undefined, cars.length]}
+      frustumCulled={false}
+      raycast={() => null}
+    >
       <boxGeometry args={[0.26, 0.09, 0.13]} />
-      <meshStandardMaterial
-        color="#6df3a6"
-        emissive="#6df3a6"
-        emissiveIntensity={0.9}
-        toneMapped={false}
-        roughness={0.3}
-        metalness={0.4}
-      />
+      <meshBasicMaterial color="#6df3a6" toneMapped={false} />
     </instancedMesh>
   );
 }
 
-
-
-function ActiveGlow({
-  building,
-}: {
-  building: Building | null;
-}) {
-  const lightRef = useRef<THREE.PointLight>(null);
-  const beamRef = useRef<THREE.Mesh>(null);
-
-  useFrame(({ clock }) => {
-    if (!lightRef.current || !building) return;
-    const pulse = 1.2 + Math.sin(clock.getElapsedTime() * 6) * 0.5;
-    lightRef.current.intensity = pulse * 3.5;
-    lightRef.current.color.set(building.color);
+/** One shared grow-in animation for the whole skyline. */
+function GrowIn({ children }: { children: React.ReactNode }) {
+  const ref = useRef<THREE.Group>(null);
+  const t = useRef(0);
+  const done = useRef(false);
+  useFrame((_, rawDelta) => {
+    if (done.current || !ref.current) return;
+    t.current = Math.min(1, t.current + Math.min(rawDelta, 1 / 30) * 1.2);
+    const ease = 1 - Math.pow(1 - t.current, 3);
+    ref.current.scale.y = Math.max(0.001, ease);
+    if (t.current >= 1) {
+      ref.current.scale.y = 1;
+      done.current = true;
+    }
   });
+  return <group ref={ref}>{children}</group>;
+}
 
+function HoverLight({ building }: { building: Building | null }) {
   if (!building) return null;
   return (
-    <group position={[building.x, 0, building.z]}>
-      <pointLight
-        ref={lightRef}
-        position={[0, building.h + 1.4, 0]}
-        distance={10}
-        decay={2}
-        color={building.color}
-        intensity={4}
-      />
-      <mesh ref={beamRef} position={[0, building.h / 2 + 0.5, 0]}>
-        <cylinderGeometry args={[0.12, 0.35, building.h + 1.2, 16, 1, true]} />
-        <meshBasicMaterial
-          color={building.color}
-          transparent
-          opacity={0.08}
-          side={THREE.DoubleSide}
-          depthWrite={false}
-        />
-      </mesh>
-    </group>
+    <pointLight
+      position={[building.x, building.h + 1.6, building.z]}
+      distance={11}
+      decay={2}
+      color={building.color}
+      intensity={9}
+    />
   );
 }
 
@@ -438,140 +302,15 @@ function Scene({
   zoomEnabled: boolean;
   controlsRef: MutableRefObject<OrbitLike | null>;
 }) {
-
-  const windows = useMemo<WindowLight[]>(() => {
-    const out: WindowLight[] = [];
-    let id = 0;
-    for (const b of buildings) {
-      for (const s of b.segments) {
-        const rows = Math.min(Math.max(Math.round(s.h / 0.32), 1), 6);
-        const cols = 2;
-        const startY = s.y - s.h / 2 + 0.12;
-        const stepY = rows > 1 ? (s.h - 0.24) / (rows - 1) : 0;
-        const startX = -CELL * 0.22;
-        const stepX = CELL * 0.44;
-        for (let r = 0; r < rows; r++) {
-          for (let c = 0; c < cols; c++) {
-            // skip some windows randomly for a lived-in look
-            if (Math.random() > 0.78) continue;
-            const y = rows === 1 ? s.y : startY + r * stepY;
-            // front face windows
-            out.push({
-              id: `${b.date}-${s.platform}-f-${id++}`,
-              position: [
-                b.x + startX + c * stepX,
-                y,
-                b.z + CELL / 2 + 0.045,
-              ],
-              color: lighten(s.color, 0.35),
-              scale: 1,
-            });
-            // right face windows
-            out.push({
-              id: `${b.date}-${s.platform}-r-${id++}`,
-              position: [
-                b.x + CELL / 2 + 0.045,
-                y,
-                b.z + startX + c * stepX,
-              ],
-              color: lighten(s.color, 0.28),
-              scale: 1,
-            });
-          }
-        }
-      }
-    }
-    return out;
-  }, [buildings]);
-
-  // Facade floor bands + corner mullions (2 instanced draw calls total).
-  const { bands, mullions } = useMemo(() => {
-    const bandOut: FacadeBand[] = [];
-    const mullOut: FacadeBand[] = [];
-    for (const b of buildings) {
-      for (const s of b.segments) {
-        const floors = Math.min(Math.max(Math.round(s.h / 0.42), 1), 8);
-        const top = s.y + s.h / 2;
-        const step = s.h / floors;
-        for (let f = 1; f < floors; f++) {
-          bandOut.push({
-            key: `${b.date}-${s.platform}-b${f}`,
-            date: b.date,
-            position: [b.x, top - f * step, b.z],
-            color: lighten(s.color, 0.18),
-          });
-        }
-      }
-      const half = CELL / 2 + 0.012;
-      const corners: Array<[number, number]> = [
-        [-half, -half],
-        [half, -half],
-        [-half, half],
-        [half, half],
-      ];
-      corners.forEach(([dx, dz], i) => {
-        mullOut.push({
-          key: `${b.date}-m${i}`,
-          date: b.date,
-          position: [b.x + dx, b.h / 2, b.z + dz],
-          color: lighten(b.color, 0.1),
-        });
-      });
-    }
-    return { bands: bandOut, mullions: mullOut };
-  }, [buildings]);
-
-  // Small city props placed only on genuinely empty grid cells.
-  const { lights, cars } = useMemo(() => {
-    const occupied = new Set(
-      buildings.map((b) => `${Math.round(b.x / STEP)}|${Math.round(b.z / STEP)}`),
-    );
-    const cols = Math.round(width / STEP);
-    const rows = 7;
-    const free: Prop3D[] = [];
-    for (let wi = 0; wi < cols; wi++) {
-      for (let di = 0; di < rows; di++) {
-        const x = wi * STEP - width / 2;
-        const z = di * STEP - depth / 2;
-        if (occupied.has(`${Math.round(x / STEP)}|${Math.round(z / STEP)}`)) continue;
-        free.push({ x, z });
-      }
-    }
-    // keep it sparse: at most ~14 lights, evenly sampled
-    const maxLights = Math.min(14, Math.floor(free.length / 6));
-    const stride = maxLights > 0 ? Math.floor(free.length / maxLights) : 0;
-    const lightOut: Prop3D[] = [];
-    for (let i = 0; stride > 0 && i < free.length && lightOut.length < maxLights; i += stride) {
-      const cell = free[i];
-      if (cell) lightOut.push({ x: cell.x + STEP * 0.32, z: cell.z + STEP * 0.32 });
-    }
-
-    // a few vehicles gliding along the outer lanes only
+  const cars = useMemo<CarProp[]>(() => {
     const laneZ = depth / 2 + STEP * 0.9;
-    const carOut: CarProp[] = [
-      { x: 0, z: -laneZ, axis: "x", dir: 1, speed: 2.4, color: "#6df3a6" },
-      { x: 0, z: -laneZ + 0.3, axis: "x", dir: -1, speed: 1.9, color: "#6df3a6" },
-      { x: 0, z: laneZ, axis: "x", dir: -1, speed: 2.1, color: "#6df3a6" },
-      { x: 0, z: laneZ - 0.3, axis: "x", dir: 1, speed: 1.6, color: "#6df3a6" },
-      { x: -width / 2 - STEP * 0.9, z: 0, axis: "z", dir: 1, speed: 1.7, color: "#6df3a6" },
-      { x: width / 2 + STEP * 0.9, z: 0, axis: "z", dir: -1, speed: 2.0, color: "#6df3a6" },
+    return [
+      { x: 0, z: -laneZ, axis: "x", dir: 1, speed: 2.4 },
+      { x: 0, z: laneZ, axis: "x", dir: -1, speed: 2.1 },
+      { x: -width / 2 - STEP * 0.9, z: 0, axis: "z", dir: 1, speed: 1.7 },
+      { x: width / 2 + STEP * 0.9, z: 0, axis: "z", dir: -1, speed: 2.0 },
     ];
-    return { lights: lightOut, cars: carOut };
-  }, [buildings, width, depth]);
-
-
-  const activeIds = useMemo(() => {
-    const set = new Set<string>();
-    if (!hoverDate) return set;
-    const b = buildings.find((x) => x.date === hoverDate);
-    if (!b) return set;
-    for (const s of b.segments) {
-      for (const w of windows) {
-        if (w.id.startsWith(`${b.date}-${s.platform}-`)) set.add(w.id);
-      }
-    }
-    return set;
-  }, [buildings, hoverDate, windows]);
+  }, [width, depth]);
 
   const hoverBuilding = useMemo(
     () => buildings.find((b) => b.date === hoverDate) ?? null,
@@ -581,70 +320,44 @@ function Scene({
   return (
     <>
       <color attach="background" args={["#08150f"]} />
-      <fog attach="fog" args={["#08150f", 32, 90]} />
-      <Environment preset="night" />
-      <Stars radius={140} depth={70} count={3000} factor={4} saturation={0} fade speed={0.5} />
+      <fog attach="fog" args={["#08150f", 40, 110]} />
+      <Stars radius={140} depth={60} count={700} factor={4} saturation={0} fade speed={0.4} />
 
-      <ambientLight intensity={0.45} />
-      <directionalLight
-        position={[22, 40, 18]}
-        intensity={1.35}
-        castShadow
-        shadow-mapSize={[2048, 2048]}
-        shadow-camera-far={120}
-        shadow-camera-left={-60}
-        shadow-camera-right={60}
-        shadow-camera-top={60}
-        shadow-camera-bottom={-60}
-      />
-      <directionalLight position={[-18, 12, -12]} intensity={0.45} color="#3ddc84" />
-      <pointLight position={[0, 20, 0]} intensity={0.9} color="#a8ffbe" distance={70} decay={2} />
+      <ambientLight intensity={0.75} />
+      <hemisphereLight args={["#a8ffbe", "#04120b", 0.6]} />
+      <directionalLight position={[22, 34, 18]} intensity={1.15} />
+      <directionalLight position={[-18, 12, -12]} intensity={0.4} color="#3ddc84" />
 
-      {/* reflective ground */}
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.08, 0]} receiveShadow>
-        <planeGeometry args={[width + 10, depth + 10]} />
-        <MeshReflectorMaterial
-          blur={[400, 160]}
-          resolution={1024}
-          mixBlur={0.9}
-          mixStrength={0.28}
-          roughness={0.85}
-          depthScale={0.8}
-          color="#0a1a12"
-          metalness={0.15}
-          mirror={0.35}
-        />
+      {/* ground */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.06, 0]} raycast={() => null}>
+        <planeGeometry args={[width + 12, depth + 12]} />
+        <meshStandardMaterial color="#0a1a12" roughness={0.9} metalness={0.1} />
       </mesh>
 
       <Grid
-        position={[0, -0.06, 0]}
+        position={[0, -0.04, 0]}
         args={[width + 10, depth + 10]}
         cellSize={STEP}
         cellColor="#1f5c3c"
         sectionSize={STEP * 7}
         sectionColor="#3ddc84"
-        fadeDistance={90}
+        fadeDistance={95}
         fadeStrength={1.4}
         infiniteGrid={false}
       />
 
-      {buildings.map((b) => (
-        <Tower
-          key={b.date}
-          b={b}
-          active={hoverDate === b.date}
+      <GrowIn>
+        <Towers
+          buildings={buildings}
+          hoverDate={hoverDate}
           onHover={onHover}
-          onLeave={() => onHover(null)}
           dragRef={dragRef}
         />
-      ))}
+        <Details buildings={buildings} />
+      </GrowIn>
 
-      <FacadeGrid bands={bands} mullions={mullions} hoverDate={hoverDate} />
-      <WindowLights windows={windows} activeIds={activeIds} />
-      <StreetLights spots={lights} />
       <Cars cars={cars} span={width + STEP * 4} />
-      <ActiveGlow building={hoverBuilding} />
-
+      <HoverLight building={hoverBuilding} />
 
       <OrbitControls
         makeDefault
@@ -652,9 +365,9 @@ function Scene({
         enablePan
         enableZoom={zoomEnabled}
         enableDamping
-        dampingFactor={0.08}
+        dampingFactor={0.1}
         rotateSpeed={0.55}
-        zoomSpeed={0.5}
+        zoomSpeed={0.6}
         panSpeed={0.5}
         screenSpacePanning={false}
         touches={{ ONE: THREE.TOUCH.ROTATE, TWO: THREE.TOUCH.DOLLY_PAN }}
@@ -678,11 +391,9 @@ function Scene({
             c.object.position.z += nz - t.z;
             t.set(nx, ny, nz);
           }
-          // never let the camera dip below the ground plane
           if (c.object.position.y < 1.5) c.object.position.y = 1.5;
         }}
       />
-
     </>
   );
 }
@@ -707,7 +418,6 @@ export default function GitCity3D({ weeks, merged, calendars, colors }: Props) {
         }
         per.sort((a, b) => b.count - a.count);
 
-        const parts = per.map((p) => `${PLATFORM_LABELS[p.platform]}: ${p.count}`);
         const total = per.reduce((s, p) => s + p.count, 0) || 1;
         const h = Math.min(count, 24) * UNIT + 0.25;
 
@@ -732,7 +442,6 @@ export default function GitCity3D({ weeks, merged, calendars, colors }: Props) {
           h,
           count,
           color: per[0] ? (colors[per[0].platform] ?? "#3ddc84") : "#3ddc84",
-          parts,
           segments,
         });
       });
@@ -748,7 +457,6 @@ export default function GitCity3D({ weeks, merged, calendars, colors }: Props) {
 
   const endDrag = useCallback(() => {
     downRef.current = null;
-    // clear on the next frame so the pending click/hover events are ignored
     requestAnimationFrame(() => {
       dragRef.current = false;
     });
@@ -762,7 +470,6 @@ export default function GitCity3D({ weeks, merged, calendars, colors }: Props) {
     c.update();
   }, []);
 
-  // release the wheel back to the page whenever the pointer leaves the canvas
   useEffect(() => {
     const onBlur = () => setZoomEnabled(false);
     window.addEventListener("blur", onBlur);
@@ -798,11 +505,12 @@ export default function GitCity3D({ weeks, merged, calendars, colors }: Props) {
       >
         <Canvas
           camera={{ position: DEFAULT_CAM, fov: 42 }}
-          dpr={[1, 1.6]}
-          gl={{ antialias: true, alpha: false }}
-          shadows
+          dpr={[1, 1.5]}
+          gl={{ antialias: true, alpha: false, powerPreference: "high-performance" }}
           onPointerMissed={() => setHover(null)}
         >
+          <AdaptiveDpr pixelated />
+          <AdaptiveEvents />
           <Scene
             buildings={buildings}
             width={width}
@@ -820,7 +528,6 @@ export default function GitCity3D({ weeks, merged, calendars, colors }: Props) {
             ? "drag = rotate · scroll = zoom · right-drag = pan · double-click = reset"
             : "click the city to enable zoom · drag = rotate"}
         </div>
-
 
         {hover ? (
           <div className="pointer-events-none absolute bottom-3 left-3 max-w-[75%] rounded-md border border-emerald-500/30 bg-black/75 px-3 py-2 font-mono text-[11px] text-emerald-200">
