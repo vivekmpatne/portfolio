@@ -108,7 +108,7 @@ function Towers({
     <instancedMesh
       ref={ref}
       args={[undefined, undefined, count]}
-      frustumCulled={false}
+      frustumCulled={true}
       onPointerMove={(e) => {
         e.stopPropagation();
         if (dragRef.current) return;
