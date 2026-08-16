@@ -134,10 +134,11 @@ function Details({ buildings }: { buildings: Building[] }) {
     const out: Array<{ x: number; y: number; z: number; color: string }> = [];
     for (const b of buildings) {
       for (const s of b.segments) {
-        const floors = Math.min(Math.max(Math.round(s.h / 0.5), 1), 5);
+        // cap visual bands to keep draw calls light while still showing platform layers
+        const floors = Math.min(Math.max(Math.round(s.h / 0.8), 1), 2);
         const top = s.y + s.h / 2;
-        const step = s.h / floors;
-        for (let f = 1; f < floors; f++) {
+        const step = s.h / (floors + 1);
+        for (let f = 1; f <= floors; f++) {
           out.push({ x: b.x, y: top - f * step, z: b.z, color: s.color });
         }
       }
