@@ -459,7 +459,7 @@ export default function GitCity3D({ weeks, merged, calendars, colors }: Props) {
           z: di * STEP - d / 2,
           h,
           count,
-          color: per[0] ? (colors[per[0].platform] ?? "#3ddc84") : "#3ddc84",
+          color: topPer[0] ? (colors[topPer[0].platform] ?? "#3ddc84") : "#3ddc84",
           segments,
         });
       });
