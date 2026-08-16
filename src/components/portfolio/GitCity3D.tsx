@@ -182,7 +182,7 @@ function Details({ buildings }: { buildings: Building[] }) {
       <instancedMesh
         ref={roofRef}
         args={[undefined, undefined, Math.max(buildings.length, 1)]}
-        frustumCulled={false}
+        frustumCulled={true}
         raycast={() => null}
       >
         <boxGeometry args={[CELL * 0.4, 0.14, CELL * 0.4]} />
@@ -191,7 +191,7 @@ function Details({ buildings }: { buildings: Building[] }) {
       <instancedMesh
         ref={bandRef}
         args={[undefined, undefined, Math.max(bands.length, 1)]}
-        frustumCulled={false}
+        frustumCulled={true}
         raycast={() => null}
       >
         <boxGeometry args={[CELL * 1.03, 0.02, CELL * 1.03]} />
