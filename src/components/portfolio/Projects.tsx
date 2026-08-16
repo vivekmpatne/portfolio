@@ -1,4 +1,5 @@
-import { ExternalLink, Github, Sparkles } from "lucide-react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { ChevronLeft, ChevronRight, ExternalLink, Github, Sparkles } from "lucide-react";
 import { projects, type Project } from "@/data/projects";
 import { SectionHeader } from "./SectionHeader";
 
@@ -15,21 +16,93 @@ const statusDot: Record<Project["status"], string> = {
 };
 
 export function Projects() {
-  // All projects render with the same side-by-side "hero" layout
-  // (banner on one side, content on the other) — matching the
-  // DSA Tracker card. Featured projects float to the top.
+  // Horizontal slider: one project at a time, arrows slide the next/previous
+  // card into the middle. Keeps the page short as more projects are added.
   const ordered = [
     ...projects.filter((p) => p.featured),
     ...projects.filter((p) => !p.featured),
   ];
 
+  const trackRef = useRef<HTMLDivElement>(null);
+  const [index, setIndex] = useState(0);
+
+  const scrollTo = useCallback((i: number) => {
+    const track = trackRef.current;
+    if (!track) return;
+    const clamped = Math.max(0, Math.min(i, ordered.length - 1));
+    const child = track.children[clamped] as HTMLElement | undefined;
+    if (child) track.scrollTo({ left: child.offsetLeft, behavior: "smooth" });
+    setIndex(clamped);
+  }, [ordered.length]);
+
+  useEffect(() => {
+    const track = trackRef.current;
+    if (!track) return;
+    const onScroll = () => {
+      const children = Array.from(track.children) as HTMLElement[];
+      let best = 0;
+      let bestDist = Infinity;
+      children.forEach((c, i) => {
+        const d = Math.abs(c.offsetLeft - track.scrollLeft);
+        if (d < bestDist) {
+          bestDist = d;
+          best = i;
+        }
+      });
+      setIndex(best);
+    };
+    track.addEventListener("scroll", onScroll, { passive: true });
+    return () => track.removeEventListener("scroll", onScroll);
+  }, []);
+
   return (
     <section id="projects" className="mx-auto max-w-6xl px-6 py-20">
-      <SectionHeader title="Projects" />
+      <div className="flex items-end justify-between gap-4">
+        <SectionHeader title="Projects" />
+        <div className="mb-4 flex shrink-0 gap-2">
+          <button
+            type="button"
+            aria-label="Previous project"
+            onClick={() => scrollTo(index - 1)}
+            disabled={index === 0}
+            className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-border transition-colors hover:bg-accent disabled:opacity-40"
+          >
+            <ChevronLeft className="h-4 w-4" />
+          </button>
+          <button
+            type="button"
+            aria-label="Next project"
+            onClick={() => scrollTo(index + 1)}
+            disabled={index >= ordered.length - 1}
+            className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-border transition-colors hover:bg-accent disabled:opacity-40"
+          >
+            <ChevronRight className="h-4 w-4" />
+          </button>
+        </div>
+      </div>
 
-      <div className="grid gap-5">
+      <div
+        ref={trackRef}
+        className="flex snap-x snap-mandatory gap-5 overflow-x-auto scroll-smooth pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+      >
         {ordered.map((p) => (
-          <ProjectCard key={p.id} project={p} />
+          <div key={p.id} className="w-full shrink-0 snap-start">
+            <ProjectCard project={p} />
+          </div>
+        ))}
+      </div>
+
+      <div className="mt-5 flex justify-center gap-2">
+        {ordered.map((p, i) => (
+          <button
+            key={p.id}
+            type="button"
+            aria-label={`Go to ${p.title}`}
+            onClick={() => scrollTo(i)}
+            className={`h-1.5 rounded-full transition-all ${
+              i === index ? "w-6 bg-foreground" : "w-1.5 bg-border"
+            }`}
+          />
         ))}
       </div>
     </section>
@@ -38,7 +111,7 @@ export function Projects() {
 
 function ProjectCard({ project }: { project: Project }) {
   return (
-    <article className="group relative flex flex-col overflow-hidden rounded-2xl border border-border bg-card transition-all hover:-translate-y-1 hover:border-foreground/30 hover:shadow-xl md:grid md:grid-cols-2 md:gap-0">
+    <article className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-card transition-all hover:border-foreground/30 hover:shadow-xl md:grid md:grid-cols-2 md:gap-0">
       {project.image && (
         <div className="relative overflow-hidden border-b border-border bg-secondary aspect-[16/10] md:aspect-auto md:border-b-0 md:border-r">
           {/* eslint-disable-next-line jsx-a11y/alt-text */}
