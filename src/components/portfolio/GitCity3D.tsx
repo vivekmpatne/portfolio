@@ -336,28 +336,28 @@ function Scene({
   return (
     <>
       <color attach="background" args={["#08150f"]} />
-      <fog attach="fog" args={["#08150f", 40, 110]} />
-      <Stars radius={140} depth={60} count={700} factor={4} saturation={0} fade speed={0.4} />
+      <fog attach="fog" args={["#08150f", 35, 90]} />
+      <Stars radius={120} depth={50} count={320} factor={4} saturation={0} fade speed={0.4} />
 
       <ambientLight intensity={0.75} />
       <hemisphereLight args={["#a8ffbe", "#04120b", 0.6]} />
-      <directionalLight position={[22, 34, 18]} intensity={1.15} />
-      <directionalLight position={[-18, 12, -12]} intensity={0.4} color="#3ddc84" />
+      <directionalLight position={[22, 34, 18]} intensity={1.05} />
+      <directionalLight position={[-18, 12, -12]} intensity={0.35} color="#3ddc84" />
 
       {/* ground */}
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.06, 0]} raycast={() => null}>
-        <planeGeometry args={[width + 12, depth + 12]} />
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.06, 0]} frustumCulled={false} raycast={() => null}>
+        <planeGeometry args={[width + 10, depth + 10]} />
         <meshStandardMaterial color="#0a1a12" roughness={0.9} metalness={0.1} />
       </mesh>
 
       <Grid
         position={[0, -0.04, 0]}
-        args={[width + 10, depth + 10]}
+        args={[width + 8, depth + 8]}
         cellSize={STEP}
         cellColor="#1f5c3c"
         sectionSize={STEP * 7}
         sectionColor="#3ddc84"
-        fadeDistance={95}
+        fadeDistance={75}
         fadeStrength={1.4}
         infiniteGrid={false}
       />
