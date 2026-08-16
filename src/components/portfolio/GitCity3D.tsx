@@ -235,7 +235,7 @@ function Cars({ cars, span }: { cars: CarProp[]; span: number }) {
     <instancedMesh
       ref={ref}
       args={[undefined, undefined, cars.length]}
-      frustumCulled={false}
+      frustumCulled={true}
       raycast={() => null}
     >
       <boxGeometry args={[0.26, 0.09, 0.13]} />
