@@ -433,13 +433,15 @@ export default function GitCity3D({ weeks, merged, calendars, colors }: Props) {
           if (c) per.push({ platform: key, count: c });
         }
         per.sort((a, b) => b.count - a.count);
+        // cap platforms per day to keep segment/instance count low without losing top contributors
+        const topPer = per.slice(0, 3);
 
-        const total = per.reduce((s, p) => s + p.count, 0) || 1;
+        const total = topPer.reduce((s, p) => s + p.count, 0) || 1;
         const h = Math.min(count, 24) * UNIT + 0.25;
 
         const segments: Segment[] = [];
         let y = 0;
-        for (const p of per) {
+        for (const p of topPer) {
           const sh = (p.count / total) * h;
           segments.push({
             platform: p.platform,
