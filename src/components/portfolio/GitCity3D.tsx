@@ -108,7 +108,7 @@ function Towers({
     <instancedMesh
       ref={ref}
       args={[undefined, undefined, count]}
-      frustumCulled={false}
+      frustumCulled={true}
       onPointerMove={(e) => {
         e.stopPropagation();
         if (dragRef.current) return;
@@ -134,10 +134,11 @@ function Details({ buildings }: { buildings: Building[] }) {
     const out: Array<{ x: number; y: number; z: number; color: string }> = [];
     for (const b of buildings) {
       for (const s of b.segments) {
-        const floors = Math.min(Math.max(Math.round(s.h / 0.5), 1), 5);
+        // cap visual bands to keep draw calls light while still showing platform layers
+        const floors = Math.min(Math.max(Math.round(s.h / 0.8), 1), 2);
         const top = s.y + s.h / 2;
-        const step = s.h / floors;
-        for (let f = 1; f < floors; f++) {
+        const step = s.h / (floors + 1);
+        for (let f = 1; f <= floors; f++) {
           out.push({ x: b.x, y: top - f * step, z: b.z, color: s.color });
         }
       }
@@ -181,7 +182,7 @@ function Details({ buildings }: { buildings: Building[] }) {
       <instancedMesh
         ref={roofRef}
         args={[undefined, undefined, Math.max(buildings.length, 1)]}
-        frustumCulled={false}
+        frustumCulled={true}
         raycast={() => null}
       >
         <boxGeometry args={[CELL * 0.4, 0.14, CELL * 0.4]} />
@@ -190,7 +191,7 @@ function Details({ buildings }: { buildings: Building[] }) {
       <instancedMesh
         ref={bandRef}
         args={[undefined, undefined, Math.max(bands.length, 1)]}
-        frustumCulled={false}
+        frustumCulled={true}
         raycast={() => null}
       >
         <boxGeometry args={[CELL * 1.03, 0.02, CELL * 1.03]} />
@@ -234,7 +235,7 @@ function Cars({ cars, span }: { cars: CarProp[]; span: number }) {
     <instancedMesh
       ref={ref}
       args={[undefined, undefined, cars.length]}
-      frustumCulled={false}
+      frustumCulled={true}
       raycast={() => null}
     >
       <boxGeometry args={[0.26, 0.09, 0.13]} />
@@ -262,14 +263,29 @@ function GrowIn({ children }: { children: React.ReactNode }) {
 }
 
 function HoverLight({ building }: { building: Building | null }) {
-  if (!building) return null;
+  const lightRef = useRef<THREE.PointLight>(null);
+  const targetPos = useRef(new THREE.Vector3(0, -100, 0));
+  const targetInt = useRef(0);
+  useFrame(() => {
+    const light = lightRef.current;
+    if (!light) return;
+    if (building) {
+      targetPos.current.set(building.x, building.h + 1.6, building.z);
+      targetInt.current = 9;
+    } else {
+      targetInt.current = 0;
+    }
+    light.position.lerp(targetPos.current, 0.18);
+    light.intensity = THREE.MathUtils.lerp(light.intensity, targetInt.current, 0.18);
+  });
   return (
     <pointLight
-      position={[building.x, building.h + 1.6, building.z]}
+      ref={lightRef}
+      position={[0, -100, 0]}
       distance={11}
       decay={2}
-      color={building.color}
-      intensity={9}
+      color="#3ddc84"
+      intensity={0}
     />
   );
 }
@@ -320,28 +336,28 @@ function Scene({
   return (
     <>
       <color attach="background" args={["#08150f"]} />
-      <fog attach="fog" args={["#08150f", 40, 110]} />
-      <Stars radius={140} depth={60} count={700} factor={4} saturation={0} fade speed={0.4} />
+      <fog attach="fog" args={["#08150f", 35, 90]} />
+      <Stars radius={120} depth={50} count={320} factor={4} saturation={0} fade speed={0.4} />
 
       <ambientLight intensity={0.75} />
       <hemisphereLight args={["#a8ffbe", "#04120b", 0.6]} />
-      <directionalLight position={[22, 34, 18]} intensity={1.15} />
-      <directionalLight position={[-18, 12, -12]} intensity={0.4} color="#3ddc84" />
+      <directionalLight position={[22, 34, 18]} intensity={1.05} />
+      <directionalLight position={[-18, 12, -12]} intensity={0.35} color="#3ddc84" />
 
       {/* ground */}
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.06, 0]} raycast={() => null}>
-        <planeGeometry args={[width + 12, depth + 12]} />
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.06, 0]} frustumCulled={false} raycast={() => null}>
+        <planeGeometry args={[width + 10, depth + 10]} />
         <meshStandardMaterial color="#0a1a12" roughness={0.9} metalness={0.1} />
       </mesh>
 
       <Grid
         position={[0, -0.04, 0]}
-        args={[width + 10, depth + 10]}
+        args={[width + 8, depth + 8]}
         cellSize={STEP}
         cellColor="#1f5c3c"
         sectionSize={STEP * 7}
         sectionColor="#3ddc84"
-        fadeDistance={95}
+        fadeDistance={75}
         fadeStrength={1.4}
         infiniteGrid={false}
       />
@@ -417,13 +433,15 @@ export default function GitCity3D({ weeks, merged, calendars, colors }: Props) {
           if (c) per.push({ platform: key, count: c });
         }
         per.sort((a, b) => b.count - a.count);
+        // cap platforms per day to keep segment/instance count low without losing top contributors
+        const topPer = per.slice(0, 3);
 
-        const total = per.reduce((s, p) => s + p.count, 0) || 1;
+        const total = topPer.reduce((s, p) => s + p.count, 0) || 1;
         const h = Math.min(count, 24) * UNIT + 0.25;
 
         const segments: Segment[] = [];
         let y = 0;
-        for (const p of per) {
+        for (const p of topPer) {
           const sh = (p.count / total) * h;
           segments.push({
             platform: p.platform,
@@ -441,7 +459,7 @@ export default function GitCity3D({ weeks, merged, calendars, colors }: Props) {
           z: di * STEP - d / 2,
           h,
           count,
-          color: per[0] ? (colors[per[0].platform] ?? "#3ddc84") : "#3ddc84",
+          color: topPer[0] ? (colors[topPer[0].platform] ?? "#3ddc84") : "#3ddc84",
           segments,
         });
       });
@@ -505,8 +523,8 @@ export default function GitCity3D({ weeks, merged, calendars, colors }: Props) {
       >
         <Canvas
           camera={{ position: DEFAULT_CAM, fov: 42 }}
-          dpr={[1, 1.5]}
-          gl={{ antialias: true, alpha: false, powerPreference: "high-performance" }}
+          dpr={[1, 1.25]}
+          gl={{ antialias: false, alpha: false, powerPreference: "high-performance" }}
           onPointerMissed={() => setHover(null)}
         >
           <AdaptiveDpr pixelated />
