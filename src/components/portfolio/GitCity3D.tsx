@@ -262,14 +262,29 @@ function GrowIn({ children }: { children: React.ReactNode }) {
 }
 
 function HoverLight({ building }: { building: Building | null }) {
-  if (!building) return null;
+  const lightRef = useRef<THREE.PointLight>(null);
+  const targetPos = useRef(new THREE.Vector3(0, -100, 0));
+  const targetInt = useRef(0);
+  useFrame(() => {
+    const light = lightRef.current;
+    if (!light) return;
+    if (building) {
+      targetPos.current.set(building.x, building.h + 1.6, building.z);
+      targetInt.current = 9;
+    } else {
+      targetInt.current = 0;
+    }
+    light.position.lerp(targetPos.current, 0.18);
+    light.intensity = THREE.MathUtils.lerp(light.intensity, targetInt.current, 0.18);
+  });
   return (
     <pointLight
-      position={[building.x, building.h + 1.6, building.z]}
+      ref={lightRef}
+      position={[0, -100, 0]}
       distance={11}
       decay={2}
-      color={building.color}
-      intensity={9}
+      color="#3ddc84"
+      intensity={0}
     />
   );
 }
