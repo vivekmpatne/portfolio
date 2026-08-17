@@ -6,11 +6,11 @@ import { useResumeAvailable } from "@/hooks/use-resume-available";
 const sections = [
   { id: "home", label: "Home" },
   { id: "about", label: "About" },
-  { id: "consistency", label: "Consistency" },
-  { id: "achievements", label: "Achievements" },
   { id: "skills", label: "Skills" },
   { id: "projects", label: "Projects" },
   { id: "experience", label: "Experience" },
+  { id: "achievements", label: "Achievements" },
+  { id: "consistency", label: "Consistency" },
   { id: "contact", label: "Contact" },
 ];
 
