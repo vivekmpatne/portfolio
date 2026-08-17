@@ -2,8 +2,6 @@ import {
   Github,
   Linkedin,
   Twitter,
-  Instagram,
-  Youtube,
   type LucideIcon,
 } from "lucide-react";
 import { socialLinks } from "@/data/links";
@@ -12,8 +10,6 @@ const iconMap: Record<string, LucideIcon> = {
   Github,
   Linkedin,
   Twitter,
-  Instagram,
-  Youtube,
 };
 
 export function SocialIcons({ className = "" }: { className?: string }) {

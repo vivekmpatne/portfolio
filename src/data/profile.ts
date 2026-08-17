@@ -19,7 +19,7 @@ export const profile = {
   // functions and show "Unavailable" on failure — they never fall back
   // to hardcoded numbers.
   stats: {
-    problemsSolved: 500,
+    problemsSolved: 400,
     linkedinConnections: 5000,
   },
   openTo: [

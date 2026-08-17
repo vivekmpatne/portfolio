@@ -2,8 +2,8 @@ import { Code2, Monitor, Server, Wrench, Brain, Terminal, type LucideIcon } from
 import {
   SiJavascript, SiPython, SiCplusplus, SiMysql,
   SiReact, SiRedux, SiReactrouter, SiTailwindcss, SiHtml5, SiCss,
-  SiNodedotjs, SiExpress, SiJsonwebtokens, SiMongodb, SiMongoose, SiRedis,
-  SiGit, SiGithub, SiPostman, SiVercel, SiRailway, SiDocker, SiKubernetes, SiLinux,
+  SiNodedotjs, SiExpress, SiJsonwebtokens, SiMongodb, SiMongoose,
+  SiGit, SiGithub, SiPostman, SiVercel, SiRailway, SiLinux,
 } from "react-icons/si";
 import { FaJava } from "react-icons/fa";
 import { VscVscode } from "react-icons/vsc";
