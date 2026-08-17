@@ -137,7 +137,6 @@ export function Shell({ onClose }: { onClose: () => void }) {
       case "contact":
         push([
           out(`email : ${profile.email}`),
-          out(`phone : ${profile.phone}`),
           out(`loc   : ${profile.location}`),
           out(`www   : ${links.linkedin}`),
         ]);

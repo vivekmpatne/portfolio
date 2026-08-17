@@ -30,18 +30,14 @@ export const skills: Record<string, string[]> = {
     "JWT Auth",
     "MongoDB",
     "Mongoose",
-    "Redis",
   ],
 
-  // Redis lives under Backend & Database; not repeated here.
   "Tools & Technologies": [
     "Git",
     "GitHub",
     "Linux",
     "VS Code",
     "Postman",
-    "Docker",
-    "Kubernetes",
     "Vercel",
     "Railway",
   ],

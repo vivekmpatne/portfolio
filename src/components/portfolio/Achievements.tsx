@@ -30,7 +30,7 @@ const achievements: Achievement[] = [
     icon: Code2,
     value: `${profile.stats.problemsSolved}+`,
     label: "DSA Problems Solved",
-    sub: "Across LeetCode, Codeforces, GFG",
+    sub: "LeetCode · Codeforces · GFG · CodeChef · HackerRank",
     color: "text-emerald-500",
   },
 ];

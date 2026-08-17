@@ -40,24 +40,12 @@ export const projects: Project[] = [
     id: "chefkart",
     title: "ChefKart",
     description:
-      "Full-stack food delivery platform with role-based dashboards (user, chef, admin) and Razorpay payment integration.",
+      "Full-stack food delivery platform with role-based dashboards (user, chef, admin) and Razorpay payment integration. Full-stack food delivery platform — deploying soon.",
     techStack: ["React", "Node.js", "Express", "MongoDB", "Razorpay", "JWT"],
     githubUrl: null,
     liveUrl: null,
     status: "in-progress",
     featured: true,
-    image: null,
-  },
-  {
-    id: "samsung-sic",
-    title: "Samsung SIC Capstone",
-    description:
-      "IoT system using Raspberry Pi, sensors, and a Node.js + Grafana data pipeline.",
-    techStack: ["Python", "Node.js", "Raspberry Pi", "Linux", "Grafana", "MQTT"],
-    githubUrl: null,
-    liveUrl: null,
-    status: "planned",
-    featured: false,
     image: null,
   },
   // ────────────────────────────────────────────────────────────

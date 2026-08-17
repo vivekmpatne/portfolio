@@ -121,12 +121,6 @@ export function Footer() {
                 </a>
               </li>
               <li className="flex items-start gap-2">
-                <span className="mt-0.5 text-[var(--phosphor)]">#</span>
-                <a href={`tel:${profile.phone.replace(/\s/g, "")}`} className="text-foreground/85 hover:text-[var(--phosphor)] hover:underline">
-                  {profile.phone}
-                </a>
-              </li>
-              <li className="flex items-start gap-2">
                 <span className="mt-0.5 text-[var(--phosphor)]">~</span>
                 <span className="text-foreground/85">{profile.location}</span>
               </li>

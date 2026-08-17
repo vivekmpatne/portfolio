@@ -11,7 +11,7 @@ export const profile = {
   location: "Bengaluru, India",
   avatar: avatarAsset.url,
   email: "vivekpatnem@gmail.com",
-  phone: "+91 7676287523",
+
   // Manually-maintained stats.
   //   • linkedinConnections — LinkedIn has no public API; edit here to update the card.
   //   • problemsSolved      — headline DSA count shown in Achievements.
@@ -19,7 +19,7 @@ export const profile = {
   // functions and show "Unavailable" on failure — they never fall back
   // to hardcoded numbers.
   stats: {
-    problemsSolved: 500,
+    problemsSolved: 400,
     linkedinConnections: 5000,
   },
   openTo: [

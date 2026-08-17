@@ -30,8 +30,6 @@ export const socialLinks = [
   { name: "GitHub", url: links.github, icon: "Github" },
   { name: "LinkedIn", url: links.linkedin, icon: "Linkedin" },
   { name: "X / Twitter", url: links.x, icon: "Twitter" },
-  { name: "Instagram", url: links.instagram, icon: "Instagram" },
-  { name: "YouTube", url: links.youtube, icon: "Youtube" },
 ] as const;
 
 export const codingProfiles = [

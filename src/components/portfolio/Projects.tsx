@@ -5,7 +5,7 @@ import { SectionHeader } from "./SectionHeader";
 
 const statusLabel: Record<Project["status"], string> = {
   live: "Live",
-  "in-progress": "In Progress",
+  "in-progress": "Building",
   planned: "Planned",
 };
 
