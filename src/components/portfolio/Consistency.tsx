@@ -320,6 +320,9 @@ export function Consistency() {
 
       </div>
 
+      <LiveLog />
+
+
       {/* Activity breakdown */}
       <div className="mt-6">
         <div className="mb-3 text-xs font-medium uppercase tracking-widest text-muted-foreground">
