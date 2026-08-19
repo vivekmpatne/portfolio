@@ -6,6 +6,8 @@ import { SiGithub, SiLeetcode, SiCodeforces, SiCodechef, SiGeeksforgeeks, SiHack
 import { profile } from "@/data/profile";
 import { SectionHeader } from "./SectionHeader";
 import { GitCity } from "./GitCity";
+import { LiveLog } from "./LiveLog";
+
 
 
 
@@ -319,6 +321,9 @@ export function Consistency() {
         )}
 
       </div>
+
+      <LiveLog />
+
 
       {/* Activity breakdown */}
       <div className="mt-6">
