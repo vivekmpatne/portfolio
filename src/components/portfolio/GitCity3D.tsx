@@ -381,10 +381,10 @@ function Scene({
         enablePan
         enableZoom={zoomEnabled}
         enableDamping
-        dampingFactor={0.1}
-        rotateSpeed={0.55}
-        zoomSpeed={0.6}
-        panSpeed={0.5}
+        dampingFactor={0.045}
+        rotateSpeed={0.42}
+        zoomSpeed={0.45}
+        panSpeed={0.4}
         screenSpacePanning={false}
         touches={{ ONE: THREE.TOUCH.ROTATE, TWO: THREE.TOUCH.DOLLY_PAN }}
         minDistance={16}
