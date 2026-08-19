@@ -527,7 +527,7 @@ export default function GitCity3D({ weeks, merged, calendars, colors }: Props) {
           gl={{ antialias: false, alpha: false, powerPreference: "high-performance" }}
           onPointerMissed={() => setHover(null)}
         >
-          <AdaptiveDpr pixelated />
+          <AdaptiveDpr />
           <AdaptiveEvents />
           <Scene
             buildings={buildings}
