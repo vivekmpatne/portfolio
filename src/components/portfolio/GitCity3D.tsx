@@ -381,10 +381,10 @@ function Scene({
         enablePan
         enableZoom={zoomEnabled}
         enableDamping
-        dampingFactor={0.1}
-        rotateSpeed={0.55}
-        zoomSpeed={0.6}
-        panSpeed={0.5}
+        dampingFactor={0.045}
+        rotateSpeed={0.42}
+        zoomSpeed={0.45}
+        panSpeed={0.4}
         screenSpacePanning={false}
         touches={{ ONE: THREE.TOUCH.ROTATE, TWO: THREE.TOUCH.DOLLY_PAN }}
         minDistance={16}
@@ -523,11 +523,11 @@ export default function GitCity3D({ weeks, merged, calendars, colors }: Props) {
       >
         <Canvas
           camera={{ position: DEFAULT_CAM, fov: 42 }}
-          dpr={[1, 1.25]}
+          dpr={[1, 1.5]}
           gl={{ antialias: false, alpha: false, powerPreference: "high-performance" }}
           onPointerMissed={() => setHover(null)}
         >
-          <AdaptiveDpr pixelated />
+          <AdaptiveDpr />
           <AdaptiveEvents />
           <Scene
             buildings={buildings}

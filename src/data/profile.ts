@@ -20,7 +20,7 @@ export const profile = {
   // to hardcoded numbers.
   stats: {
     problemsSolved: 400,
-    linkedinConnections: 5000,
+    linkedinConnections: 6000,
   },
   openTo: [
     "Software Engineering Internships",
