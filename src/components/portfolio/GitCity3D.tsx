@@ -523,7 +523,7 @@ export default function GitCity3D({ weeks, merged, calendars, colors }: Props) {
       >
         <Canvas
           camera={{ position: DEFAULT_CAM, fov: 42 }}
-          dpr={[1, 1.25]}
+          dpr={[1, 1.5]}
           gl={{ antialias: false, alpha: false, powerPreference: "high-performance" }}
           onPointerMissed={() => setHover(null)}
         >
