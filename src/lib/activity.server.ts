@@ -106,6 +106,47 @@ export async function fetchGithub(username: string, year: number): Promise<Fetch
   for (const w of user.contributionsCollection.contributionCalendar.weeks) {
     for (const d of w.contributionDays) calendar[d.date] = d.contributionCount;
   }
+
+  // GitHub's contribution calendar only counts commits on default branches and
+  // lags for very recent activity, so recent days can read 0 even though the
+  // user pushed today. Backfill the last 7 days from the public events feed.
+  try {
+    const evRes = await fetch(
+      `https://api.github.com/users/${encodeURIComponent(username)}/events/public?per_page=100`,
+      {
+        headers: {
+          Accept: "application/vnd.github+json",
+          "User-Agent": "lovable-portfolio",
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    );
+    if (evRes.ok) {
+      const events: any = await evRes.json();
+      if (Array.isArray(events)) {
+        const cutoff = Date.now() - 7 * 24 * 60 * 60 * 1000;
+        const perDay: DayMap = {};
+        for (const e of events) {
+          const t = e?.created_at ? Date.parse(e.created_at) : NaN;
+          if (!Number.isFinite(t) || t < cutoff) continue;
+          // Same IST day boundary the streak logic uses.
+          const date = new Date(t + 5.5 * 60 * 60 * 1000).toISOString().slice(0, 10);
+          if (!date.startsWith(`${year}-`)) continue;
+          const n =
+            e?.type === "PushEvent"
+              ? (e?.payload?.commits?.length ?? e?.payload?.size ?? 1)
+              : 1;
+          perDay[date] = (perDay[date] ?? 0) + n;
+        }
+        for (const [date, n] of Object.entries(perDay)) {
+          calendar[date] = Math.max(calendar[date] ?? 0, n);
+        }
+      }
+    }
+  } catch (e) {
+    console.warn("[activity/github] events backfill failed", e);
+  }
+
   return {
     ok: true,
     calendar,
