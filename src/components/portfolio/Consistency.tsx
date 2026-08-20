@@ -71,7 +71,17 @@ export function Consistency() {
   const gfgFn = useServerFn(getGfgActivity);
   const tufFn = useServerFn(getTufActivity);
 
-  const opts = { staleTime: 10 * 60_000, retry: 1 as const };
+  // Keep the dashboard live: refetch every 5 min, on tab focus, on reconnect
+  // and on every mount, so a long-open tab still picks up today's activity.
+  const opts = {
+    staleTime: 5 * 60_000,
+    refetchInterval: 5 * 60_000,
+    refetchIntervalInBackground: false,
+    refetchOnWindowFocus: true as const,
+    refetchOnReconnect: true as const,
+    refetchOnMount: "always" as const,
+    retry: 1 as const,
+  };
   const queries = useQueries({
     queries: [
       { queryKey: ["activity", "github", github.username, year],       queryFn: () => ghFn({ data: { username: github.username, year } }), ...opts },
