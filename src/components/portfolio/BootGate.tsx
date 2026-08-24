@@ -38,6 +38,7 @@ export function BootGate() {
 
   // Decide visibility client-side only (avoids hydration mismatch).
   useEffect(() => {
+    console.log("BOOTDBG effect run");
     setMounted(true);
     let seen = false;
     try {
