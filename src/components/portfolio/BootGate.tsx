@@ -47,6 +47,7 @@ export function BootGate() {
       seen = false;
     }
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    console.log("BOOTDBG vals", seen, reduced);
     if (!seen && !reduced) {
       setShow(true);
       document.body.style.overflow = "hidden";
