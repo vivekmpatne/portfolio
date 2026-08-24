@@ -11,6 +11,7 @@ import { Contact } from "@/components/portfolio/Contact";
 import { Footer } from "@/components/portfolio/Footer";
 import { BackToTop } from "@/components/portfolio/BackToTop";
 import { TerminalOverlay } from "@/components/portfolio/TerminalOverlay";
+import { BootGate } from "@/components/portfolio/BootGate";
 import { profile } from "@/data/profile";
 
 const SITE_URL = "https://vivek-patne-portfolio.lovable.app";
