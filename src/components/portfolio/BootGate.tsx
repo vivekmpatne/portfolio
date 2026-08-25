@@ -130,6 +130,7 @@ export function BootGate() {
     return () => window.removeEventListener("keydown", onKey);
   }, [show, ready, dismiss]);
 
+  console.log("BOOTDBG render", mounted, show, leaving);
   if (!mounted || !show) return null;
 
   return (
