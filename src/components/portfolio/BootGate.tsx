@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { createPortal } from "react-dom";
 import { profile } from "@/data/profile";
 
 /**
@@ -39,7 +38,6 @@ export function BootGate() {
 
   // Decide visibility client-side only (avoids hydration mismatch).
   useEffect(() => {
-    console.log("BOOTDBG effect run");
     setMounted(true);
     let seen = false;
     try {
@@ -48,7 +46,6 @@ export function BootGate() {
       seen = false;
     }
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    console.log("BOOTDBG vals", seen, reduced);
     if (!seen && !reduced) {
       setShow(true);
       document.body.style.overflow = "hidden";
@@ -131,10 +128,8 @@ export function BootGate() {
     return () => window.removeEventListener("keydown", onKey);
   }, [show, ready, dismiss]);
 
-  console.log("BOOTDBG render", mounted, show, leaving, typeof document!=="undefined" ? document.querySelectorAll("[role=dialog]").length : -1);
   if (!mounted || !show) return null;
 
-  if (typeof window !== "undefined" && (window as any).__BOOTMIN) return createPortal(<div role="dialog" aria-label="System boot">MINIMAL</div>, document.body);
   return (
     <div
       role="dialog"
