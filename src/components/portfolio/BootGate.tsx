@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { profile } from "@/data/profile";
 
 /**
@@ -133,7 +134,7 @@ export function BootGate() {
   console.log("BOOTDBG render", mounted, show, leaving);
   if (!mounted || !show) return null;
 
-  if (typeof window !== "undefined" && (window as any).__BOOTMIN) return <div role="dialog" aria-label="System boot">MINIMAL</div>;
+  if (typeof window !== "undefined" && (window as any).__BOOTMIN) return createPortal(<div role="dialog" aria-label="System boot">MINIMAL</div>, document.body);
   return (
     <div
       role="dialog"
