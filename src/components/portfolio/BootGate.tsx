@@ -133,6 +133,7 @@ export function BootGate() {
   console.log("BOOTDBG render", mounted, show, leaving);
   if (!mounted || !show) return null;
 
+  if (typeof window !== "undefined" && (window as any).__BOOTMIN) return <div role="dialog" aria-label="System boot">MINIMAL</div>;
   return (
     <div
       role="dialog"
