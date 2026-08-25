@@ -120,6 +120,49 @@ async function codeforcesEvents(handle: string): Promise<FeedEvent[]> {
 
 const UNSUPPORTED = ["CodeChef", "HackerRank", "GeeksforGeeks", "TUF+"];
 
+function istDayKey(d: Date) {
+  const p = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Kolkata",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(d);
+  const g = (t: string) => p.find((x) => x.type === t)?.value ?? "01";
+  return `${g("year")}-${g("month")}-${g("day")}`;
+}
+
+/**
+ * GitHub's public events feed only exposes activity in public repos. Private
+ * commits still show up in the contribution calendar (heatmap), so summarise
+ * the last 7 calendar days that produced contributions but have no matching
+ * public event — otherwise the log looks stale next to a green heatmap cell.
+ */
+async function githubCalendarSummary(
+  username: string,
+  covered: Set<string>,
+): Promise<FeedEvent[]> {
+  const { fetchGithub } = await import("./activity.server");
+  const now = new Date();
+  const year = Number(istDayKey(now).slice(0, 4));
+  const out: FeedEvent[] = [];
+  const res = await fetchGithub(username, year);
+  if (!res.ok) return out;
+  for (let i = 0; i < 7; i++) {
+    const day = istDayKey(new Date(now.getTime() - i * 86400000));
+    const count = res.calendar[day] ?? 0;
+    if (!count || covered.has(day)) continue;
+    // Stamp at the end of that IST day, but never in the future.
+    const endOfDay = new Date(`${day}T23:59:00+05:30`);
+    const ts = endOfDay > now ? now : endOfDay;
+    out.push({
+      platform: "GitHub",
+      ts: ts.toISOString(),
+      text: `${count} contribution${count === 1 ? "" : "s"} (private / non-public repos)`,
+    });
+  }
+  return out;
+}
+
 export async function buildFeed(handles: {
   github: string;
   leetcode: string;
@@ -143,6 +186,16 @@ export async function buildFeed(handles: {
         note: true,
       });
   });
+
+  const coveredGithubDays = new Set(
+    events.filter((e) => e.platform === "GitHub" && !e.note).map((e) => istDayKey(new Date(e.ts))),
+  );
+  try {
+    events.push(...(await githubCalendarSummary(handles.github, coveredGithubDays)));
+  } catch {
+    /* calendar summary is best-effort */
+  }
+
 
   events.sort((a, b) => b.ts.localeCompare(a.ts));
 
