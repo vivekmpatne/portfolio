@@ -131,7 +131,7 @@ export function BootGate() {
     return () => window.removeEventListener("keydown", onKey);
   }, [show, ready, dismiss]);
 
-  console.log("BOOTDBG render", mounted, show, leaving);
+  console.log("BOOTDBG render", mounted, show, leaving, typeof document!=="undefined" ? document.querySelectorAll("[role=dialog]").length : -1);
   if (!mounted || !show) return null;
 
   if (typeof window !== "undefined" && (window as any).__BOOTMIN) return createPortal(<div role="dialog" aria-label="System boot">MINIMAL</div>, document.body);
