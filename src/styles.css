@@ -274,3 +274,68 @@
 .boot-overlay { display: none; }
 html.boot-pending .boot-overlay { display: flex; }
 html.boot-pending body { overflow: hidden; }
+
+/* ---------- Custom targeting-reticle cursor ---------- */
+html.has-reticle,
+html.has-reticle * {
+  cursor: none !important;
+}
+
+.reticle-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 2147483000;
+  pointer-events: none;
+}
+
+.reticle-ring {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 34px;
+  height: 34px;
+  border: 1px solid var(--phosphor);
+  border-radius: 9999px;
+  box-shadow:
+    0 0 10px color-mix(in oklab, var(--phosphor) 45%, transparent),
+    inset 0 0 8px color-mix(in oklab, var(--phosphor) 20%, transparent);
+  will-change: transform, opacity;
+  transition: opacity 150ms linear;
+}
+
+.reticle-tick {
+  position: absolute;
+  background: var(--phosphor);
+  box-shadow: 0 0 6px color-mix(in oklab, var(--phosphor) 55%, transparent);
+}
+.reticle-tick-t,
+.reticle-tick-b {
+  left: 50%;
+  width: 1px;
+  height: 7px;
+  margin-left: -0.5px;
+}
+.reticle-tick-t { top: -9px; }
+.reticle-tick-b { bottom: -9px; }
+.reticle-tick-l,
+.reticle-tick-r {
+  top: 50%;
+  height: 1px;
+  width: 7px;
+  margin-top: -0.5px;
+}
+.reticle-tick-l { left: -9px; }
+.reticle-tick-r { right: -9px; }
+
+.reticle-dot {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 4px;
+  border-radius: 9999px;
+  background: var(--phosphor);
+  box-shadow: 0 0 8px color-mix(in oklab, var(--phosphor) 75%, transparent);
+  will-change: transform;
+}
+

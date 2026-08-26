@@ -13,6 +13,7 @@ import { Toaster } from "sonner";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { BootGate } from "@/components/portfolio/BootGate";
+import { CursorReticle } from "@/components/portfolio/CursorReticle";
 
 function NotFoundComponent() {
   return (
