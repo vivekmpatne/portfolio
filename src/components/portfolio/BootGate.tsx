@@ -36,23 +36,12 @@ export function BootGate() {
   const [ready, setReady] = useState(false);
   const scrambleDone = useRef(false);
 
-  // Decide visibility client-side only (avoids hydration mismatch).
+  // The overlay markup ships with SSR and is hidden by CSS unless the
+  // pre-hydration script added `boot-pending` to <html> — so there is no flash
+  // of the page before the boot screen appears.
   useEffect(() => {
     setMounted(true);
-    let seen = false;
-    try {
-      seen = sessionStorage.getItem(SESSION_KEY) === "1";
-    } catch {
-      seen = false;
-    }
-    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (!seen && !reduced) {
-      setShow(true);
-      document.body.style.overflow = "hidden";
-    }
-    return () => {
-      document.body.style.overflow = "";
-    };
+    setShow(document.documentElement.classList.contains("boot-pending"));
   }, []);
 
   const dismiss = useCallback(() => {
@@ -65,9 +54,11 @@ export function BootGate() {
     }
     window.setTimeout(() => {
       setShow(false);
+      document.documentElement.classList.remove("boot-pending");
       document.body.style.overflow = "";
     }, 520);
   }, [leaving]);
+
 
   // Boot log sequence
   useEffect(() => {
@@ -128,14 +119,14 @@ export function BootGate() {
     return () => window.removeEventListener("keydown", onKey);
   }, [show, ready, dismiss]);
 
-  if (!mounted || !show) return null;
+  if (mounted && !show) return null;
 
   return (
     <div
       role="dialog"
       aria-label="System boot"
       onClick={ready ? dismiss : undefined}
-      className={`fixed inset-0 z-[100] flex items-center justify-center overflow-hidden bg-[#050d09] font-mono transition-all duration-500 ${
+      className={`boot-overlay fixed inset-0 z-[100] items-center justify-center overflow-hidden bg-[#050d09] font-mono transition-all duration-500 ${
         leaving ? "pointer-events-none opacity-0 blur-sm" : "opacity-100"
       }`}
       style={{ color: "#8affb4" }}
