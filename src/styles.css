@@ -267,3 +267,10 @@
   background: rgba(150, 255, 185, 0.75);
 }
 
+
+/* Boot splash: rendered in the SSR markup but hidden unless the pre-hydration
+   script marks the document as boot-pending. Prevents a flash of the page
+   before the boot screen mounts. */
+.boot-overlay { display: none; }
+html.boot-pending .boot-overlay { display: flex; }
+html.boot-pending body { overflow: hidden; }
