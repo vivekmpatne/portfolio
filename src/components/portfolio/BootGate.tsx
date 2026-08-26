@@ -119,14 +119,14 @@ export function BootGate() {
     return () => window.removeEventListener("keydown", onKey);
   }, [show, ready, dismiss]);
 
-  if (!mounted || !show) return null;
+  if (mounted && !show) return null;
 
   return (
     <div
       role="dialog"
       aria-label="System boot"
       onClick={ready ? dismiss : undefined}
-      className={`fixed inset-0 z-[100] flex items-center justify-center overflow-hidden bg-[#050d09] font-mono transition-all duration-500 ${
+      className={`boot-overlay fixed inset-0 z-[100] items-center justify-center overflow-hidden bg-[#050d09] font-mono transition-all duration-500 ${
         leaving ? "pointer-events-none opacity-0 blur-sm" : "opacity-100"
       }`}
       style={{ color: "#8affb4" }}
