@@ -13,6 +13,7 @@ import { Toaster } from "sonner";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { BootGate } from "@/components/portfolio/BootGate";
+import { CursorReticle } from "@/components/portfolio/CursorReticle";
 
 function NotFoundComponent() {
   return (
@@ -145,6 +146,7 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <BootGate />
+      <CursorReticle />
       <Outlet />
       <Toaster position="bottom-right" richColors />
     </QueryClientProvider>
