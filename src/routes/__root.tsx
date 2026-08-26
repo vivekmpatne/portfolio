@@ -119,7 +119,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 function RootShell({ children }: { children: ReactNode }) {
   // Pre-hydration theme bootstrap — avoids flash of light theme on first paint.
   // Defaults to dark; respects localStorage("theme") if set.
-  const themeBootstrap = `(function(){try{var t=localStorage.getItem('theme');var d=t?t==='dark':true;if(d)document.documentElement.classList.add('dark');}catch(e){document.documentElement.classList.add('dark');}})();`;
+  const themeBootstrap = `(function(){try{var t=localStorage.getItem('theme');var d=t?t==='dark':true;if(d)document.documentElement.classList.add('dark');}catch(e){document.documentElement.classList.add('dark');}try{var seen=sessionStorage.getItem('boot:v1')==='1';var reduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches;if(!seen&&!reduced)document.documentElement.classList.add('boot-pending');}catch(e){}})();`;
   return (
     <html lang="en" 
       className="scroll-pt-20"
