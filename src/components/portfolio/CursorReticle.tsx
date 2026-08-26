@@ -38,11 +38,18 @@ export function CursorReticle() {
     const onUp = () => (down.current = false);
 
     const tick = () => {
-      ring.current.x += (pos.current.x - ring.current.x) * 0.18;
-      ring.current.y += (pos.current.y - ring.current.y) * 0.18;
+      const k = 0.085; // lower = silkier ring lag
+      const dx = pos.current.x - ring.current.x;
+      const dy = pos.current.y - ring.current.y;
+      ring.current.x += dx * k;
+      ring.current.y += dy * k;
+
+      const speed = Math.hypot(dx, dy);
+      const tilt = Math.max(-12, Math.min(12, speed * 0.35));
+      const rotation = Math.atan2(dy, dx) * (180 / Math.PI);
       const scale = (hot.current ? 1.55 : 1) * (down.current ? 0.82 : 1);
       if (ringRef.current) {
-        ringRef.current.style.transform = `translate3d(${ring.current.x}px, ${ring.current.y}px, 0) translate(-50%, -50%) scale(${scale})`;
+        ringRef.current.style.transform = `translate3d(${ring.current.x}px, ${ring.current.y}px, 0) translate(-50%, -50%) rotate(${rotation}deg) rotateX(${tilt}deg) rotateY(${tilt * 0.6}deg) scale(${scale})`;
         ringRef.current.style.opacity = hot.current ? "1" : "0.75";
       }
       if (dotRef.current) {
