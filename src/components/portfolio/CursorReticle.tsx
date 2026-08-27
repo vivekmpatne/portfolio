@@ -26,6 +26,11 @@ export function CursorReticle() {
   useEffect(() => {
     if (!enabled) return;
     let raf = 0;
+    let lastT = performance.now();
+    const rot = { v: 0 };
+    const tilt = { v: 0 };
+    const scl = { v: 1 };
+    let lastHot: boolean | null = null;
 
     const onMove = (e: MouseEvent) => {
       pos.current.x = e.clientX;
