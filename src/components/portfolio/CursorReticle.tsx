@@ -28,7 +28,8 @@ export function CursorReticle() {
     let raf = 0;
 
     const onMove = (e: MouseEvent) => {
-      pos.current = { x: e.clientX, y: e.clientY };
+      pos.current.x = e.clientX;
+      pos.current.y = e.clientY;
       const t = e.target as HTMLElement | null;
       hot.current = !!t?.closest?.(
         'a, button, [role="button"], input, textarea, select, summary, canvas, [data-cursor="hot"]',
