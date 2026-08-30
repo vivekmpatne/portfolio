@@ -1,7 +1,6 @@
 import { useQueries } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { SiLeetcode, SiCodeforces, SiGithub } from "react-icons/si";
-import { FaLinkedin as SiLinkedin } from "react-icons/fa";
 import { profile } from "@/data/profile";
 import {
   getGithubActivity,

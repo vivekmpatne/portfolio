@@ -38,7 +38,7 @@ const achievements: Achievement[] = [
 export function Achievements() {
   return (
     <section id="achievements" className="mx-auto max-w-6xl px-6 py-20">
-      <SectionHeader title="Achievements" />
+      <SectionHeader title="Coding Profiles" />
 
       <div className="mb-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {achievements.map((a) => {
