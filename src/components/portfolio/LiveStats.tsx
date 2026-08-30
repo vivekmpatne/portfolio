@@ -155,14 +155,6 @@ export function LiveStats() {
               {Number(gh!.meta.repos ?? 0)}
               <span className="ml-1 text-xs font-normal text-muted-foreground">repos</span>
             </div>
-            <div className="mt-2 flex gap-3 text-xs text-muted-foreground">
-              <span>
-                <span className="font-semibold text-foreground">{Number(gh!.meta.followers ?? 0)}</span> followers
-              </span>
-              <span>
-                <span className="font-semibold text-foreground">{Number(gh!.meta.following ?? 0)}</span> following
-              </span>
-            </div>
             {gh!.meta.totalContributions != null && (
               <div className="mt-2 text-xs text-muted-foreground">
                 {Number(gh!.meta.totalContributions)} contributions in {year}
@@ -172,15 +164,6 @@ export function LiveStats() {
         ) : (
           <Unavailable />
         )}
-      </Card>
-
-      <Card icon={<SiLinkedin />} brand="#0A66C2" label="LinkedIn">
-        <div className="font-display text-2xl font-semibold">
-          {profile.stats.linkedinConnections}+
-        </div>
-        <div className="mt-1 text-xs text-muted-foreground">
-          Professional Connections
-        </div>
       </Card>
     </div>
   );
