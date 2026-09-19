@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { ChevronLeft, ChevronRight, ExternalLink, Github, Sparkles } from "lucide-react";
+import { ChevronLeft, ChevronRight, ExternalLink, Github, Play, Sparkles } from "lucide-react";
 import { projects, type Project } from "@/data/projects";
 import { SectionHeader } from "./SectionHeader";
 
@@ -188,6 +188,16 @@ function ProjectCard({ project }: { project: Project }) {
               className="inline-flex items-center gap-1.5 rounded-md bg-primary px-3 py-1.5 text-sm text-primary-foreground transition-opacity hover:opacity-90"
             >
               <ExternalLink className="h-4 w-4" /> Live
+            </a>
+          )}
+          {project.demoVideoUrl && (
+            <a
+              href={project.demoVideoUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 rounded-md border border-border px-3 py-1.5 text-sm transition-colors hover:bg-accent"
+            >
+              <Play className="h-4 w-4" /> Demo Video
             </a>
           )}
         </div>

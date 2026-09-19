@@ -19,6 +19,7 @@ export interface Project {
   techStack: string[];
   githubUrl: string | null;
   liveUrl: string | null;
+  demoVideoUrl?: string | null;
   status: ProjectStatus;
   statusDetail?: string;
   featured: boolean;
@@ -43,6 +44,8 @@ export const projects: Project[] = [
     ],
     githubUrl: "https://github.com/vivekmpatne/smart-drain-flood-warning-system",
     liveUrl: null,
+    demoVideoUrl:
+      "https://drive.google.com/file/d/1zJQG9QPFGXjYabdxMXgRPIjrd-HZ-JN9/view?usp=drive_link",
     status: "completed",
     statusDetail: "Sept 2026",
     featured: true,
