@@ -7,12 +7,14 @@ const statusLabel: Record<Project["status"], string> = {
   live: "Live",
   "in-progress": "Building",
   planned: "Planned",
+  completed: "Completed",
 };
 
 const statusDot: Record<Project["status"], string> = {
   live: "bg-green-500",
   "in-progress": "bg-amber-500",
   planned: "bg-slate-400",
+  completed: "bg-cyan-500",
 };
 
 export function Projects() {
@@ -111,7 +113,11 @@ export function Projects() {
 
 function ProjectCard({ project }: { project: Project }) {
   return (
-    <article className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-card transition-all hover:border-foreground/30 hover:shadow-xl md:grid md:grid-cols-2 md:gap-0">
+    <article
+      className={`group relative flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-card transition-all hover:border-foreground/30 hover:shadow-xl ${
+        project.image ? "md:grid md:grid-cols-2 md:gap-0" : ""
+      }`}
+    >
       {project.image && (
         <div className="relative overflow-hidden border-b border-border bg-secondary aspect-[16/10] md:aspect-auto md:border-b-0 md:border-r">
           {/* eslint-disable-next-line jsx-a11y/alt-text */}
@@ -136,12 +142,18 @@ function ProjectCard({ project }: { project: Project }) {
           <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-background px-2.5 py-0.5 text-xs text-muted-foreground">
             <span className={`h-1.5 w-1.5 rounded-full ${statusDot[project.status]}`} />
             {statusLabel[project.status]}
+            {project.statusDetail ? ` — ${project.statusDetail}` : ""}
           </span>
         </div>
 
         <h3 className="font-display font-semibold text-2xl md:text-3xl">
           {project.title}
         </h3>
+        {project.subtitle && (
+          <p className="mt-1 text-sm font-medium text-foreground/80">
+            {project.subtitle}
+          </p>
+        )}
         <p className="mt-2 flex-1 text-sm leading-relaxed text-muted-foreground">
           {project.description}
         </p>
@@ -165,7 +177,7 @@ function ProjectCard({ project }: { project: Project }) {
               rel="noopener noreferrer"
               className="inline-flex items-center gap-1.5 rounded-md border border-border px-3 py-1.5 text-sm transition-colors hover:bg-accent"
             >
-              <Github className="h-4 w-4" /> Code
+              <Github className="h-4 w-4" /> View on GitHub
             </a>
           )}
           {project.liveUrl && (

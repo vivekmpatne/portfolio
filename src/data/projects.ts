@@ -9,21 +9,45 @@
 //
 // Zero component changes are needed to add more projects — just push here.
 // ============================================================
-export type ProjectStatus = "live" | "in-progress" | "planned";
+export type ProjectStatus = "live" | "in-progress" | "planned" | "completed";
 
 export interface Project {
   id: string;
   title: string;
+  subtitle?: string;
   description: string;
   techStack: string[];
   githubUrl: string | null;
   liveUrl: string | null;
   status: ProjectStatus;
+  statusDetail?: string;
   featured: boolean;
   image?: string | null;
 }
 
 export const projects: Project[] = [
+  {
+    id: "intelligent-water-clogging-flood-prevention",
+    title: "Intelligent Water Clogging and Flood Prevention Using Real-Time Data",
+    subtitle: "SIC IoT Capstone — Samsung Innovation Campus 2026",
+    description:
+      "IoT-based real-time flood early warning system for Bengaluru urban drains. Monitors drain water level using an HC-SR04 ultrasonic sensor, calculates rate of rise using EMA smoothing, and combines OpenWeatherMap weather data for flood risk prediction. Includes four auto-escalating alert states (Normal, Watch, Alert, and Critical), control-room email alerts, and a citizen reporting dashboard.",
+    techStack: [
+      "ESP32",
+      "MQTT",
+      "Node-RED",
+      "FlowFuse Dashboard 2.0",
+      "OpenWeatherMap API",
+      "Python",
+      "JavaScript",
+    ],
+    githubUrl: null,
+    liveUrl: null,
+    status: "completed",
+    statusDetail: "Sept 2026",
+    featured: true,
+    image: null,
+  },
   {
     id: "dsa-tracker",
     title: "DSA Tracker",

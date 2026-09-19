@@ -17,7 +17,7 @@ export const timeline: TimelineEntry[] = [
     type: "experience",
     title: "IoT Trainee — Samsung Innovation Campus",
     organization: "In collaboration with Samsung R&D Institute Bangalore",
-    duration: "Aug 2026 — Present",
+    duration: "Aug 2026 — Sept 2026 · 1.5 months",
     details:
       "Selected for a 245-hour IoT training program covering Raspberry Pi, Linux, networking protocols (TCP/IP, MQTT), Git/GitHub, and Node.js. Working toward an industry-oriented capstone project.",
   },
