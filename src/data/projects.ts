@@ -46,7 +46,7 @@ export const projects: Project[] = [
     status: "completed",
     statusDetail: "Sept 2026",
     featured: true,
-    image: "/__l5e/assets-v1/876f1f0a-5c9e-4e91-91e1-2fd481f5ff50/smart-drain-dashboard.png",
+    image: "/__l5e/assets-v1/8dbb4596-357c-4ad1-8ec2-57cae5ce2196/smart-drain-dashboard.png",
   },
   {
     id: "chefkart",
