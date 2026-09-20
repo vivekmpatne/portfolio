@@ -30,7 +30,7 @@ export const profile = {
   ],
   // Legacy handles — kept for backwards compat with LiveStats
   handles: {
-    leetcode: "vivekpatnem",
+    leetcode: "showyourid",
     codeforces: "vivekpatnem",
     github: "vivekmpatne",
   },
@@ -39,7 +39,7 @@ export const profile = {
     github:      { username: "vivekmpatne",  url: "https://github.com/vivekmpatne" },
 
     linkedin:    { username: "vivekpatnem",  url: "https://www.linkedin.com/in/vivekpatnem/" },
-    leetcode:    { username: "vivekpatnem",  url: "https://leetcode.com/u/vivekpatnem/" },
+    leetcode:    { username: "showyourid",    url: "https://leetcode.com/u/showyourid/" },
     codeforces:  { username: "vivekpatnem",  url: "https://codeforces.com/profile/vivekpatnem" },
     codechef:    { username: "vivekpatnem",  url: "https://www.codechef.com/users/vivekpatnem" },
     gfg:         { username: "vivekpcom8",   url: "https://www.geeksforgeeks.org/user/vivekpcom8" },
