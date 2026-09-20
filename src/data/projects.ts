@@ -43,7 +43,6 @@ export const projects: Project[] = [
       "Node-RED",
       "FlowFuse Dashboard 2.0",
       "OpenWeatherMap API",
-      "Python",
       "JavaScript",
     ],
     githubUrl: "https://github.com/vivekmpatne/smart-drain-flood-warning-system",
