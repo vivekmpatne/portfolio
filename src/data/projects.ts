@@ -23,6 +23,10 @@ export interface Project {
   status: ProjectStatus;
   statusDetail?: string;
   featured: boolean;
+  /** Optional badge label, e.g. "SIC Mini Project". */
+  label?: string;
+  /** "learning" marks a secondary/learning project (shown with its own badge). */
+  category?: "main" | "learning";
   image?: string | null;
 }
 
@@ -62,6 +66,24 @@ export const projects: Project[] = [
     status: "in-progress",
     featured: true,
     image: null,
+  },
+  {
+    id: "homeos-smart-home-automation",
+    title: "HomeOS — Smart Home Automation",
+    subtitle: "ESP32 + WebSocket + HTTP Dashboard",
+    description:
+      "A compact smart-home prototype built during Samsung Innovation Campus IoT program. Controls 4 room LEDs from a web dashboard with real-time temperature and humidity monitoring using DHT11. Demonstrates HTTP for control requests and WebSocket for live state synchronization.",
+    techStack: ["ESP32", "WebSocket", "HTTP", "DHT11", "JavaScript"],
+    githubUrl: "https://github.com/vivekmpatne/Home_OS/tree/main",
+    liveUrl: null,
+    demoVideoUrl:
+      "https://drive.google.com/drive/folders/19Udw4bOgJWFc6ZZxo3cJ439hi3jMLoxB?usp=drive_link",
+    status: "completed",
+    statusDetail: "SIC 2026",
+    featured: false,
+    label: "SIC Mini Project",
+    category: "learning",
+    image: "/__l5e/assets-v1/68a4c6f3-ff56-403a-8686-1f11486e10df/homeos-dashboard.png",
   },
   // ────────────────────────────────────────────────────────────
   // 👇 FUTURE PROJECTS — append new objects here (IoT, MERN, etc.).

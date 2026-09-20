@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { ChevronLeft, ChevronRight, ExternalLink, Github, Play, Sparkles } from "lucide-react";
+import { BookOpen, ChevronLeft, ChevronRight, ExternalLink, Github, Play, Sparkles } from "lucide-react";
 import { projects, type Project } from "@/data/projects";
 import { SectionHeader } from "./SectionHeader";
 
@@ -134,9 +134,19 @@ function ProjectCard({ project }: { project: Project }) {
 
       <div className="flex flex-1 flex-col p-7 md:p-8">
         <div className="mb-3 flex flex-wrap items-center gap-2">
+          {project.category === "learning" && (
+            <span className="inline-flex items-center gap-1 rounded-full border border-border bg-accent px-2.5 py-0.5 text-[10px] font-medium uppercase tracking-wider">
+              <BookOpen className="h-3 w-3" /> Learning Project
+            </span>
+          )}
           {project.featured && (
             <span className="inline-flex items-center gap-1 rounded-full border border-border bg-accent px-2.5 py-0.5 text-[10px] font-medium uppercase tracking-wider">
               <Sparkles className="h-3 w-3" /> Featured
+            </span>
+          )}
+          {project.label && (
+            <span className="inline-flex items-center rounded-full border border-border bg-background px-2.5 py-0.5 text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
+              {project.label}
             </span>
           )}
           <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-background px-2.5 py-0.5 text-xs text-muted-foreground">
