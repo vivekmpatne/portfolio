@@ -5,7 +5,7 @@ import { z } from "zod";
 
 export const ALLOWED_USERNAMES = {
   github: new Set(["vivekmpatne"]),
-  leetcode: new Set(["vivekpatnem"]),
+  leetcode: new Set(["showyourid"]),
   codeforces: new Set(["vivekpatnem"]),
   codechef: new Set(["vivekpatnem"]),
   hackerrank: new Set(["vivekpatnem"]),

@@ -15,7 +15,7 @@ export const links = {
   discord: "__v1v3k", // username only
 
   // Coding profiles
-  leetcode: "https://leetcode.com/u/vivekpatnem",
+  leetcode: "https://leetcode.com/u/showyourid",
   codeforces: "https://codeforces.com/profile/vivekpatnem",
   codechef: "https://www.codechef.com/users/vivekpatnem",
   gfg: "https://www.geeksforgeeks.org/user/vivekpcom8",
