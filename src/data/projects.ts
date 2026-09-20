@@ -56,18 +56,6 @@ export const projects: Project[] = [
     image: "/__l5e/assets-v1/8dbb4596-357c-4ad1-8ec2-57cae5ce2196/smart-drain-dashboard.png",
   },
   {
-    id: "chefkart",
-    title: "ChefKart",
-    description:
-      "Full-stack food delivery platform with role-based dashboards (user, chef, admin) and Razorpay payment integration. Full-stack food delivery platform — deploying soon.",
-    techStack: ["React", "Node.js", "Express", "MongoDB", "Razorpay", "JWT"],
-    githubUrl: null,
-    liveUrl: null,
-    status: "in-progress",
-    featured: true,
-    image: null,
-  },
-  {
     id: "homeos-smart-home-automation",
     title: "HomeOS — Smart Home Automation",
     subtitle: "ESP32 + WebSocket + HTTP Dashboard",
