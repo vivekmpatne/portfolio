@@ -28,14 +28,19 @@ export function Projects() {
   const trackRef = useRef<HTMLDivElement>(null);
   const [index, setIndex] = useState(0);
 
-  const scrollTo = useCallback((i: number) => {
-    const track = trackRef.current;
-    if (!track) return;
-    const clamped = Math.max(0, Math.min(i, ordered.length - 1));
-    const child = track.children[clamped] as HTMLElement | undefined;
-    if (child) track.scrollTo({ left: child.offsetLeft, behavior: "smooth" });
-    setIndex(clamped);
-  }, [ordered.length]);
+  const scrollTo = useCallback(
+    (i: number) => {
+      const track = trackRef.current;
+      if (!track) return;
+      // Wrap around: next past the last project loops back to the first.
+      const n = ordered.length;
+      const next = ((i % n) + n) % n;
+      const child = track.children[next] as HTMLElement | undefined;
+      if (child) track.scrollTo({ left: child.offsetLeft, behavior: "smooth" });
+      setIndex(next);
+    },
+    [ordered.length]
+  );
 
   useEffect(() => {
     const track = trackRef.current;
@@ -66,8 +71,7 @@ export function Projects() {
             type="button"
             aria-label="Previous project"
             onClick={() => scrollTo(index - 1)}
-            disabled={index === 0}
-            className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-border transition-colors hover:bg-accent disabled:opacity-40"
+            className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-border transition-colors hover:bg-accent"
           >
             <ChevronLeft className="h-4 w-4" />
           </button>
@@ -75,8 +79,7 @@ export function Projects() {
             type="button"
             aria-label="Next project"
             onClick={() => scrollTo(index + 1)}
-            disabled={index >= ordered.length - 1}
-            className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-border transition-colors hover:bg-accent disabled:opacity-40"
+            className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-border transition-colors hover:bg-accent"
           >
             <ChevronRight className="h-4 w-4" />
           </button>
