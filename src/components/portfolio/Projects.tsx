@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { BookOpen, ChevronLeft, ChevronRight, ExternalLink, Github, Play, Sparkles } from "lucide-react";
 import { projects, type Project } from "@/data/projects";
 import { SectionHeader } from "./SectionHeader";
@@ -17,50 +17,27 @@ const statusDot: Record<Project["status"], string> = {
   completed: "bg-cyan-500",
 };
 
+const GAP_PX = 20; // keep in sync with gap-5 below
+
 export function Projects() {
-  // Horizontal slider: one project at a time, arrows slide the next/previous
-  // card into the middle. Keeps the page short as more projects are added.
+  // Transform-based carousel: one project at a time, arrows slide the
+  // next/previous card into the middle. GPU-composited translate + easing
+  // makes the motion buttery smooth (no native scroll jank), and it wraps
+  // around infinitely (next past the last loops back to the first).
   const ordered = [
     ...projects.filter((p) => p.featured),
     ...projects.filter((p) => !p.featured),
   ];
+  const count = ordered.length;
 
-  const trackRef = useRef<HTMLDivElement>(null);
   const [index, setIndex] = useState(0);
-
-  const scrollTo = useCallback(
-    (i: number) => {
-      const track = trackRef.current;
-      if (!track) return;
-      // Wrap around: next past the last project loops back to the first.
-      const n = ordered.length;
-      const next = ((i % n) + n) % n;
-      const child = track.children[next] as HTMLElement | undefined;
-      if (child) track.scrollTo({ left: child.offsetLeft, behavior: "smooth" });
-      setIndex(next);
-    },
-    [ordered.length]
+  const goTo = useCallback(
+    (i: number) => setIndex(((i % count) + count) % count),
+    [count]
   );
 
-  useEffect(() => {
-    const track = trackRef.current;
-    if (!track) return;
-    const onScroll = () => {
-      const children = Array.from(track.children) as HTMLElement[];
-      let best = 0;
-      let bestDist = Infinity;
-      children.forEach((c, i) => {
-        const d = Math.abs(c.offsetLeft - track.scrollLeft);
-        if (d < bestDist) {
-          bestDist = d;
-          best = i;
-        }
-      });
-      setIndex(best);
-    };
-    track.addEventListener("scroll", onScroll, { passive: true });
-    return () => track.removeEventListener("scroll", onScroll);
-  }, []);
+  // Light touch-swipe support so mobile still feels natural.
+  const touchStartX = useRef<number | null>(null);
 
   return (
     <section id="projects" className="mx-auto max-w-6xl px-6 py-20">
@@ -70,7 +47,7 @@ export function Projects() {
           <button
             type="button"
             aria-label="Previous project"
-            onClick={() => scrollTo(index - 1)}
+            onClick={() => goTo(index - 1)}
             className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-border transition-colors hover:bg-accent"
           >
             <ChevronLeft className="h-4 w-4" />
@@ -78,7 +55,7 @@ export function Projects() {
           <button
             type="button"
             aria-label="Next project"
-            onClick={() => scrollTo(index + 1)}
+            onClick={() => goTo(index + 1)}
             className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-border transition-colors hover:bg-accent"
           >
             <ChevronRight className="h-4 w-4" />
@@ -87,14 +64,36 @@ export function Projects() {
       </div>
 
       <div
-        ref={trackRef}
-        className="flex snap-x snap-mandatory gap-5 overflow-x-auto scroll-smooth pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        className="overflow-hidden"
+        onTouchStart={(e) => {
+          touchStartX.current = e.touches[0].clientX;
+        }}
+        onTouchEnd={(e) => {
+          if (touchStartX.current === null) return;
+          const dx = e.changedTouches[0].clientX - touchStartX.current;
+          touchStartX.current = null;
+          if (Math.abs(dx) > 50) goTo(index + (dx < 0 ? 1 : -1));
+        }}
       >
-        {ordered.map((p) => (
-          <div key={p.id} className="w-full shrink-0 snap-start">
-            <ProjectCard project={p} />
-          </div>
-        ))}
+        <div
+          className="flex gap-5 will-change-transform"
+          style={{
+            transform: `translateX(calc(-${index * 100}% - ${index * GAP_PX}px))`,
+            transition: "transform 600ms cubic-bezier(0.22, 1, 0.36, 1)",
+          }}
+        >
+          {ordered.map((p, i) => (
+            <div
+              key={p.id}
+              className={`w-full shrink-0 transition-opacity duration-500 ${
+                i === index ? "opacity-100" : "opacity-40"
+              }`}
+              aria-hidden={i !== index}
+            >
+              <ProjectCard project={p} />
+            </div>
+          ))}
+        </div>
       </div>
 
       <div className="mt-5 flex justify-center gap-2">
@@ -103,7 +102,7 @@ export function Projects() {
             key={p.id}
             type="button"
             aria-label={`Go to ${p.title}`}
-            onClick={() => scrollTo(i)}
+            onClick={() => goTo(i)}
             className={`h-1.5 rounded-full transition-all ${
               i === index ? "w-6 bg-foreground" : "w-1.5 bg-border"
             }`}
