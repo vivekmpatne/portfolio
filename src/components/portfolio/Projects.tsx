@@ -1,5 +1,5 @@
 import { useCallback, useRef, useState } from "react";
-import { BookOpen, ChevronLeft, ChevronRight, ExternalLink, Github, Play, Sparkles } from "lucide-react";
+import { Award, BookOpen, ChevronLeft, ChevronRight, ExternalLink, Github, Play, Sparkles } from "lucide-react";
 import { projects, type Project } from "@/data/projects";
 import { SectionHeader } from "./SectionHeader";
 
@@ -161,6 +161,19 @@ function ProjectCard({ project }: { project: Project }) {
         <h3 className="font-display font-semibold text-2xl md:text-3xl">
           {project.title}
         </h3>
+        {project.highlight && (
+          <div className="mt-3 rounded-lg border border-foreground/20 bg-accent/60 px-3.5 py-2.5">
+            <p className="flex items-center gap-2 text-sm font-semibold">
+              <Award className="h-4 w-4 shrink-0" />
+              {project.highlight}
+            </p>
+            {project.highlightDetail && (
+              <p className="mt-1 pl-6 text-xs text-muted-foreground">
+                {project.highlightDetail}
+              </p>
+            )}
+          </div>
+        )}
         {project.subtitle && (
           <p className="mt-1 text-sm font-medium text-foreground/80">
             {project.subtitle}

@@ -15,6 +15,10 @@ export interface Project {
   id: string;
   title: string;
   subtitle?: string;
+  /** Prominent achievement highlight shown as a badge below the title. */
+  highlight?: string;
+  /** Supporting detail line shown under the highlight badge. */
+  highlightDetail?: string;
   description: string;
   techStack: string[];
   githubUrl: string | null;
@@ -35,6 +39,9 @@ export const projects: Project[] = [
     id: "intelligent-water-clogging-flood-prevention",
     title: "Intelligent Water Clogging and Flood Prevention Using Real-Time Data",
     subtitle: "SIC IoT Capstone — Samsung Innovation Campus 2026",
+    highlight: "Selected for Paper Publication & Patent",
+    highlightDetail:
+      "Samsung Innovation Campus IoT 2026 — 12 of 20 teams shortlisted",
     description:
       "IoT-based real-time flood early warning system for Bengaluru urban drains. Monitors drain water level using an HC-SR04 ultrasonic sensor, calculates rate of rise using EMA smoothing, and combines OpenWeatherMap weather data for flood risk prediction. Includes four auto-escalating alert states (Normal, Watch, Alert, and Critical), control-room email alerts, and a citizen reporting dashboard.",
     techStack: [
