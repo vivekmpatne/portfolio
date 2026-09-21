@@ -1,5 +1,5 @@
 import { useCallback, useRef, useState } from "react";
-import { BookOpen, ChevronLeft, ChevronRight, ExternalLink, Github, Play, Sparkles } from "lucide-react";
+import { Award, BookOpen, ChevronLeft, ChevronRight, ExternalLink, Github, Play, Sparkles } from "lucide-react";
 import { projects, type Project } from "@/data/projects";
 import { SectionHeader } from "./SectionHeader";
 
