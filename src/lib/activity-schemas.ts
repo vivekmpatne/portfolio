@@ -10,7 +10,7 @@ export const ALLOWED_USERNAMES = {
   codechef: new Set(["vivekpatnem"]),
   hackerrank: new Set(["vivekpatnem"]),
   gfg: new Set(["vivekpcom8"]),
-  tuf: new Set(["Vivek_paten_25"]),
+  tuf: new Set(["vivek_patne"]),
 } as const;
 
 const makeSchema = (allowed: ReadonlySet<string>) =>
