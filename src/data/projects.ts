@@ -39,7 +39,7 @@ export const projects: Project[] = [
     id: "intelligent-water-clogging-flood-prevention",
     title: "Intelligent Water Clogging and Flood Prevention Using Real-Time Data",
     subtitle: "SIC IoT Capstone — Samsung Innovation Campus 2026",
-    highlight: "Selected for Paper Publication & Patent",
+    highlight: "Selected for Paper Publication",
     highlightDetail:
       "Samsung Innovation Campus IoT 2026 — 12 of 20 teams shortlisted",
     description:
