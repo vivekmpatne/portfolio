@@ -365,7 +365,7 @@ git grep -n -E "ghp_|github_pat_|SUPABASE_SERVICE_ROLE|PRIVATE_KEY|re_[a-zA-Z0-9
 Computer Science & Engineering (Data Science)
 RNS Institute of Technology, Bengaluru
 
-- Email: vivekpatnem@gmail.com
+- Email: vivekpatne.dev@gmail.com
 - LinkedIn: linkedin.com/in/vivekpatnem
 - GitHub: github.com/vivekmpatne
 - LeetCode: leetcode.com/u/vivekpatnem
