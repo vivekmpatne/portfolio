@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import { profile } from "@/data/profile";
 
 const contactInput = z.object({
   name: z.string().min(1).max(200),
@@ -15,7 +16,7 @@ export const sendContactEmail = createServerFn({ method: "POST" })
 
     const escape = (s: string) =>
       s.replace(/[&<>"']/g, (c) =>
-        ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]!),
+        ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c] ?? c),
       );
 
     const html = `
@@ -36,7 +37,7 @@ export const sendContactEmail = createServerFn({ method: "POST" })
       },
       body: JSON.stringify({
         from: "Vivek Portfolio <contact@vivekpatne.me>",
-        to: ["vivekpatnem@gmail.com"],
+        to: [profile.email],
         reply_to: data.email,
         subject: `Portfolio contact from ${data.name}`,
         html,

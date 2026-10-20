@@ -10,7 +10,7 @@ export const profile = {
   bio: "Computer Science & Engineering (Data Science), RNS Institute of Technology, Bengaluru — 2028 graduate. Focused on Data Structures & Algorithms, Full-Stack Development, and building real-world software products.",
   location: "Bengaluru, India",
   avatar: avatarAsset.url,
-  email: "vivekpatnem@gmail.com",
+  email: "vivekpatne.dev@gmail.com",
 
   // Manually-maintained stats.
   //   • linkedinConnections — LinkedIn has no public API; edit here to update the card.
