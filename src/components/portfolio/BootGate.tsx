@@ -17,7 +17,7 @@ const BOOT_LINES: Array<{ text: string; status?: string; ms: number }> = [
   { text: "kernel: phosphor-crt 3.1.4-vivek #1 SMP ...", status: "OK", ms: 110 },
   { text: "mount /dev/portfolio on / (ext4,rw) .......", status: "OK", ms: 100 },
   { text: "fsck /home/vivek ... 0 bad sectors ........", status: "OK", ms: 130 },
-  { text: "modprobe dsa_engine  (400+ problems) ......", status: "OK", ms: 110 },
+  { text: "modprobe dsa_engine  (500+ problems) ......", status: "OK", ms: 110 },
   { text: "net: linking github/leetcode/codeforces ...", status: "UP", ms: 140 },
   { text: "svc: activity-daemon  streak tracker ......", status: "OK", ms: 110 },
   { text: "svc: shell  (press ` anywhere) ............", status: "OK", ms: 100 },
