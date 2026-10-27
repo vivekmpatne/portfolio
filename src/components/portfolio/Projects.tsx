@@ -114,6 +114,8 @@ export function Projects() {
 }
 
 function ProjectCard({ project }: { project: Project }) {
+  const [showSecondary, setShowSecondary] = useState(false);
+  const currentImage = showSecondary && project.secondaryImage ? project.secondaryImage : project.image;
   return (
     <article
       className={`group relative flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-card transition-all hover:border-foreground/30 hover:shadow-xl ${
@@ -124,13 +126,29 @@ function ProjectCard({ project }: { project: Project }) {
         <div className="relative overflow-hidden border-b border-border bg-secondary aspect-[16/10] md:aspect-auto md:border-b-0 md:border-r">
           {/* eslint-disable-next-line jsx-a11y/alt-text */}
           <img
-            src={project.image}
-            alt={project.title}
+            src={currentImage ?? undefined}
+            alt={`${project.title} — ${showSecondary ? project.secondaryImageLabel ?? "secondary" : project.imageLabel ?? "screenshot"}`}
             className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
             onError={(e) => {
               (e.currentTarget.parentElement as HTMLElement).style.display = "none";
             }}
           />
+          {project.secondaryImage && (
+            <div className="absolute bottom-3 left-3 flex gap-1 rounded-md border border-border bg-background/90 p-1 text-xs backdrop-blur">
+              {[false, true].map((sec) => (
+                <button
+                  key={String(sec)}
+                  type="button"
+                  onClick={() => setShowSecondary(sec)}
+                  className={`rounded px-2 py-0.5 transition-colors ${
+                    showSecondary === sec ? "bg-primary text-primary-foreground" : "hover:bg-accent"
+                  }`}
+                >
+                  {sec ? project.secondaryImageLabel ?? "Secondary" : project.imageLabel ?? "Primary"}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       )}
 
@@ -195,16 +213,6 @@ function ProjectCard({ project }: { project: Project }) {
         </div>
 
         <div className="mt-6 flex flex-wrap gap-2">
-          {project.githubUrl && (
-            <a
-              href={project.githubUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 rounded-md border border-border px-3 py-1.5 text-sm transition-colors hover:bg-accent"
-            >
-              <Github className="h-4 w-4" /> View on GitHub
-            </a>
-          )}
           {project.liveUrl && (
             <a
               href={project.liveUrl}
@@ -212,7 +220,27 @@ function ProjectCard({ project }: { project: Project }) {
               rel="noopener noreferrer"
               className="inline-flex items-center gap-1.5 rounded-md bg-primary px-3 py-1.5 text-sm text-primary-foreground transition-opacity hover:opacity-90"
             >
-              <ExternalLink className="h-4 w-4" /> Live
+              <ExternalLink className="h-4 w-4" /> {project.liveLabel ?? "Live"}
+            </a>
+          )}
+          {project.githubUrl && (
+            <a
+              href={project.githubUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 rounded-md border border-border px-3 py-1.5 text-sm transition-colors hover:bg-accent"
+            >
+              <Github className="h-4 w-4" /> {project.githubLabel ?? "View on GitHub"}
+            </a>
+          )}
+          {project.extraRepoUrl && (
+            <a
+              href={project.extraRepoUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 rounded-md border border-border px-3 py-1.5 text-sm transition-colors hover:bg-accent"
+            >
+              <Github className="h-4 w-4" /> {project.extraRepoLabel ?? "Code"}
             </a>
           )}
           {project.demoVideoUrl && (
@@ -222,7 +250,7 @@ function ProjectCard({ project }: { project: Project }) {
               rel="noopener noreferrer"
               className="inline-flex items-center gap-1.5 rounded-md border border-border px-3 py-1.5 text-sm transition-colors hover:bg-accent"
             >
-              <Play className="h-4 w-4" /> Demo Video
+              <Play className="h-4 w-4" /> {project.demoVideoLabel ?? "Demo Video"}
             </a>
           )}
         </div>

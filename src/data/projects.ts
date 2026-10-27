@@ -24,6 +24,19 @@ export interface Project {
   githubUrl: string | null;
   liveUrl: string | null;
   demoVideoUrl?: string | null;
+  /** Button text for the demo video link (default "Demo Video"). */
+  demoVideoLabel?: string;
+  /** Button text for the live link (default "Live"). */
+  liveLabel?: string;
+  /** Button text for the main GitHub link (default "View on GitHub"). */
+  githubLabel?: string;
+  /** Optional second repo, e.g. the web simulation code. */
+  extraRepoUrl?: string | null;
+  extraRepoLabel?: string;
+  /** Labels for the primary/secondary screenshots when both exist. */
+  imageLabel?: string;
+  secondaryImage?: string | null;
+  secondaryImageLabel?: string;
   status: ProjectStatus;
   statusDetail?: string;
   featured: boolean;
