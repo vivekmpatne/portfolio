@@ -48,7 +48,7 @@ export const profile = {
     tuf:         { username: "vivek_patne",  url: "https://takeuforward.org/profile/vivek_patne" },
     codolio:     { username: "Viwake",       url: "https://codolio.com/profile/Viwake" },
   },
-  // Resume PDF / Google Drive public link. Paste the URL here when ready.
-  // Leave null to hide the Resume action everywhere.
-  resumeUrl: null as string | null,
+  // Replace with a public PDF URL when the final resume is ready.
+  // The Resume actions remain visible and report when the PDF is unavailable.
+  resumeUrl: "/resume.pdf" as string | null,
 };
