@@ -1,22 +1,25 @@
+const ORDER = [
+  "about",
+  "skills",
+  "projects",
+  "experience & education",
+  "coding profiles",
+  "consistency",
+  "contact",
+];
+
 export function SectionHeader({ title, subtitle }: { title: string; subtitle?: string }) {
-  const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_|_$/g, "");
+  const idx = ORDER.indexOf(title.toLowerCase());
+  const num = idx >= 0 ? String(idx + 1).padStart(2, "0") : null;
   return (
-    <div className="mb-10">
-      <div className="flex items-center gap-2 text-xs text-muted-foreground">
-        <span className="phosphor-glow">guest@vivek</span>
-        <span className="opacity-60">:</span>
-        <span className="opacity-70">~/portfolio</span>
-        <span className="phosphor-glow">$</span>
-        <span className="text-foreground/90">cat {slug}.md</span>
+    <div className="mb-12">
+      <div className="flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.2em] text-primary">
+        {num && <span>{num}</span>}
+        <span className="h-px w-8 bg-primary/40" />
+        <span className="text-muted-foreground">{title}</span>
       </div>
-      <h2 className="mt-3 font-display text-4xl md:text-5xl leading-none tracking-wide">
-        <span className="phosphor-glow">#</span>{" "}
-        <span className="text-foreground">{title}</span>
-      </h2>
-      {subtitle ? (
-        <p className="mt-2 text-sm text-muted-foreground">// {subtitle}</p>
-      ) : null}
-      <div className="mt-4 h-px w-full bg-[repeating-linear-gradient(to_right,color-mix(in_oklab,var(--phosphor)_55%,transparent)_0_6px,transparent_6px_12px)]" />
+      <h2 className="mt-4 text-4xl font-bold tracking-tight md:text-5xl">{title}</h2>
+      {subtitle ? <p className="mt-3 max-w-2xl text-muted-foreground">{subtitle}</p> : null}
     </div>
   );
 }
