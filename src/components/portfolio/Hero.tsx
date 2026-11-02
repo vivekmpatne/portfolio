@@ -5,7 +5,6 @@ import { profile } from "@/data/profile";
 import { SocialIcons } from "./SocialIcons";
 import { useResumeAvailable } from "@/hooks/use-resume-available";
 import { PuzzleAvatar } from "./PuzzleAvatar";
-import { toast } from "sonner";
 
 const ROLES = [
   "Aspiring Software Engineer",
@@ -27,7 +26,6 @@ const STATS = [
 export function Hero() {
   const resumeUrl = profile.resumeUrl;
   const resumeAvailable = useResumeAvailable();
-  const handleResumeClick = () => toast.info("Resume will be updated shortly");
   const [rIndex, setRIndex] = useState(0);
   const [visible, setVisible] = useState(true);
 
@@ -91,17 +89,13 @@ export function Hero() {
                 View Projects <ArrowRight className="ml-1 h-4 w-4" />
               </a>
             </Button>
-            {resumeUrl && (resumeAvailable ? (
+            {resumeUrl && resumeAvailable && (
               <Button asChild size="lg" variant="outline" className="rounded-full border-primary/30 bg-primary/10 px-6 text-primary shadow-sm transition-all duration-300 hover:border-primary/50 hover:bg-primary/20">
                 <a href={resumeUrl} target="_blank" rel="noopener noreferrer" download>
                   <FileText className="mr-1 h-4 w-4" /> Resume
                 </a>
               </Button>
-            ) : (
-              <Button type="button" size="lg" variant="outline" onClick={handleResumeClick} className="rounded-full border-primary/30 bg-primary/10 px-6 text-primary shadow-sm transition-all duration-300 hover:border-primary/50 hover:bg-primary/20">
-                <FileText className="mr-1 h-4 w-4" /> Resume
-              </Button>
-            ))}
+            )}
             <Button asChild size="lg" variant="ghost" className="rounded-full px-5">
               <a href="#contact">
                 <Mail className="mr-1 h-4 w-4" /> Contact

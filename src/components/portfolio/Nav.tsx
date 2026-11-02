@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { FileText, Menu, X } from "lucide-react";
 import { profile } from "@/data/profile";
 import { useResumeAvailable } from "@/hooks/use-resume-available";
-import { toast } from "sonner";
 
 const sections = [
   { id: "home", label: "Home" },
@@ -22,7 +21,6 @@ export function Nav() {
   const [active, setActive] = useState("home");
   const resumeUrl = profile.resumeUrl;
   const resumeAvailable = useResumeAvailable();
-  const handleResumeClick = () => toast.info("Resume will be updated shortly");
 
   useEffect(() => {
     document.documentElement.classList.remove("dark");
@@ -88,15 +86,11 @@ export function Nav() {
           ))}
         </ul>
         <div className="flex items-center gap-2">
-          {resumeUrl && (resumeAvailable ? (
+          {resumeUrl && resumeAvailable && (
             <a href={resumeUrl} target="_blank" rel="noopener noreferrer" download aria-label="Open resume" className="inline-flex items-center gap-1.5 rounded-full border border-primary/30 bg-primary/10 px-2.5 py-2 text-sm font-semibold text-primary shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-primary/50 hover:bg-primary/20 sm:px-4">
               <FileText className="h-3.5 w-3.5" /> <span className="hidden sm:inline">Resume</span>
             </a>
-          ) : (
-            <button type="button" onClick={handleResumeClick} aria-label="Resume will be updated shortly" className="inline-flex items-center gap-1.5 rounded-full border border-primary/30 bg-primary/10 px-2.5 py-2 text-sm font-semibold text-primary shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-primary/50 hover:bg-primary/20 sm:px-4">
-              <FileText className="h-3.5 w-3.5" /> <span className="hidden sm:inline">Resume</span>
-            </button>
-          ))}
+          )}
           <button
             onClick={() => setOpen((o) => !o)}
             aria-label="Toggle menu"
@@ -123,15 +117,11 @@ export function Nav() {
                 </a>
               </li>
             ))}
-            {resumeUrl && <li>{resumeAvailable ? (
+            {resumeUrl && resumeAvailable && <li>
               <a href={resumeUrl} target="_blank" rel="noopener noreferrer" download className="flex items-center gap-2 rounded-xl px-3 py-2 font-medium text-primary transition-colors hover:bg-primary/10">
                 <FileText className="h-4 w-4" /> Resume
               </a>
-            ) : (
-              <button type="button" onClick={handleResumeClick} className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-left font-medium text-primary transition-colors hover:bg-primary/10">
-                <FileText className="h-4 w-4" /> Resume
-              </button>
-            )}</li>}
+            </li>}
           </ul>
         </div>
       )}
