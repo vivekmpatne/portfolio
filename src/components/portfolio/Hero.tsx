@@ -48,7 +48,7 @@ export function Hero() {
         <div className="absolute top-20 right-0 h-[360px] w-[360px] rounded-full bg-[var(--sky)]/10 blur-3xl" />
       </div>
 
-      <div className="mx-auto grid max-w-6xl gap-14 px-6 pt-36 pb-20 md:grid-cols-[minmax(0,1fr)_380px] md:items-center md:pt-44 md:pb-28">
+      <div className="mx-auto grid max-w-6xl gap-14 px-6 pt-28 pb-12 md:grid-cols-[minmax(0,1fr)_380px] md:items-center md:pt-36 md:pb-16">
         <div className="min-w-0">
           <span className="inline-flex items-center gap-2 rounded-full border border-[var(--emerald)]/30 bg-[var(--emerald)]/10 px-3.5 py-1.5 text-xs font-semibold text-foreground">
             <span className="relative flex h-2 w-2">

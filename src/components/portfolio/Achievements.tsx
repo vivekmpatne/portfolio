@@ -37,7 +37,7 @@ const achievements: Achievement[] = [
 
 export function Achievements() {
   return (
-    <section id="achievements" className="mx-auto max-w-6xl px-6 py-20">
+    <section id="achievements" className="mx-auto max-w-6xl px-6 py-10 sm:py-14">
       <SectionHeader title="Coding Profiles" />
 
       <div className="mb-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -46,7 +46,7 @@ export function Achievements() {
           return (
             <div
               key={a.label}
-              className="group relative overflow-hidden rounded-2xl border border-border bg-card p-6 shadow-card transition-all hover:-translate-y-1 hover:border-foreground/30 hover:shadow-card-hover"
+              className="group relative overflow-hidden rounded-2xl border border-border/80 bg-card/95 p-6 shadow-card transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-card-hover"
             >
               <Icon className={`h-6 w-6 ${a.color}`} />
               <div className="mt-4 font-display text-3xl font-semibold">{a.value}</div>

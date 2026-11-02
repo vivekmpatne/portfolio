@@ -64,8 +64,14 @@
   --amber-term: oklch(0.7 0.16 60);
   --gradient-primary: linear-gradient(135deg, oklch(0.51 0.23 277), oklch(0.59 0.15 237));
 
-  --shadow-card: 0 1px 2px oklch(0.21 0.03 265 / 4%), 0 4px 16px -4px oklch(0.21 0.03 265 / 6%);
-  --shadow-card-hover: 0 2px 4px oklch(0.21 0.03 265 / 4%), 0 18px 40px -12px oklch(0.51 0.23 277 / 22%);
+  --shadow-card:
+    0 1px 2px rgba(15, 23, 42, 0.04),
+    0 8px 20px -6px rgba(15, 23, 42, 0.07),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.85);
+  --shadow-card-hover:
+    0 4px 6px -1px rgba(15, 23, 42, 0.04),
+    0 20px 32px -8px rgba(79, 70, 229, 0.16),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.95);
   --shadow-nav: 0 8px 30px -12px oklch(0.21 0.03 265 / 15%);
 }
 
@@ -106,9 +112,11 @@
 
 @utility shadow-card {
   box-shadow: var(--shadow-card);
+  transition: all 300ms ease-out;
 }
 @utility shadow-card-hover {
   box-shadow: var(--shadow-card-hover);
+  transition: all 300ms ease-out;
 }
 @utility shadow-nav {
   box-shadow: var(--shadow-nav);

@@ -11,7 +11,7 @@ const focusAreas = [
 
 export function About() {
   return (
-    <section id="about" className="mx-auto max-w-6xl px-6 py-20">
+    <section id="about" className="mx-auto max-w-6xl px-6 py-10 sm:py-14">
       <SectionHeader title="About" />
       <p className="max-w-3xl text-lg leading-relaxed text-muted-foreground">
         {profile.bio}

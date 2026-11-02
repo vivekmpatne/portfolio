@@ -23,7 +23,7 @@ function Card({
   children: React.ReactNode;
 }) {
   return (
-    <div className="group relative overflow-hidden rounded-2xl border border-border bg-card p-5 shadow-card backdrop-blur-sm transition-all hover:-translate-y-1 hover:border-foreground/30 hover:shadow-card-hover">
+    <div className="group relative overflow-hidden rounded-2xl border border-border/80 bg-card/95 p-5 shadow-card backdrop-blur-sm transition-all duration-300 hover:-translate-y-1.5 hover:border-primary/40 hover:shadow-card-hover">
       <div
         className="pointer-events-none absolute inset-0 opacity-0 transition-opacity group-hover:opacity-100"
         style={{ background: `radial-gradient(400px circle at 50% 0%, ${brand}22, transparent 60%)` }}

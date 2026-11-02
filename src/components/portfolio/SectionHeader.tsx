@@ -12,7 +12,7 @@ export function SectionHeader({ title, subtitle }: { title: string; subtitle?: s
   const idx = ORDER.indexOf(title.toLowerCase());
   const num = idx >= 0 ? String(idx + 1).padStart(2, "0") : null;
   return (
-    <div className="mb-12">
+    <div className="mb-6 sm:mb-8">
       <div className="flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.2em] text-primary">
         {num && <span>{num}</span>}
         <span className="h-px w-8 bg-primary/40" />
