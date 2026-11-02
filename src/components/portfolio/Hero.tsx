@@ -92,13 +92,13 @@ export function Hero() {
               </a>
             </Button>
             {resumeUrl && (resumeAvailable ? (
-              <Button asChild size="lg" variant="outline" className="rounded-full border-green-500/40 bg-[#0a1410] px-6 text-green-400 hover:bg-[#102318] hover:text-green-300">
+              <Button asChild size="lg" variant="outline" className="rounded-full border-primary/30 bg-primary/10 px-6 text-primary shadow-sm transition-all duration-300 hover:border-primary/50 hover:bg-primary/20">
                 <a href={resumeUrl} target="_blank" rel="noopener noreferrer" download>
                   <FileText className="mr-1 h-4 w-4" /> Resume
                 </a>
               </Button>
             ) : (
-              <Button type="button" size="lg" variant="outline" onClick={handleResumeClick} className="rounded-full border-green-500/40 bg-[#0a1410] px-6 text-green-400 hover:bg-[#102318] hover:text-green-300">
+              <Button type="button" size="lg" variant="outline" onClick={handleResumeClick} className="rounded-full border-primary/30 bg-primary/10 px-6 text-primary shadow-sm transition-all duration-300 hover:border-primary/50 hover:bg-primary/20">
                 <FileText className="mr-1 h-4 w-4" /> Resume
               </Button>
             ))}

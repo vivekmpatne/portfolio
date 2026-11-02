@@ -2,24 +2,99 @@
 import { RotateCcw } from "lucide-react";
 import { profile } from "@/data/profile";
 
-interface SliceConfig {
+const SVG_WIDTH = 400;
+const SVG_HEIGHT = 500;
+const COLUMN_WIDTH = SVG_WIDTH / 2;
+const ROW_HEIGHT = SVG_HEIGHT / 3;
+
+interface PuzzlePiece {
   id: number;
-  col: 0 | 1;
-  row: 0 | 1 | 2;
-  initX: string;
-  initY: string;
-  initRotate: number;
+  column: number;
+  row: number;
+  x: string;
+  y: string;
+  rotation: number;
+  scale: number;
   delayMs: number;
+  path: string;
 }
 
-const SLICES: SliceConfig[] = [
-  { id: 0, col: 0, row: 0, initX: "-100vw", initY: "-60vh", initRotate: -28, delayMs: 40 },
-  { id: 1, col: 1, row: 0, initX: "100vw", initY: "-70vh", initRotate: 32, delayMs: 120 },
-  { id: 2, col: 0, row: 1, initX: "-110vw", initY: "10vh", initRotate: -18, delayMs: 80 },
-  { id: 3, col: 1, row: 1, initX: "110vw", initY: "-15vh", initRotate: 24, delayMs: 160 },
-  { id: 4, col: 0, row: 2, initX: "-90vw", initY: "85vh", initRotate: 22, delayMs: 100 },
-  { id: 5, col: 1, row: 2, initX: "90vw", initY: "90vh", initRotate: -30, delayMs: 180 },
-];
+const entrance = [
+  { x: "-95vw", y: "-65vh", rotation: -32, scale: 0.7, delayMs: 30 },
+  { x: "95vw", y: "-75vh", rotation: 35, scale: 0.72, delayMs: 110 },
+  { x: "-110vw", y: "8vh", rotation: -24, scale: 0.76, delayMs: 70 },
+  { x: "110vw", y: "-12vh", rotation: 26, scale: 0.68, delayMs: 170 },
+  { x: "-90vw", y: "85vh", rotation: 23, scale: 0.72, delayMs: 100 },
+  { x: "90vw", y: "90vh", rotation: -38, scale: 0.74, delayMs: 200 },
+] as const;
+
+type Point = readonly [number, number];
+
+function edgePath(start: Point, end: Point, normal: Point, tabDirection: number) {
+  const horizontal = start[1] === end[1];
+  const distance = horizontal ? end[0] - start[0] : end[1] - start[1];
+  const direction = Math.sign(distance);
+  const length = Math.abs(distance);
+  const center = (horizontal ? start[0] : start[1]) + distance / 2;
+  const fixed = horizontal ? start[1] : start[0];
+  const point = (along: number, out: number): Point => horizontal
+    ? [center + direction * along, fixed + normal[1] * out * tabDirection]
+    : [fixed + normal[0] * out * tabDirection, center + direction * along];
+  const p = (along: number, out: number) => {
+    const [x, y] = point(along, out);
+    return `${x.toFixed(2)} ${y.toFixed(2)}`;
+  };
+  const startTab = point(-27, 0);
+  const endTab = point(27, 0);
+  if (length < 60) return `L ${end[0]} ${end[1]}`;
+  return [
+    `L ${startTab[0].toFixed(2)} ${startTab[1].toFixed(2)}`,
+    `C ${p(-27, 8)} ${p(-20, 11)} ${p(-14, 11)}`,
+    `C ${p(-7, 11)} ${p(-12, 27)} ${p(0, 27)}`,
+    `C ${p(12, 27)} ${p(7, 11)} ${p(14, 11)}`,
+    `C ${p(20, 11)} ${p(27, 8)} ${p(27, 0)}`,
+    `L ${endTab[0].toFixed(2)} ${endTab[1].toFixed(2)}`,
+    `L ${end[0]} ${end[1]}`,
+  ].join(" ");
+}
+
+function straightEdge(end: Point) {
+  return `L ${end[0]} ${end[1]}`;
+}
+
+function createPiecePath(column: number, row: number) {
+  const x0 = column * COLUMN_WIDTH;
+  const x1 = x0 + COLUMN_WIDTH;
+  const y0 = row * ROW_HEIGHT;
+  const y1 = y0 + ROW_HEIGHT;
+  const topLeft: Point = [x0, y0];
+  const topRight: Point = [x1, y0];
+  const bottomRight: Point = [x1, y1];
+  const bottomLeft: Point = [x0, y1];
+  const horizontalSign = (boundary: number) => boundary === 1 ? 1 : -1;
+  const verticalSign = row % 2 === 0 ? 1 : -1;
+
+  const top = row === 0
+    ? straightEdge(topRight)
+    : edgePath(topLeft, topRight, [0, 1], horizontalSign(row));
+  const right = column === 1
+    ? straightEdge(bottomRight)
+    : edgePath(topRight, bottomRight, [1, 0], verticalSign);
+  const bottom = row === 2
+    ? straightEdge(bottomLeft)
+    : edgePath(bottomRight, bottomLeft, [0, 1], horizontalSign(row + 1));
+  const left = column === 0
+    ? straightEdge(topLeft)
+    : edgePath(bottomLeft, topLeft, [1, 0], verticalSign);
+
+  return `M ${x0} ${y0} ${top} ${right} ${bottom} ${left} Z`;
+}
+
+const PIECES: PuzzlePiece[] = Array.from({ length: 6 }, (_, id) => {
+  const column = id % 2;
+  const row = Math.floor(id / 2);
+  return { id, column, row, ...entrance[id]!, path: createPiecePath(column, row) };
+});
 
 export function PuzzleAvatar() {
   const [replayKey, setReplayKey] = useState(0);
@@ -29,8 +104,7 @@ export function PuzzleAvatar() {
   const [showSheen, setShowSheen] = useState(false);
 
   useEffect(() => {
-    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (reducedMotion) {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       setAssembled(true);
       setAnimating(false);
       setShowBadge(true);
@@ -50,7 +124,7 @@ export function PuzzleAvatar() {
         setShowSheen(true);
         setShowBadge(true);
         setAnimating(false);
-      }, 1250);
+      }, 1300);
     });
 
     return () => {
@@ -75,46 +149,54 @@ export function PuzzleAvatar() {
       />
 
       <div className="relative overflow-hidden rounded-[2rem] border border-border bg-card/80 p-3 shadow-card-hover backdrop-blur-xl">
-        <div className="relative aspect-[4/5] w-full overflow-hidden rounded-[1.5rem] bg-slate-100 dark:bg-slate-900">
-          {!animating && (
+        <div className="relative aspect-[4/5] w-full overflow-hidden rounded-[1.5rem]">
+          {animating ? (
+            PIECES.map((piece) => {
+              const clipId = `portrait-piece-${piece.id}`;
+              const transform = assembled
+                ? "translate3d(0, 0, 0) rotate(0deg) scale(1)"
+                : `translate3d(${piece.x}, ${piece.y}, 0) rotate(${piece.rotation}deg) scale(${piece.scale})`;
+              const style: CSSProperties = {
+                transform,
+                transformOrigin: "50% 50%",
+                transition: `transform 1050ms cubic-bezier(0.16, 1, 0.3, 1) ${piece.delayMs}ms`,
+                willChange: "transform",
+              };
+              return (
+                <div key={piece.id} aria-hidden="true" className="pointer-events-none absolute inset-0" style={style}>
+                  <svg className="absolute inset-0 h-full w-full overflow-visible" viewBox={`0 0 ${SVG_WIDTH} ${SVG_HEIGHT}`} preserveAspectRatio="none">
+                    <defs>
+                      <clipPath id={clipId} clipPathUnits="userSpaceOnUse">
+                        <path d={piece.path} />
+                      </clipPath>
+                    </defs>
+                    <image
+                      href={profile.avatar}
+                      x="0"
+                      y="0"
+                      width={SVG_WIDTH}
+                      height={SVG_HEIGHT}
+                      preserveAspectRatio="xMidYMid slice"
+                      clipPath={`url(#${clipId})`}
+                    />
+                    <path d={piece.path} fill="none" stroke="rgba(255,255,255,0.38)" strokeWidth="1.25" vectorEffect="non-scaling-stroke" />
+                  </svg>
+                </div>
+              );
+            })
+          ) : (
             <img
               src={profile.avatar}
               alt={profile.name}
-              className="absolute inset-0 h-full w-full rounded-[1.5rem] object-cover"
+              className="absolute inset-0 h-full w-full object-cover"
               loading="eager"
             />
           )}
 
-          {animating && SLICES.map((slice) => {
-            const tileStyle: CSSProperties = {
-              left: `${slice.col * 50}%`,
-              top: `${(slice.row / 3) * 100}%`,
-              width: "50%",
-              height: "33.3333%",
-              transform: assembled
-                ? "translate(0, 0) rotate(0deg) scale(1)"
-                : `translate(${slice.initX}, ${slice.initY}) rotate(${slice.initRotate}deg) scale(0.65)`,
-              transition: `transform 950ms cubic-bezier(0.16, 1, 0.3, 1) ${slice.delayMs}ms, opacity 700ms ease-out ${slice.delayMs}ms`,
-              opacity: assembled ? 1 : 0.2,
-            };
-            const imageStyle: CSSProperties = {
-              left: slice.col === 0 ? "0%" : "-100%",
-              top: slice.row === 0 ? "0%" : slice.row === 1 ? "-100%" : "-200%",
-              width: "200%",
-              height: "300%",
-            };
-
-            return (
-              <div key={slice.id} aria-hidden="true" style={tileStyle} className="pointer-events-none absolute overflow-hidden border border-white/30 shadow-lg">
-                <img src={profile.avatar} alt="" style={imageStyle} className="absolute max-w-none object-cover" />
-              </div>
-            );
-          })}
-
           {showSheen && (
             <div
               aria-hidden="true"
-              className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/55 to-transparent animate-[sheen-sweep_900ms_ease-out_forwards]"
+              className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/25 to-transparent mix-blend-screen animate-[sheen-sweep_900ms_ease-out_forwards]"
             />
           )}
         </div>
