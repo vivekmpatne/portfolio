@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import type { MutableRefObject } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { OrbitControls, Grid, Stars, AdaptiveDpr, AdaptiveEvents } from "@react-three/drei";
+import { OrbitControls, Grid, AdaptiveDpr, AdaptiveEvents } from "@react-three/drei";
 import * as THREE from "three";
 import type { DayMap, PlatformId } from "@/lib/activity/types";
 import { PLATFORM_LABELS } from "@/lib/activity/types";
@@ -335,29 +335,28 @@ function Scene({
 
   return (
     <>
-      <color attach="background" args={["#08150f"]} />
-      <fog attach="fog" args={["#08150f", 35, 90]} />
-      <Stars radius={120} depth={50} count={320} factor={4} saturation={0} fade speed={0.4} />
+      <color attach="background" args={["#F8FAFC"]} />
+      <fog attach="fog" args={["#F8FAFC", 40, 105]} />
 
-      <ambientLight intensity={0.75} />
-      <hemisphereLight args={["#a8ffbe", "#04120b", 0.6]} />
-      <directionalLight position={[22, 34, 18]} intensity={1.05} />
-      <directionalLight position={[-18, 12, -12]} intensity={0.35} color="#3ddc84" />
+      <ambientLight intensity={0.9} />
+      <hemisphereLight args={["#FFFFFF", "#E2E8F0", 0.65]} />
+      <directionalLight position={[25, 40, 20]} intensity={1.2} />
+      <directionalLight position={[-20, 15, -15]} intensity={0.4} color="#60A5FA" />
 
       {/* ground */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.06, 0]} frustumCulled={false} raycast={() => null}>
         <planeGeometry args={[width + 10, depth + 10]} />
-        <meshStandardMaterial color="#0a1a12" roughness={0.9} metalness={0.1} />
+        <meshStandardMaterial color="#F1F5F9" roughness={0.85} metalness={0.05} />
       </mesh>
 
       <Grid
         position={[0, -0.04, 0]}
         args={[width + 8, depth + 8]}
         cellSize={STEP}
-        cellColor="#1f5c3c"
+        cellColor="#E2E8F0"
         sectionSize={STEP * 7}
-        sectionColor="#3ddc84"
-        fadeDistance={75}
+        sectionColor="#CBD5E1"
+        fadeDistance={80}
         fadeStrength={1.4}
         infiniteGrid={false}
       />
@@ -434,7 +433,7 @@ export default function GitCity3D({ weeks, merged, calendars, colors }: Props) {
         }
         per.sort((a, b) => b.count - a.count);
         // cap platforms per day to keep segment/instance count low without losing top contributors
-        const topPer = per.slice(0, 3);
+        const topPer = per;
 
         const total = topPer.reduce((s, p) => s + p.count, 0) || 1;
         const h = Math.min(count, 24) * UNIT + 0.25;
@@ -497,8 +496,8 @@ export default function GitCity3D({ weeks, merged, calendars, colors }: Props) {
   return (
     <div>
       <div
-        className="relative h-[420px] w-full overflow-hidden [touch-action:pan-y] rounded-xl border border-emerald-500/25"
-        style={{ background: "linear-gradient(180deg,#08150f 0%,#0d1f16 100%)" }}
+        className="relative h-[420px] w-full overflow-hidden [touch-action:pan-y] rounded-xl border border-border shadow-sm"
+        style={{ background: "linear-gradient(180deg, #F8FAFC 0%, #FFFFFF 100%)" }}
         onPointerDown={(e) => {
           downRef.current = { x: e.clientX, y: e.clientY };
           dragRef.current = false;
@@ -541,14 +540,14 @@ export default function GitCity3D({ weeks, merged, calendars, colors }: Props) {
           />
         </Canvas>
 
-        <div className="pointer-events-none absolute left-3 top-3 rounded-md border border-emerald-500/25 bg-black/40 px-2 py-1 font-mono text-[10px] text-emerald-300/80">
+        <div className="pointer-events-none absolute left-3 top-3 rounded-lg border border-border bg-background/85 px-3 py-1.5 font-mono text-[11px] text-foreground/80 shadow-sm backdrop-blur-md">
           {zoomEnabled
             ? "drag = rotate · scroll = zoom · right-drag = pan · double-click = reset"
             : "click the city to enable zoom · drag = rotate"}
         </div>
 
         {hover ? (
-          <div className="pointer-events-none absolute bottom-3 left-3 max-w-[75%] rounded-md border border-emerald-500/30 bg-black/75 px-3 py-2 font-mono text-[11px] text-emerald-200">
+          <div className="pointer-events-none absolute bottom-3 left-3 max-w-[75%] rounded-xl border border-border bg-card/95 p-3.5 font-mono text-xs text-foreground shadow-xl backdrop-blur-md">
             <div className="font-semibold">
               {hover.date} — {hover.count} {hover.count === 1 ? "contribution" : "contributions"}
             </div>
@@ -559,9 +558,9 @@ export default function GitCity3D({ weeks, merged, calendars, colors }: Props) {
                     className="inline-block h-2 w-2 rounded-[2px]"
                     style={{ background: s.color }}
                   />
-                  <span className="text-emerald-100/90">{PLATFORM_LABELS[s.platform]}</span>
-                  <span className="text-emerald-300/70">
-                    {s.count} · {Math.round((s.count / hover.count) * 100)}%
+                  <span className="text-foreground/90">{PLATFORM_LABELS[s.platform]}</span>
+                  <span className="text-foreground/70">
+                    {s.count} · {((s.count / hover.count) * 100).toFixed(2)}%
                   </span>
                 </div>
               ))}

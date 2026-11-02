@@ -13,7 +13,7 @@ type Props = {
 
 function Skeleton() {
   return (
-    <div className="flex h-[420px] w-full items-center justify-center rounded-xl border border-emerald-500/25 bg-[#0d1f16] font-mono text-xs text-emerald-300/70">
+    <div className="flex h-[420px] w-full items-center justify-center rounded-xl border border-border bg-card/60 font-mono text-xs text-muted-foreground backdrop-blur-sm">
       building city…
     </div>
   );
