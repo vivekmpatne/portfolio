@@ -13,8 +13,6 @@ import { Toaster } from "sonner";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
-import { BootGate } from "@/components/portfolio/BootGate";
-import { CursorReticle } from "@/components/portfolio/CursorReticle";
 
 function NotFoundComponent() {
   return (
@@ -96,7 +94,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {
         rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=VT323&display=swap",
+        href: "https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap",
       },
     ],
 
@@ -119,9 +117,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 });
 
 function RootShell({ children }: { children: ReactNode }) {
-  // Pre-hydration theme bootstrap — avoids flash of light theme on first paint.
-  // Defaults to dark; respects localStorage("theme") if set.
-  const themeBootstrap = `(function(){try{var t=localStorage.getItem('theme');var d=t?t==='dark':true;if(d)document.documentElement.classList.add('dark');}catch(e){document.documentElement.classList.add('dark');}try{var seen=sessionStorage.getItem('boot:v1')==='1';var reduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches;if(!seen&&!reduced)document.documentElement.classList.add('boot-pending');}catch(e){}})();`;
+  // Light theme only — clear any stale dark preference from older versions.
+  const themeBootstrap = `(function(){try{localStorage.removeItem('theme');sessionStorage.removeItem('boot:v1');}catch(e){}})();`;
   return (
     <html lang="en" 
       className="scroll-pt-20"
@@ -146,8 +143,6 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-      <BootGate />
-      <CursorReticle />
       <Outlet />
       <Toaster position="bottom-right" richColors />
     </QueryClientProvider>

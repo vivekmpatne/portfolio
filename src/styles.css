@@ -5,10 +5,10 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-  --radius-sm: 2px;
-  --radius-md: 2px;
-  --radius-lg: 3px;
-  --radius-xl: 4px;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -30,69 +30,43 @@
   --color-ring: var(--ring);
   --color-phosphor: var(--phosphor);
   --color-amber-term: var(--amber-term);
-  --font-sans: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
-  --font-display: "VT323", "JetBrains Mono", ui-monospace, monospace;
+  --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
 }
 
 :root {
-  --radius: 0.125rem;
-  /* Light "paper terminal" — crisp off-white with deep forest phosphor */
-  --background: oklch(0.985 0.005 120);
-  --foreground: oklch(0.18 0.04 155);
+  --radius: 0.75rem;
+  /* Luminous light studio — crisp white, porcelain, electric indigo */
+  --background: oklch(0.984 0.003 248);
+  --foreground: oklch(0.21 0.03 265);
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.18 0.04 155);
-  --popover: oklch(0.995 0.003 120);
-  --popover-foreground: oklch(0.18 0.04 155);
-  --primary: oklch(0.42 0.16 150);
-  --primary-foreground: oklch(0.985 0.005 120);
-  --secondary: oklch(0.955 0.012 130);
-  --secondary-foreground: oklch(0.22 0.04 155);
-  --muted: oklch(0.955 0.008 120);
-  --muted-foreground: oklch(0.42 0.05 155);
-  --accent: oklch(0.94 0.05 140);
-  --accent-foreground: oklch(0.18 0.04 155);
-  --destructive: oklch(0.55 0.22 25);
+  --card-foreground: oklch(0.21 0.03 265);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.21 0.03 265);
+  --primary: oklch(0.51 0.23 277);
+  --primary-foreground: oklch(0.99 0 0);
+  --secondary: oklch(0.968 0.007 248);
+  --secondary-foreground: oklch(0.28 0.03 265);
+  --muted: oklch(0.968 0.007 248);
+  --muted-foreground: oklch(0.52 0.03 260);
+  --accent: oklch(0.955 0.025 277);
+  --accent-foreground: oklch(0.32 0.15 277);
+  --destructive: oklch(0.58 0.22 25);
   --destructive-foreground: oklch(0.98 0 0);
-  --border: oklch(0.42 0.12 150 / 28%);
-  --input: oklch(0.955 0.012 130);
-  --ring: oklch(0.42 0.16 150);
-  --phosphor: oklch(0.38 0.18 150);
-  --amber-term: oklch(0.55 0.17 75);
+  --border: oklch(0.929 0.013 255);
+  --input: oklch(0.929 0.013 255);
+  --ring: oklch(0.51 0.23 277);
+  --sky: oklch(0.59 0.15 237);
+  --emerald: oklch(0.69 0.15 163);
+  /* legacy accent name used across components — now indigo */
+  --phosphor: oklch(0.51 0.23 277);
+  --amber-term: oklch(0.7 0.16 60);
+  --gradient-primary: linear-gradient(135deg, oklch(0.51 0.23 277), oklch(0.59 0.15 237));
 
-  --shadow-card: 0 1px 0 oklch(0.38 0.18 150 / 8%), 0 0 0 1px oklch(0.38 0.18 150 / 18%);
-  --shadow-card-hover: 0 0 24px -8px oklch(0.38 0.18 150 / 35%), 0 0 0 1px oklch(0.38 0.18 150 / 55%);
-  --shadow-nav: 0 1px 0 oklch(0.38 0.18 150 / 12%);
-}
-
-
-/* Dark mode = phosphor CRT terminal */
-.dark {
-  --background: oklch(0.13 0.008 160);
-  --foreground: oklch(0.95 0.02 140);
-  --card: oklch(0.16 0.01 160);
-  --card-foreground: oklch(0.94 0.02 140);
-  --popover: oklch(0.14 0.01 160);
-  --popover-foreground: oklch(0.94 0.02 140);
-  --primary: oklch(0.85 0.20 145);
-  --primary-foreground: oklch(0.12 0.01 160);
-  --secondary: oklch(0.20 0.012 160);
-  --secondary-foreground: oklch(0.90 0.02 140);
-  --muted: oklch(0.19 0.01 160);
-  --muted-foreground: oklch(0.62 0.03 140);
-  --accent: oklch(0.24 0.03 145);
-  --accent-foreground: oklch(0.95 0.02 140);
-  --destructive: oklch(0.65 0.22 25);
-  --destructive-foreground: oklch(0.98 0 0);
-  --border: oklch(0.32 0.03 145 / 55%);
-  --input: oklch(0.22 0.015 160);
-  --ring: oklch(0.75 0.18 145);
-  --phosphor: oklch(0.85 0.20 145);
-  --amber-term: oklch(0.82 0.16 75);
-
-  --shadow-card: 0 0 0 1px oklch(0.85 0.20 145 / 8%);
-  --shadow-card-hover: 0 0 24px -6px oklch(0.85 0.20 145 / 28%), 0 0 0 1px oklch(0.85 0.20 145 / 40%);
-  --shadow-nav: 0 0 0 1px oklch(0.85 0.20 145 / 12%);
+  --shadow-card: 0 1px 2px oklch(0.21 0.03 265 / 4%), 0 4px 16px -4px oklch(0.21 0.03 265 / 6%);
+  --shadow-card-hover: 0 2px 4px oklch(0.21 0.03 265 / 4%), 0 18px 40px -12px oklch(0.51 0.23 277 / 22%);
+  --shadow-nav: 0 8px 30px -12px oklch(0.21 0.03 265 / 15%);
 }
 
 @layer base {
@@ -105,24 +79,23 @@
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
-    font-family: var(--font-mono);
-    font-feature-settings: "ss01", "cv01";
+    font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
   }
   h1, h2, h3, h4 {
     font-family: var(--font-display);
-    letter-spacing: 0.01em;
-    font-weight: 400;
+    letter-spacing: -0.02em;
+    font-weight: 700;
   }
   /* Terminal-style selection */
   ::selection {
-    background: color-mix(in oklab, var(--phosphor) 40%, transparent);
-    color: var(--background);
+    background: color-mix(in oklab, var(--primary) 18%, transparent);
+    color: var(--foreground);
   }
   /* Focus ring = phosphor */
   :focus-visible {
-    outline: 1px solid var(--phosphor);
+    outline: 2px solid var(--ring);
     outline-offset: 2px;
   }
   /* Buttons/inputs stay in mono */
@@ -203,7 +176,6 @@
   height: 1em;
   vertical-align: -0.1em;
   background: var(--phosphor);
-  box-shadow: 0 0 8px color-mix(in oklab, var(--phosphor) 60%, transparent);
   animation: term-blink 1s steps(1) infinite;
 }
 
@@ -213,8 +185,17 @@
 
 /* Text glow (phosphor) */
 @utility phosphor-glow {
-  color: var(--phosphor);
-  text-shadow: 0 0 6px color-mix(in oklab, var(--phosphor) 45%, transparent);
+  color: var(--primary);
+}
+@utility text-gradient {
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+@keyframes float-slow {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-14px) rotate(4deg); }
 }
 
 /* Slow drifting scroll for the floating character field */
@@ -267,75 +248,4 @@
   background: rgba(150, 255, 185, 0.75);
 }
 
-
-/* Boot splash: rendered in the SSR markup but hidden unless the pre-hydration
-   script marks the document as boot-pending. Prevents a flash of the page
-   before the boot screen mounts. */
-.boot-overlay { display: none; }
-html.boot-pending .boot-overlay { display: flex; }
-html.boot-pending body { overflow: hidden; }
-
-/* ---------- Custom targeting-reticle cursor ---------- */
-html.has-reticle,
-html.has-reticle * {
-  cursor: none !important;
-}
-
-.reticle-layer {
-  position: fixed;
-  inset: 0;
-  z-index: 2147483000;
-  pointer-events: none;
-}
-
-.reticle-ring {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 34px;
-  height: 34px;
-  border: 1px solid var(--phosphor);
-  border-radius: 9999px;
-  box-shadow:
-    0 0 10px color-mix(in oklab, var(--phosphor) 45%, transparent),
-    inset 0 0 8px color-mix(in oklab, var(--phosphor) 20%, transparent);
-  will-change: transform, opacity;
-  transition: opacity 150ms linear;
-}
-
-.reticle-tick {
-  position: absolute;
-  background: var(--phosphor);
-  box-shadow: 0 0 6px color-mix(in oklab, var(--phosphor) 55%, transparent);
-}
-.reticle-tick-t,
-.reticle-tick-b {
-  left: 50%;
-  width: 1px;
-  height: 7px;
-  margin-left: -0.5px;
-}
-.reticle-tick-t { top: -9px; }
-.reticle-tick-b { bottom: -9px; }
-.reticle-tick-l,
-.reticle-tick-r {
-  top: 50%;
-  height: 1px;
-  width: 7px;
-  margin-top: -0.5px;
-}
-.reticle-tick-l { left: -9px; }
-.reticle-tick-r { right: -9px; }
-
-.reticle-dot {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 4px;
-  height: 4px;
-  border-radius: 9999px;
-  background: var(--phosphor);
-  box-shadow: 0 0 8px color-mix(in oklab, var(--phosphor) 75%, transparent);
-  will-change: transform;
-}
 
