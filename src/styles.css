@@ -211,6 +211,10 @@
 }
 
 /* Animated dot-dot-dot loader */
+@keyframes sheen-sweep {
+  to { transform: translateX(100%); }
+}
+
 @keyframes loading-dots-anim {
   0%   { content: ""; }
   25%  { content: "."; }

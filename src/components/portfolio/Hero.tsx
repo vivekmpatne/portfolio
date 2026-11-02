@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { profile } from "@/data/profile";
 import { SocialIcons } from "./SocialIcons";
 import { useResumeAvailable } from "@/hooks/use-resume-available";
+import { PuzzleAvatar } from "./PuzzleAvatar";
 
 const ROLES = [
   "Aspiring Software Engineer",
@@ -120,34 +121,7 @@ export function Hero() {
           </div>
         </div>
 
-        {/* Glass portrait */}
-        <div className="relative mx-auto w-full max-w-[340px] md:max-w-none">
-          <div
-            aria-hidden
-            className="absolute -top-6 -left-6 h-20 w-20 rounded-2xl border border-card/60 bg-primary/15 backdrop-blur-md animate-[float-slow_7s_ease-in-out_infinite]"
-          />
-          <div
-            aria-hidden
-            className="absolute -right-4 -bottom-6 h-16 w-16 rounded-full border border-card/60 bg-[var(--sky)]/20 backdrop-blur-md animate-[float-slow_9s_ease-in-out_infinite_reverse]"
-          />
-          <div className="relative rounded-[2rem] border border-border bg-card/70 p-3 shadow-card-hover backdrop-blur-xl">
-            <img
-              src={profile.avatar}
-              alt={profile.name}
-              className="aspect-[4/5] w-full rounded-[1.5rem] object-cover"
-              loading="eager"
-            />
-            <div className="absolute inset-x-6 bottom-6 flex items-center justify-between rounded-2xl border border-border bg-card/85 px-4 py-3 shadow-card backdrop-blur-md">
-              <div>
-                <div className="text-sm font-semibold">{profile.name}</div>
-                <div className="text-xs text-muted-foreground">RNSIT · Class of 2028</div>
-              </div>
-              <span className="rounded-full bg-accent px-2.5 py-1 text-[11px] font-semibold text-accent-foreground">
-                Open to work
-              </span>
-            </div>
-          </div>
-        </div>
+        <PuzzleAvatar />
       </div>
     </section>
   );
