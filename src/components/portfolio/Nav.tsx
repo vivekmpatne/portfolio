@@ -63,8 +63,9 @@ export function Nav() {
           style={{ transform: `scaleX(${progress / 100})` }}
         />
         <a href="#home" className="flex items-center gap-2 text-base font-bold tracking-tight">
-          <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-[image:var(--gradient-primary)] text-xs font-extrabold text-primary-foreground">
-            VP
+          <span className="flex h-7 w-7 items-center justify-center rounded-lg border border-green-400/50 bg-[#0a1410] font-mono text-[11px] font-bold tracking-tight text-green-400 shadow-[0_0_10px_rgba(74,222,128,0.2)] transition-all duration-300 hover:animate-[terminal-pulse_1.1s_ease-in-out_infinite] hover:border-green-300 hover:text-green-300 motion-reduce:hover:animate-none">
+            <span aria-hidden="true">&gt;_</span>
+            <span className="sr-only">Terminal</span>
           </span>
           Vivek Patne
         </a>

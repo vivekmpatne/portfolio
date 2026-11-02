@@ -215,6 +215,11 @@
   to { transform: translateX(100%); }
 }
 
+@keyframes terminal-pulse {
+  0%, 100% { box-shadow: 0 0 10px rgba(74, 222, 128, 0.2); }
+  50% { box-shadow: 0 0 15px rgba(74, 222, 128, 0.38); }
+}
+
 @keyframes loading-dots-anim {
   0%   { content: ""; }
   25%  { content: "."; }
