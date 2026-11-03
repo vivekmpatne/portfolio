@@ -14,11 +14,15 @@ export function SectionHeader({ title, subtitle }: { title: string; subtitle?: s
   return (
     <div className="mb-6 sm:mb-8">
       <div className="flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.2em] text-primary">
-        {num && <span>{num}</span>}
-        <span className="h-px w-8 bg-primary/40" />
+        {num && (
+          <span className="rounded-md bg-gradient-primary px-2 py-0.5 font-mono text-primary-foreground shadow-glow">{num}</span>
+        )}
+        <span className="h-px w-10 bg-gradient-primary" />
         <span className="text-muted-foreground">{title}</span>
       </div>
-      <h2 className="mt-4 text-4xl font-bold tracking-tight md:text-5xl">{title}</h2>
+      <h2 className="mt-4 text-4xl font-bold tracking-tight md:text-5xl">
+        <span className="text-gradient">{title}</span>
+      </h2>
       {subtitle ? <p className="mt-3 max-w-2xl text-muted-foreground">{subtitle}</p> : null}
     </div>
   );

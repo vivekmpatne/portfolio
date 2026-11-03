@@ -62,17 +62,27 @@
   /* legacy accent name used across components — now indigo */
   --phosphor: oklch(0.51 0.23 277);
   --amber-term: oklch(0.7 0.16 60);
-  --gradient-primary: linear-gradient(135deg, oklch(0.51 0.23 277), oklch(0.59 0.15 237));
+  --cyan-glow: oklch(0.72 0.14 210);
+  --gradient-primary: linear-gradient(120deg, oklch(0.51 0.23 277), oklch(0.6 0.17 237) 55%, oklch(0.7 0.15 175));
+  --gradient-mesh:
+    radial-gradient(900px 600px at 8% -5%, oklch(0.51 0.23 277 / 9%), transparent 60%),
+    radial-gradient(800px 600px at 100% 20%, oklch(0.72 0.14 210 / 8%), transparent 60%),
+    radial-gradient(700px 500px at 30% 100%, oklch(0.69 0.15 163 / 7%), transparent 60%);
 
   --shadow-card:
-    0 1px 2px rgba(15, 23, 42, 0.04),
-    0 8px 20px -6px rgba(15, 23, 42, 0.07),
-    inset 0 1px 0 0 rgba(255, 255, 255, 0.85);
+    0 1px 1px oklch(0.21 0.03 265 / 4%),
+    0 2px 4px -1px oklch(0.21 0.03 265 / 5%),
+    0 12px 28px -10px oklch(0.21 0.03 265 / 12%),
+    inset 0 1px 0 0 oklch(1 0 0 / 90%),
+    inset 0 -1px 0 0 oklch(0.21 0.03 265 / 4%);
   --shadow-card-hover:
-    0 4px 6px -1px rgba(15, 23, 42, 0.04),
-    0 20px 32px -8px rgba(79, 70, 229, 0.16),
-    inset 0 1px 0 0 rgba(255, 255, 255, 0.95);
+    0 2px 4px -1px oklch(0.21 0.03 265 / 6%),
+    0 24px 40px -14px oklch(0.51 0.23 277 / 26%),
+    0 10px 24px -12px oklch(0.72 0.14 210 / 22%),
+    0 0 0 1px oklch(0.51 0.23 277 / 18%),
+    inset 0 1px 0 0 oklch(1 0 0 / 100%);
   --shadow-nav: 0 8px 30px -12px oklch(0.21 0.03 265 / 15%);
+  --shadow-glow: 0 10px 30px -8px oklch(0.51 0.23 277 / 45%), 0 0 0 1px oklch(0.51 0.23 277 / 25%);
 }
 
 @layer base {
@@ -84,6 +94,8 @@
   }
   body {
     background-color: var(--color-background);
+    background-image: var(--gradient-mesh);
+    background-attachment: fixed;
     color: var(--color-foreground);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
@@ -112,14 +124,21 @@
 
 @utility shadow-card {
   box-shadow: var(--shadow-card);
-  transition: all 300ms ease-out;
+  background-image: linear-gradient(180deg, oklch(1 0 0 / 70%), transparent 40%);
+  transition: transform 350ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 350ms ease-out, border-color 300ms ease-out;
 }
 @utility shadow-card-hover {
   box-shadow: var(--shadow-card-hover);
-  transition: all 300ms ease-out;
+  transition: transform 350ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 350ms ease-out, border-color 300ms ease-out;
 }
 @utility shadow-nav {
   box-shadow: var(--shadow-nav);
+}
+@utility shadow-glow {
+  box-shadow: var(--shadow-glow);
+}
+@utility bg-gradient-primary {
+  background-image: var(--gradient-primary);
 }
 
 /* ---------- Terminal-specific utilities ---------- */
