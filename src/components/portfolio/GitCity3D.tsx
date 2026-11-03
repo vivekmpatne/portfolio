@@ -293,6 +293,142 @@ function HoverLight({ building }: { building: Building | null }) {
 const DEFAULT_CAM: [number, number, number] = [18, 22, 34];
 const DEFAULT_TARGET: [number, number, number] = [0, 1, 0];
 
+const BEACON_COUNT = 5;
+const BEACON_HEIGHT = 26;
+const TOUR_SECONDS = 22;
+
+/** Sky laser pillars over the top contribution days. */
+function Beacons({ buildings }: { buildings: Building[] }) {
+  const top = useMemo(
+    () => [...buildings].sort((a, b) => b.count - a.count).slice(0, BEACON_COUNT),
+    [buildings],
+  );
+  const beamRefs = useRef<Array<THREE.Mesh | null>>([]);
+  const ringRefs = useRef<Array<THREE.Mesh | null>>([]);
+  const t = useRef(0);
+
+  useFrame((_, rawDelta) => {
+    t.current += Math.min(rawDelta, 1 / 30);
+    top.forEach((_, i) => {
+      const phase = t.current * 1.6 + i * 1.3;
+      const beam = beamRefs.current[i];
+      if (beam) {
+        const m = beam.material as THREE.MeshBasicMaterial;
+        m.opacity = 0.28 + Math.sin(phase) * 0.1;
+      }
+      const ring = ringRefs.current[i];
+      if (ring) {
+        const p = (t.current * 0.6 + i * 0.2) % 1;
+        ring.scale.setScalar(0.6 + p * 2.2);
+        (ring.material as THREE.MeshBasicMaterial).opacity = 0.7 * (1 - p);
+      }
+    });
+  });
+
+  return (
+    <>
+      {top.map((b, i) => (
+        <group key={b.date} position={[b.x, b.h, b.z]}>
+          <mesh
+            ref={(m) => {
+              beamRefs.current[i] = m;
+            }}
+            position={[0, BEACON_HEIGHT / 2, 0]}
+            raycast={() => null}
+          >
+            <cylinderGeometry args={[0.08, 0.22, BEACON_HEIGHT, 8, 1, true]} />
+            <meshBasicMaterial
+              color={b.color}
+              transparent
+              opacity={0.3}
+              depthWrite={false}
+              blending={THREE.AdditiveBlending}
+              toneMapped={false}
+            />
+          </mesh>
+          <mesh
+            ref={(m) => {
+              ringRefs.current[i] = m;
+            }}
+            rotation={[-Math.PI / 2, 0, 0]}
+            position={[0, 0.2, 0]}
+            raycast={() => null}
+          >
+            <ringGeometry args={[0.55, 0.68, 32]} />
+            <meshBasicMaterial
+              color={b.color}
+              transparent
+              depthWrite={false}
+              side={THREE.DoubleSide}
+              toneMapped={false}
+            />
+          </mesh>
+        </group>
+      ))}
+    </>
+  );
+}
+
+/** Cinematic drone flight: low sweep through the skyline, then a rising orbit. */
+function DroneTour({
+  active,
+  width,
+  depth,
+  controlsRef,
+  onDone,
+}: {
+  active: boolean;
+  width: number;
+  depth: number;
+  controlsRef: MutableRefObject<OrbitLike | null>;
+  onDone: () => void;
+}) {
+  const t = useRef(0);
+  const curve = useMemo(() => {
+    const hw = width / 2;
+    const hd = depth / 2;
+    return new THREE.CatmullRomCurve3(
+      [
+        new THREE.Vector3(-hw - 8, 14, hd + 14),
+        new THREE.Vector3(-hw + 2, 5, hd + 3),
+        new THREE.Vector3(-hw * 0.4, 3.2, 0.7),
+        new THREE.Vector3(0, 4, -0.7),
+        new THREE.Vector3(hw * 0.45, 3.4, 0.7),
+        new THREE.Vector3(hw - 2, 6, -hd - 3),
+        new THREE.Vector3(hw * 0.3, 18, -hd - 16),
+        new THREE.Vector3(-hw * 0.4, 26, -hd - 6),
+        new THREE.Vector3(...DEFAULT_CAM),
+      ],
+      false,
+      "centripetal",
+    );
+  }, [width, depth]);
+  const look = useRef(new THREE.Vector3());
+
+  useEffect(() => {
+    if (active) t.current = 0;
+  }, [active]);
+
+  useFrame((_, rawDelta) => {
+    if (!active) return;
+    const c = controlsRef.current;
+    if (!c) return;
+    t.current = Math.min(1, t.current + Math.min(rawDelta, 1 / 30) / TOUR_SECONDS);
+    const e = t.current < 0.5 ? 2 * t.current * t.current : 1 - Math.pow(-2 * t.current + 2, 2) / 2;
+    const p = curve.getPointAt(e);
+    const ahead = curve.getPointAt(Math.min(1, e + 0.04));
+    // look slightly ahead and down while low; settle on the city centre at the end
+    const blend = THREE.MathUtils.smoothstep(e, 0.7, 1);
+    look.current.set(ahead.x, Math.max(0.5, ahead.y - 2.5), ahead.z * 0.4);
+    look.current.lerp(new THREE.Vector3(...DEFAULT_TARGET), blend);
+    c.object.position.copy(p);
+    c.target.copy(look.current);
+    c.update();
+    if (t.current >= 1) onDone();
+  });
+  return null;
+}
+
 type OrbitLike = {
   target: THREE.Vector3;
   object: THREE.Camera;
