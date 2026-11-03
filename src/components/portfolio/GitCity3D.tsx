@@ -444,6 +444,8 @@ function Scene({
   dragRef,
   zoomEnabled,
   controlsRef,
+  touring,
+  onTourDone,
 }: {
   buildings: Building[];
   width: number;
@@ -453,6 +455,8 @@ function Scene({
   dragRef: MutableRefObject<boolean>;
   zoomEnabled: boolean;
   controlsRef: MutableRefObject<OrbitLike | null>;
+  touring: boolean;
+  onTourDone: () => void;
 }) {
   const cars = useMemo<CarProp[]>(() => {
     const laneZ = depth / 2 + STEP * 0.9;
@@ -507,12 +511,15 @@ function Scene({
         <Details buildings={buildings} />
       </GrowIn>
 
+      <Beacons buildings={buildings} />
+      <DroneTour active={touring} width={width} depth={depth} controlsRef={controlsRef} onDone={onTourDone} />
       <Cars cars={cars} span={width + STEP * 4} />
       <HoverLight building={hoverBuilding} />
 
       <OrbitControls
         makeDefault
         ref={controlsRef as never}
+        enabled={!touring}
         enablePan
         enableZoom={zoomEnabled}
         enableDamping
@@ -607,6 +614,7 @@ export default function GitCity3D({ weeks, merged, calendars, colors }: Props) {
   const dragRef = useRef(false);
   const downRef = useRef<{ x: number; y: number } | null>(null);
   const [zoomEnabled, setZoomEnabled] = useState(false);
+  const [touring, setTouring] = useState(false);
 
   const endDrag = useCallback(() => {
     downRef.current = null;
@@ -673,11 +681,32 @@ export default function GitCity3D({ weeks, merged, calendars, colors }: Props) {
             dragRef={dragRef}
             zoomEnabled={zoomEnabled}
             controlsRef={controlsRef}
+            touring={touring}
+            onTourDone={() => setTouring(false)}
           />
         </Canvas>
 
+        <button
+          type="button"
+          onPointerDown={(e) => e.stopPropagation()}
+          onClick={() => {
+            setHover(null);
+            setTouring((v) => !v);
+          }}
+          className="absolute right-3 top-3 rounded-lg border border-primary/40 bg-background/85 px-3 py-1.5 font-mono text-[11px] font-semibold text-primary shadow-sm backdrop-blur-md transition hover:bg-primary/10"
+        >
+          {touring ? "■ stop tour" : "▶ drone tour"}
+        </button>
+        {touring ? (
+          <div className="pointer-events-none absolute inset-x-0 bottom-3 text-center font-mono text-[11px] tracking-[0.3em] text-primary">
+            ● REC · DRONE FLYOVER
+          </div>
+        ) : null}
+
         <div className="pointer-events-none absolute left-3 top-3 rounded-lg border border-border bg-background/85 px-3 py-1.5 font-mono text-[11px] text-foreground/80 shadow-sm backdrop-blur-md">
-          {zoomEnabled
+          {touring
+            ? "cinematic flyover in progress…"
+            : zoomEnabled
             ? "drag = rotate · scroll = zoom · right-drag = pan · double-click = reset"
             : "click the city to enable zoom · drag = rotate"}
         </div>
@@ -707,7 +736,7 @@ export default function GitCity3D({ weeks, merged, calendars, colors }: Props) {
 
       <div className="mt-2 text-xs text-muted-foreground">
         Each tower is one day — height = total contributions, and every floor band is a platform
-        sized by its share of that day.
+        sized by its share of that day. Laser beacons mark your top 5 days — hit ▶ drone tour for a flyover.
       </div>
     </div>
   );
