@@ -389,44 +389,177 @@ function DroneTour({
     const hd = depth / 2;
     return new THREE.CatmullRomCurve3(
       [
-        new THREE.Vector3(-hw - 8, 14, hd + 14),
+        new THREE.Vector3(-hw - 8, 12, hd + 12),
         new THREE.Vector3(-hw + 2, 5, hd + 3),
-        new THREE.Vector3(-hw * 0.4, 3.2, 0.7),
+        new THREE.Vector3(-hw * 0.4, 3.4, 0.7),
         new THREE.Vector3(0, 4, -0.7),
-        new THREE.Vector3(hw * 0.45, 3.4, 0.7),
+        new THREE.Vector3(hw * 0.45, 3.6, 0.7),
         new THREE.Vector3(hw - 2, 6, -hd - 3),
-        new THREE.Vector3(hw * 0.3, 18, -hd - 16),
-        new THREE.Vector3(-hw * 0.4, 26, -hd - 6),
-        new THREE.Vector3(...DEFAULT_CAM),
+        new THREE.Vector3(hw * 0.3, 14, -hd - 12),
+        new THREE.Vector3(-hw * 0.4, 18, -hd - 4),
+        new THREE.Vector3(-hw * 0.6, 14, hd * 0.3),
       ],
       false,
       "centripetal",
     );
   }, [width, depth]);
-  const look = useRef(new THREE.Vector3());
+
+  const drone = useRef<THREE.Group>(null);
+  const body = useRef<THREE.Group>(null);
+  const rotors = useRef<(THREE.Mesh | null)[]>([]);
+  const lights = useRef<THREE.MeshBasicMaterial[]>([]);
+  const camPos = useRef(new THREE.Vector3());
+  const camLook = useRef(new THREE.Vector3());
+  const tmp = useMemo(
+    () => ({
+      p: new THREE.Vector3(),
+      a: new THREE.Vector3(),
+      dir: new THREE.Vector3(),
+      prevDir: new THREE.Vector3(1, 0, 0),
+      want: new THREE.Vector3(),
+      target: new THREE.Vector3(...DEFAULT_TARGET),
+      home: new THREE.Vector3(...DEFAULT_CAM),
+      bank: 0,
+      speed: 0,
+      started: false,
+      ending: 0,
+    }),
+    [],
+  );
 
   useEffect(() => {
-    if (active) t.current = 0;
-  }, [active]);
+    if (active) {
+      t.current = 0;
+      tmp.started = false;
+      tmp.ending = 0;
+      tmp.speed = 0;
+    }
+  }, [active, tmp]);
 
-  useFrame((_, rawDelta) => {
+  useFrame((state, rawDelta) => {
+    if (drone.current) drone.current.visible = active;
     if (!active) return;
     const c = controlsRef.current;
     if (!c) return;
-    t.current = Math.min(1, t.current + Math.min(rawDelta, 1 / 30) / TOUR_SECONDS);
-    const e = t.current < 0.5 ? 2 * t.current * t.current : 1 - Math.pow(-2 * t.current + 2, 2) / 2;
-    const p = curve.getPointAt(e);
-    const ahead = curve.getPointAt(Math.min(1, e + 0.04));
-    // look slightly ahead and down while low; settle on the city centre at the end
-    const blend = THREE.MathUtils.smoothstep(e, 0.7, 1);
-    look.current.set(ahead.x, Math.max(0.5, ahead.y - 2.5), ahead.z * 0.4);
-    look.current.lerp(new THREE.Vector3(...DEFAULT_TARGET), blend);
-    c.object.position.copy(p);
-    c.target.copy(look.current);
+    const dt = Math.min(rawDelta, 1 / 30);
+
+    if (!tmp.started) {
+      camPos.current.copy(c.object.position);
+      camLook.current.copy(c.target);
+      tmp.started = true;
+    }
+
+    // soft speed ramp: accelerate in, cruise, then brake
+    const ramp = THREE.MathUtils.smoothstep(t.current, 0, 0.08) * (1 - 0.6 * THREE.MathUtils.smoothstep(t.current, 0.88, 1));
+    tmp.speed += (Math.max(0.15, ramp) - tmp.speed) * (1 - Math.exp(-3 * dt));
+    t.current = Math.min(1, t.current + (dt * tmp.speed) / TOUR_SECONDS);
+
+    const u = t.current;
+    curve.getPointAt(u, tmp.p);
+    curve.getPointAt(Math.min(1, u + 0.01), tmp.a);
+    tmp.dir.subVectors(tmp.a, tmp.p);
+    if (tmp.dir.lengthSq() < 1e-6) tmp.dir.copy(tmp.prevDir);
+    tmp.dir.normalize();
+
+    // banking from turn rate
+    const turn = tmp.prevDir.x * tmp.dir.z - tmp.prevDir.z * tmp.dir.x;
+    const wantBank = THREE.MathUtils.clamp(-turn / Math.max(dt, 1e-3) * 0.6, -0.55, 0.55);
+    tmp.bank += (wantBank - tmp.bank) * (1 - Math.exp(-4 * dt));
+    tmp.prevDir.lerp(tmp.dir, 1 - Math.exp(-6 * dt)).normalize();
+
+    const time = state.clock.elapsedTime;
+    if (drone.current && body.current) {
+      drone.current.position.copy(tmp.p);
+      drone.current.position.y += Math.sin(time * 2.2) * 0.06;
+      drone.current.rotation.set(0, Math.atan2(tmp.prevDir.x, tmp.prevDir.z), 0);
+      body.current.rotation.set(0.18 * tmp.speed, 0, tmp.bank);
+    }
+    rotors.current.forEach((r, i) => {
+      if (r) r.rotation.y += dt * (40 + i * 3) * (i % 2 ? 1 : -1);
+    });
+    const blink = Math.sin(time * 6) > 0.6 ? 1 : 0.25;
+    lights.current.forEach((m) => m && (m.opacity = blink));
+
+    // chase cam: behind + above the drone, heavily damped
+    tmp.want.copy(tmp.p).addScaledVector(tmp.prevDir, -3.2);
+    tmp.want.y += 1.4;
+    const endBlend = THREE.MathUtils.smoothstep(u, 0.85, 1);
+    tmp.want.lerp(tmp.home, endBlend);
+    tmp.a.copy(tmp.p).addScaledVector(tmp.prevDir, 2).lerp(tmp.target, endBlend);
+
+    const k = 1 - Math.exp(-2.6 * dt);
+    camPos.current.lerp(tmp.want, k);
+    camLook.current.lerp(tmp.a, 1 - Math.exp(-4 * dt));
+    c.object.position.copy(camPos.current);
+    c.target.copy(camLook.current);
     c.update();
-    if (t.current >= 1) onDone();
+
+    if (u >= 1) {
+      tmp.ending += dt;
+      if (tmp.ending > 0.6 || camPos.current.distanceTo(tmp.home) < 0.2) onDone();
+    }
   });
-  return null;
+
+  const arms: [number, number][] = [
+    [0.32, 0.32],
+    [-0.32, 0.32],
+    [0.32, -0.32],
+    [-0.32, -0.32],
+  ];
+
+  return (
+    <group ref={drone} visible={false}>
+      <group ref={body} scale={0.9}>
+        {/* fuselage */}
+        <mesh>
+          <boxGeometry args={[0.26, 0.09, 0.38]} />
+          <meshStandardMaterial color="#1b2a24" metalness={0.6} roughness={0.35} />
+        </mesh>
+        <mesh position={[0, 0.06, -0.02]}>
+          <boxGeometry args={[0.18, 0.04, 0.22]} />
+          <meshStandardMaterial color="#0f1a15" metalness={0.5} roughness={0.4} />
+        </mesh>
+        {/* camera lens */}
+        <mesh position={[0, -0.02, 0.2]}>
+          <sphereGeometry args={[0.045, 12, 10]} />
+          <meshBasicMaterial color="#39ff9c" toneMapped={false} />
+        </mesh>
+        {arms.map(([x, z], i) => (
+          <group key={i}>
+            <mesh position={[x / 2, 0, z / 2]} rotation={[0, Math.atan2(x, z), 0]}>
+              <boxGeometry args={[0.035, 0.03, 0.46]} />
+              <meshStandardMaterial color="#26352f" metalness={0.5} roughness={0.5} />
+            </mesh>
+            <mesh position={[x, 0.03, z]}>
+              <cylinderGeometry args={[0.035, 0.04, 0.05, 10]} />
+              <meshStandardMaterial color="#111" metalness={0.7} roughness={0.3} />
+            </mesh>
+            <mesh ref={(m) => (rotors.current[i] = m)} position={[x, 0.065, z]}>
+              <boxGeometry args={[0.3, 0.006, 0.035]} />
+              <meshBasicMaterial color="#9fe8c4" transparent opacity={0.45} />
+            </mesh>
+            <mesh position={[x, -0.01, z]}>
+              <sphereGeometry args={[0.022, 8, 6]} />
+              <meshBasicMaterial
+                ref={(m) => {
+                  if (m) lights.current[i] = m;
+                }}
+                color={z > 0 ? "#3dff8a" : "#ff3d5a"}
+                transparent
+                toneMapped={false}
+              />
+            </mesh>
+          </group>
+        ))}
+        {/* searchlight cone */}
+        <mesh position={[0, -1.3, 0.15]}>
+          <coneGeometry args={[0.7, 2.5, 20, 1, true]} />
+          <meshBasicMaterial color="#5dffb0" transparent opacity={0.08} depthWrite={false} side={THREE.DoubleSide} toneMapped={false} />
+        </mesh>
+        <pointLight position={[0, -0.2, 0]} color="#5dffb0" intensity={3} distance={5} />
+      </group>
+    </group>
+  );
 }
 
 type OrbitLike = {
