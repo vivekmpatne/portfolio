@@ -118,13 +118,13 @@ function ProjectCard({ project }: { project: Project }) {
   const currentImage = showSecondary && project.secondaryImage ? project.secondaryImage : project.image;
   return (
     <article
-      className={`group relative flex h-full flex-col overflow-hidden rounded-3xl border border-[#24201c] bg-[#12100e] shadow-card transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-card-hover ${
+      className={`group relative flex h-full flex-col overflow-hidden rounded-3xl border border-border bg-card shadow-card transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-card ${
         project.image ? "md:grid md:grid-cols-2 md:gap-0" : ""
       }`}
     >
       {project.image && (
         <div className="relative overflow-hidden border-b border-border bg-secondary aspect-[16/10] md:aspect-auto md:border-b-0 md:border-r">
-          <div className="absolute inset-x-0 top-0 z-10 flex h-9 items-center gap-1.5 border-b border-white/10 bg-[#171512]/95 px-3 backdrop-blur"><i className="h-2.5 w-2.5 rounded-full bg-[#ef6a5b]"/><i className="h-2.5 w-2.5 rounded-full bg-[#e9bd4b]"/><i className="h-2.5 w-2.5 rounded-full bg-[#62c554]"/><span className="ml-3 rounded-full bg-black/30 px-4 py-1 text-[10px] text-white/55">{project.liveUrl?.replace(/^https?:\/\//, "").split("/")[0] ?? "Project preview"}</span></div>
+          <div className="absolute inset-x-0 top-0 z-10 flex h-9 items-center gap-1.5 border-b border-foreground/10 bg-card/95 px-3 backdrop-blur"><i className="h-2.5 w-2.5 rounded-full bg-[#ef6a5b]"/><i className="h-2.5 w-2.5 rounded-full bg-[#e9bd4b]"/><i className="h-2.5 w-2.5 rounded-full bg-[#62c554]"/><span className="ml-3 rounded-full bg-background/30 px-4 py-1 text-[10px] text-muted-foreground">{project.liveUrl?.replace(/^https?:\/\//, "").split("/")[0] ?? "Project preview"}</span></div>
           {/* eslint-disable-next-line jsx-a11y/alt-text */}
           <img
             src={currentImage ?? undefined}

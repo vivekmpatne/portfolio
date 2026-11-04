@@ -1,8 +1,9 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <rect width="64" height="64" rx="10" fill="#0a1410"/>
-  <rect x="3" y="3" width="58" height="58" rx="8" fill="none" stroke="#4ade80" stroke-opacity="0.35" stroke-width="1"/>
-  <g fill="#4ade80" style="filter: drop-shadow(0 0 3px #4ade80);" font-family="ui-monospace, 'JetBrains Mono', monospace" font-weight="700">
-    <text x="10" y="42" font-size="28">&gt;</text>
-    <rect x="34" y="34" width="18" height="6" rx="1"/>
-  </g>
+  <defs>
+    <linearGradient id="g" x1="10" y1="12" x2="54" y2="52" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#f2e9dc"/><stop offset="1" stop-color="#c2ad82"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="16" fill="#12100e" stroke="#24201c"/>
+  <path d="M13 15h12l7 24 7-24h12L36 51h-8L13 15Z" fill="url(#g)"/>
 </svg>

@@ -14,8 +14,8 @@ import { ShellHost } from "@/components/portfolio/Shell";
 import { VsCodeSimulation } from "@/components/portfolio/VsCodeSimulation";
 import { profile } from "@/data/profile";
 
-const SITE_URL = "https://vivek-patne-portfolio.lovable.app";
-const TITLE = "Vivek Patne | CSE-DS · Aspiring Software Engineer · Building in Public";
+const SITE_URL = "https://vivekpatne.me";
+const TITLE = "Vivek Patne | Software Engineer";
 const DESCRIPTION =
   "Vivek Patne — CSE-DS student at RNSIT Bengaluru. Live GitHub, LeetCode & Codeforces stats, featured full-stack projects, and contact.";
 
@@ -28,6 +28,9 @@ export const Route = createFileRoute("/")({
       { property: "og:title", content: TITLE },
       { property: "og:description", content: DESCRIPTION },
       { property: "og:url", content: `${SITE_URL}/` },
+      { property: "og:image", content: `${SITE_URL}/og-image.png` },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:image", content: `${SITE_URL}/og-image.png` },
       { name: "twitter:title", content: TITLE },
       { name: "twitter:description", content: DESCRIPTION },
     ],

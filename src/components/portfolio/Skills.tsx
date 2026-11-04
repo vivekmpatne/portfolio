@@ -51,10 +51,9 @@ const techIcon: Record<string, IconType> = {
 export function Skills() {
   return (
     <section id="skills" className="mx-auto max-w-6xl px-6 py-10 sm:py-14">
-      <p className="eyebrow-script mb-2 text-xl">the toolkit</p>
-      <SectionHeader title="Tools I ship with" subtitle="The stack I reach for when an idea needs to become a real, working product." />
+      <SectionHeader title="Tools behind my work" subtitle="Languages, frameworks, and tools I use to turn ideas into working software." />
       <div className="mb-8 grid grid-cols-4 gap-4 sm:grid-cols-7">
-        {["React","TypeScript","Node.js","MongoDB","PostgreSQL","Docker","Git","Linux","C++","Python","ESP32","MQTT"].map((name,i)=><div key={name} className="flex flex-col items-center gap-2 text-center"><div className="squircle-3d flex aspect-square w-full max-w-[76px] items-center justify-center text-lg font-bold text-[#c2ad82]">{["⚛","TS","JS","◈","▤","▦","⌘","Tux","C++","Py","IoT","⌁"][i]}</div><span className="text-[11px] text-muted-foreground">{name}</span></div>)}
+        {["React","TypeScript","Node.js","MongoDB","PostgreSQL","Docker","Git","Linux","C++","Python","ESP32","MQTT"].map((name,i)=><div key={name} className="flex flex-col items-center gap-2 text-center"><div className="squircle-3d flex aspect-square w-full max-w-[76px] items-center justify-center text-lg font-bold text-primary">{["⚛","TS","JS","◈","▤","▦","⌘","Tux","C++","Py","IoT","⌁"][i]}</div><span className="text-[11px] text-muted-foreground">{name}</span></div>)}
       </div>
       <div className="grid gap-5 md:grid-cols-2">
         {Object.entries(skills).map(([category, items]) => {
@@ -62,7 +61,7 @@ export function Skills() {
           return (
             <div
               key={category}
-              className="group relative rounded-2xl p-[1px] transition-all duration-300 hover:-translate-y-1"
+              className="group relative rounded-3xl p-[1px] transition-all duration-300 hover:-translate-y-1"
               style={{
                 background:
                   "linear-gradient(var(--card), var(--card)) padding-box, linear-gradient(135deg, transparent, transparent) border-box",
@@ -70,10 +69,10 @@ export function Skills() {
             >
               {/* Gradient border on hover */}
               <div
-                className="pointer-events-none absolute inset-0 rounded-2xl opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+                className="pointer-events-none absolute inset-0 rounded-3xl opacity-0 transition-opacity duration-300 group-hover:opacity-100"
                 style={{
                   background:
-                    "linear-gradient(135deg, #6366f1, #8b5cf6, #ec4899)",
+                    "var(--gold-ivory-gradient)",
                   WebkitMask:
                     "linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0)",
                   WebkitMaskComposite: "xor",
@@ -81,7 +80,7 @@ export function Skills() {
                   padding: "1px",
                 }}
               />
-              <div className="relative overflow-hidden rounded-2xl border border-border/80 bg-card/95 p-6 shadow-card transition-all duration-300 hover:-translate-y-1 hover:shadow-card-hover group-hover:shadow-card-hover">
+              <div className="relative overflow-hidden rounded-3xl border border-border bg-card p-6 shadow-card transition-all duration-300 hover:-translate-y-1 hover:shadow-card group-hover:shadow-card">
                 <div
                   className="pointer-events-none absolute -inset-px opacity-0 transition-opacity duration-300 group-hover:opacity-100"
                   style={{
@@ -101,7 +100,7 @@ export function Skills() {
                     return (
                       <span
                         key={skill}
-                        className="inline-flex items-center gap-1.5 rounded-lg border border-border/70 bg-background/90 px-2.5 py-1.5 text-sm shadow-[0_1px_2px_rgba(0,0,0,0.03)] transition-all hover:-translate-y-0.5 hover:scale-105 hover:border-primary/40 hover:bg-accent hover:shadow-md"
+                        className="inline-flex items-center gap-1.5 rounded-lg border border-border/70 bg-background/90 px-2.5 py-1.5 text-sm shadow-card transition-all hover:-translate-y-0.5 hover:scale-105 hover:border-primary/40 hover:bg-accent hover:shadow-card"
                       >
                         {TechIcon ? <TechIcon className="h-3.5 w-3.5 text-muted-foreground" /> : null}
                         {skill}

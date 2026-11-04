@@ -35,20 +35,20 @@ export function Contact() {
 
   return (
     <section id="contact" className="mx-auto max-w-6xl px-6 py-10 sm:py-14">
-      <SectionHeader title="Let's build something great" subtitle="Open to SDE roles, internship opportunities, and technical discussions. Email is the fastest way to reach me." />
+      <SectionHeader title="Let's talk about what you're building" subtitle="Open to SDE roles, internship opportunities, and technical discussions. Email is the fastest way to reach me." />
       <div className="grid gap-8 md:grid-cols-2">
         <div className="space-y-6">
           <p className="text-lg text-muted-foreground">
             Open to SDE roles, internship opportunities, and technical discussions. Email is the fastest way to reach me.
           </p>
 
-          <button type="button" onClick={async()=>{await navigator.clipboard.writeText(profile.email);toast.success("Email copied to clipboard");}} className="flex w-full items-center justify-between gap-3 rounded-full border border-[#2a2723] bg-[#141210] px-5 py-3 text-left text-sm"><span className="flex min-w-0 items-center gap-3"><Mail className="h-4 w-4 shrink-0 text-primary"/><span className="truncate">{profile.email}</span></span><Copy className="h-4 w-4 shrink-0 text-muted-foreground"/></button>
+          <button type="button" onClick={async()=>{await navigator.clipboard.writeText(profile.email);toast.success("Email copied to clipboard");}} className="flex w-full items-center justify-between gap-3 rounded-full border border-border bg-card px-5 py-3 text-left text-sm"><span className="flex min-w-0 items-center gap-3"><Mail className="h-4 w-4 shrink-0 text-primary"/><span className="truncate">{profile.email}</span></span><Copy className="h-4 w-4 shrink-0 text-muted-foreground"/></button>
 
           <div className="space-y-2">
             {contactItems.map((item) => {
               const Icon = item.icon;
               const inner = (
-                <div className="flex items-center gap-4 rounded-xl border border-border bg-card p-4 shadow-card transition-all hover:-translate-y-0.5 hover:border-foreground/30 hover:shadow-card-hover">
+                <div className="flex items-center gap-4 rounded-xl border border-border bg-card p-4 shadow-card transition-all hover:-translate-y-0.5 hover:border-foreground/30 hover:shadow-card">
                   <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-accent">
                     <Icon className="h-4 w-4 text-foreground" />
                   </div>
@@ -93,7 +93,7 @@ export function Contact() {
 
         <form
           onSubmit={onSubmit}
-          className="h-fit space-y-3 rounded-2xl border border-border bg-card p-6 shadow-card"
+          className="h-fit space-y-3 rounded-3xl border border-border bg-card p-6 shadow-card"
         >
           <Input
             required

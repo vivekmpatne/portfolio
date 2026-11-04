@@ -46,7 +46,7 @@ export function Achievements() {
           return (
             <div
               key={a.label}
-              className="group relative overflow-hidden rounded-2xl border border-border/80 bg-card/95 p-6 shadow-card transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-card-hover"
+              className="group relative overflow-hidden rounded-3xl border border-border/80 bg-card/95 p-6 shadow-card transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-card"
             >
               <Icon className={`h-6 w-6 ${a.color}`} />
               <div className="mt-4 font-display text-3xl font-semibold">{a.value}</div>

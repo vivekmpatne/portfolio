@@ -3,7 +3,7 @@
 export function PuzzleAvatar() {
   return (
     <div className="relative mx-auto w-full max-w-[340px] select-none md:max-w-none">
-      <div className="relative overflow-hidden rounded-[2rem] border border-border bg-card/70 p-3 shadow-card-hover backdrop-blur-xl">
+      <div className="relative overflow-hidden rounded-[2rem] border border-border bg-card/70 p-3 shadow-card backdrop-blur-xl">
         <img
           src={profile.avatar}
           alt={profile.name}

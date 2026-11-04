@@ -811,7 +811,7 @@ export default function GitCity3D({ weeks, merged, calendars, colors }: Props) {
   return (
     <div>
       <div
-        className="relative h-[420px] w-full overflow-hidden [touch-action:pan-y] rounded-xl border border-border shadow-sm"
+        className="relative h-[420px] w-full overflow-hidden [touch-action:pan-y] rounded-xl border border-border shadow-card"
         style={{ background: "linear-gradient(180deg, #F8FAFC 0%, #FFFFFF 100%)" }}
         onPointerDown={(e) => {
           downRef.current = { x: e.clientX, y: e.clientY };
@@ -865,7 +865,7 @@ export default function GitCity3D({ weeks, merged, calendars, colors }: Props) {
             setHover(null);
             setTouring((v) => !v);
           }}
-          className="absolute right-3 top-3 rounded-lg border border-primary/40 bg-background/85 px-3 py-1.5 font-mono text-[11px] font-semibold text-primary shadow-sm backdrop-blur-md transition hover:bg-primary/10"
+          className="absolute right-3 top-3 rounded-lg border border-primary/40 bg-background/85 px-3 py-1.5 font-mono text-[11px] font-semibold text-primary shadow-card backdrop-blur-md transition hover:bg-primary/10"
         >
           {touring ? "■ stop tour" : "▶ drone tour"}
         </button>
@@ -875,7 +875,7 @@ export default function GitCity3D({ weeks, merged, calendars, colors }: Props) {
           </div>
         ) : null}
 
-        <div className="pointer-events-none absolute left-3 top-3 rounded-lg border border-border bg-background/85 px-3 py-1.5 font-mono text-[11px] text-foreground/80 shadow-sm backdrop-blur-md">
+        <div className="pointer-events-none absolute left-3 top-3 rounded-lg border border-border bg-background/85 px-3 py-1.5 font-mono text-[11px] text-foreground/80 shadow-card backdrop-blur-md">
           {touring
             ? "cinematic flyover in progress…"
             : zoomEnabled
@@ -884,7 +884,7 @@ export default function GitCity3D({ weeks, merged, calendars, colors }: Props) {
         </div>
 
         {hover ? (
-          <div className="pointer-events-none absolute bottom-3 left-3 max-w-[75%] rounded-xl border border-border bg-card/95 p-3.5 font-mono text-xs text-foreground shadow-xl backdrop-blur-md">
+          <div className="pointer-events-none absolute bottom-3 left-3 max-w-[75%] rounded-xl border border-border bg-card/95 p-3.5 font-mono text-xs text-foreground shadow-card backdrop-blur-md">
             <div className="font-semibold">
               {hover.date} — {hover.count} {hover.count === 1 ? "contribution" : "contributions"}
             </div>

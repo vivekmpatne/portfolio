@@ -42,7 +42,7 @@ export function Hero() {
 
   return (
     <section id="home" className="relative overflow-hidden">
-      <div aria-hidden className="pointer-events-none absolute inset-x-0 top-28 text-center text-[clamp(4rem,14vw,12rem)] font-black leading-none tracking-[-.08em] text-[#e8dec8]/[.055]">SOFTWARE ENGINEER</div>
+      <div aria-hidden className="pointer-events-none absolute inset-x-0 top-28 text-center text-[clamp(4rem,14vw,12rem)] font-black leading-none tracking-[-.08em] text-foreground/[.055]">SOFTWARE ENGINEER</div>
       {/* soft ambient light */}
       <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
         <div className="absolute -top-32 left-1/4 h-[420px] w-[420px] rounded-full bg-primary/10 blur-3xl" />
@@ -85,19 +85,19 @@ export function Hero() {
           </div>
 
           <div className="mt-8 flex flex-wrap items-center gap-3">
-            <Button asChild size="lg" className="rounded-full bg-[#f2e9dc] px-6 text-[#0e0d0b] shadow-card-hover hover:bg-[#e8dec8]">
+            <Button asChild size="lg" className="rounded-full bg-gold-ivory px-6 text-primary-foreground shadow-card hover:opacity-90">
               <a href="#projects">
                 View Projects <ArrowRight className="ml-1 h-4 w-4" />
               </a>
             </Button>
             {resumeUrl && resumeAvailable && (
-              <Button asChild size="lg" variant="outline" className="rounded-full border-primary/30 bg-primary/10 px-6 text-primary shadow-sm transition-all duration-300 hover:border-primary/50 hover:bg-primary/20">
+              <Button asChild size="lg" variant="outline" className="rounded-full border-primary/30 bg-primary/10 px-6 text-primary shadow-card transition-all duration-300 hover:border-primary/50 hover:bg-primary/20">
                 <a href={resumeUrl} target="_blank" rel="noopener noreferrer" download>
                   <FileText className="mr-1 h-4 w-4" /> Resume
                 </a>
               </Button>
             )}
-            <Button asChild size="lg" variant="outline" className="rounded-full border-[#2a2723] bg-[#1c1a17] px-5 text-[#e8dec8] hover:bg-[#28231c]">
+            <Button asChild size="lg" variant="outline" className="rounded-full border-border bg-surface px-5 text-foreground hover:bg-accent">
               <a href="#contact">
                 <Mail className="mr-1 h-4 w-4" /> Contact
               </a>
@@ -108,7 +108,7 @@ export function Hero() {
             {STATS.map((s) => (
               <div
                 key={s.label}
-                className="rounded-2xl border border-border bg-card p-4 shadow-card transition-all duration-300 hover:-translate-y-1 hover:shadow-card-hover"
+                className="rounded-3xl border border-border bg-card p-4 shadow-card transition-all duration-300 hover:-translate-y-1 hover:shadow-card"
               >
                 <s.icon className="h-4 w-4 text-primary" />
                 <div className="mt-2 text-xl font-bold tracking-tight">{s.value}</div>
@@ -123,7 +123,7 @@ export function Hero() {
         </div>
 
         <div className="relative mx-auto w-full max-w-[380px]">
-          <div className="pointer-events-none absolute inset-8 rounded-full bg-[#c2ad82]/20 blur-[70px]" />
+          <div className="pointer-events-none absolute inset-8 rounded-full bg-primary/20 blur-[70px]" />
           <PuzzleAvatar />
           {[
             { I: Trophy, t: "LeetCode", p: "-top-4 -left-4 md:-top-5 md:-left-6", delay: "0s" },
@@ -131,7 +131,7 @@ export function Hero() {
             { I: Braces, t: "Code", p: "bottom-8 -left-5 md:bottom-10 md:-left-7", delay: "1.6s" },
             { I: Terminal, t: "Terminal", p: "-bottom-3 right-4 md:-bottom-4 md:right-6", delay: "2.4s" },
           ].map(({ I, t, p, delay }) => (
-            <div key={t} aria-label={t} className={`hero-badge squircle-3d absolute z-20 flex h-14 w-14 pointer-events-auto items-center justify-center text-[#e8dec8] motion-safe:animate-[float-slow_6s_ease-in-out_infinite] ${p}`} style={{ animationDelay: delay }}>
+            <div key={t} aria-label={t} className={`hero-badge squircle-3d absolute z-20 flex h-14 w-14 pointer-events-auto items-center justify-center text-foreground motion-safe:animate-[float-slow_6s_ease-in-out_infinite] ${p}`} style={{ animationDelay: delay }}>
               <I className="h-6 w-6" />
             </div>
           ))}

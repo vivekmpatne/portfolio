@@ -99,7 +99,7 @@ export function VsCodeSimulation() {
       aria-label="Portfolio starting up"
       className={`fixed inset-0 z-[100] flex items-center justify-center bg-[var(--vsc-bar)] p-0 font-mono text-[13px] transition-opacity duration-500 sm:p-6 ${leaving ? "opacity-0" : "opacity-100"}`}
     >
-      <div className="flex h-full w-full max-w-6xl flex-col overflow-hidden border border-[var(--vsc-border)] bg-[var(--vsc-bg)] shadow-2xl sm:h-[85vh] sm:rounded-xl">
+      <div className="flex h-full w-full max-w-6xl flex-col overflow-hidden border border-[var(--vsc-border)] bg-[var(--vsc-bg)] shadow-card sm:h-[85vh] sm:rounded-xl">
         {/* title bar */}
         <div className="flex h-9 shrink-0 items-center justify-between border-b border-[var(--vsc-border)] bg-[var(--vsc-bar)] px-3 text-xs text-[var(--vsc-dim)]">
           <div className="flex gap-1.5">

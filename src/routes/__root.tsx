@@ -80,7 +80,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { name: "author", content: "Vivek Patne" },
-      { name: "theme-color", content: "#0a1410" },
+      { title: "Vivek Patne | Software Engineer" },
+      { name: "theme-color", content: "#0a0908" },
       { property: "og:type", content: "website" },
       { property: "og:site_name", content: "Vivek Patne" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -89,12 +90,19 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     links: [
       { rel: "stylesheet", href: appCss },
       { rel: "icon", type: "image/svg+xml", href: "/favicon.svg" },
-      { rel: "apple-touch-icon", href: "/favicon.svg" },
+      { rel: "icon", type: "image/x-icon", sizes: "32x32", href: "/favicon.ico" },
+      { rel: "icon", type: "image/png", sizes: "192x192", href: "/icon-192.png" },
+      { rel: "apple-touch-icon", sizes: "180x180", href: "/apple-touch-icon.png" },
+      { rel: "manifest", href: "/site.webmanifest" },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {
         rel: "stylesheet",
         href: "https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap",
+      },
+      {
+        rel: "stylesheet",
+        href: "https://fonts.googleapis.com/css2?family=Anton&display=swap",
       },
     ],
 
@@ -105,7 +113,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           "@context": "https://schema.org",
           "@type": "WebSite",
           name: "Vivek Patne — Portfolio",
-          url: "https://vivek-patne-portfolio.lovable.app/",
+          url: "https://vivekpatne.me/",
         }),
       },
     ],
@@ -142,9 +150,45 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
+      <MotionRuntime />
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <Outlet />
       <Toaster position="bottom-right" richColors />
     </QueryClientProvider>
   );
+}
+
+function MotionRuntime() {
+  useEffect(() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    let cancelled = false;
+    let cleanupRuntime: (() => void) | undefined;
+
+    void Promise.all([import("lenis"), import("gsap"), import("gsap/ScrollTrigger")])
+      .then(([lenisModule, gsapModule, scrollTriggerModule]) => {
+        if (cancelled) return;
+        const lenis = new lenisModule.default({ lerp: 0.1 });
+        const { gsap } = gsapModule;
+        const { ScrollTrigger } = scrollTriggerModule;
+        gsap.registerPlugin(ScrollTrigger);
+        lenis.on("scroll", ScrollTrigger.update);
+        const tick = (time: number) => lenis.raf(time * 1000);
+        gsap.ticker.add(tick);
+        gsap.ticker.lagSmoothing(0);
+        cleanupRuntime = () => {
+          lenis.off("scroll", ScrollTrigger.update);
+          gsap.ticker.remove(tick);
+          lenis.destroy();
+        };
+      })
+      .catch((error: unknown) => console.error("Smooth scrolling could not initialize", error));
+
+    return () => {
+      cancelled = true;
+      cleanupRuntime?.();
+    };
+  }, []);
+
+  return null;
 }

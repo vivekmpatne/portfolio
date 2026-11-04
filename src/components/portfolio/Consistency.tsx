@@ -199,7 +199,7 @@ export function Consistency() {
           return (
             <div
               key={m.label}
-              className="group rounded-2xl border border-border/80 bg-card/95 p-5 shadow-card transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-card-hover"
+              className="group rounded-3xl border border-border/80 bg-card/95 p-5 shadow-card transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-card"
             >
               <div className="flex items-center justify-between">
                 <Icon className={`h-5 w-5 ${m.color}`} />
@@ -217,7 +217,7 @@ export function Consistency() {
       </div>
 
       {/* Heatmap card */}
-      <div className="rounded-2xl border border-border/80 bg-card/95 p-5 shadow-card">
+      <div className="rounded-3xl border border-border/80 bg-card/95 p-5 shadow-card">
         <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
           <div>
             <div className="font-display text-base font-semibold">Engineering Activity — {year}</div>
@@ -348,7 +348,7 @@ export function Consistency() {
             return (
               <div
                 key={s.key}
-                className="flex items-center justify-between rounded-2xl border border-border/80 bg-card/95 px-4 py-3 shadow-card transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-card-hover"
+                className="flex items-center justify-between rounded-3xl border border-border/80 bg-card/95 px-4 py-3 shadow-card transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-card"
               >
                 <div className="flex items-center gap-3">
                   <Icon className="h-5 w-5" style={{ color: s.color }} />

@@ -1,27 +1,26 @@
-const ORDER = [
-  "about",
-  "skills",
-  "projects",
-  "experience & education",
-  "coding profiles",
-  "consistency",
-  "contact",
-];
+const EYEBROWS: Record<string, string> = {
+  "learning by building": "behind the work",
+  "tools behind my work": "my working toolkit",
+  projects: "built with intent",
+  "experience & education": "learning through practice",
+  "coding profiles": "across platforms",
+  "consistency dashboard": "showing up, every day",
+};
 
-export function SectionHeader({ title, subtitle }: { title: string; subtitle?: string }) {
-  const idx = ORDER.indexOf(title.toLowerCase());
-  const num = idx >= 0 ? String(idx + 1).padStart(2, "0") : null;
+export function SectionHeader({
+  title,
+  subtitle,
+  eyebrow,
+}: {
+  title: string;
+  subtitle?: string;
+  eyebrow?: string;
+}) {
   return (
     <div className="mb-6 sm:mb-8">
-      <div className="flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.2em] text-primary">
-        {num && (
-          <span className="rounded-md bg-gradient-primary px-2 py-0.5 font-mono text-primary-foreground shadow-glow">{num}</span>
-        )}
-        <span className="h-px w-10 bg-gradient-primary" />
-        <span className="text-muted-foreground">{title}</span>
-      </div>
-      <h2 className="display-heading mt-4 text-4xl md:text-6xl">
-        <span>{title}</span>
+      <p className="eyebrow-script mb-2 text-xl">{eyebrow ?? EYEBROWS[title.toLowerCase()] ?? "get in touch"}</p>
+      <h2 className="display-heading text-4xl md:text-6xl">
+      {title}
       </h2>
       {subtitle ? <p className="mt-3 max-w-2xl text-muted-foreground">{subtitle}</p> : null}
     </div>

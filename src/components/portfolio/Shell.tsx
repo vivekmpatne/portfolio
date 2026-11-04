@@ -67,7 +67,7 @@ export function ShellHost() {
   }, []);
   if (!open) return null;
   return <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/60 p-4 backdrop-blur-sm" onMouseDown={(event) => { if (event.target === event.currentTarget) setOpen(false); }}>
-    <div role="dialog" aria-modal="true" aria-label="Interactive developer console" className="flex h-[min(640px,85vh)] w-full max-w-2xl flex-col overflow-hidden rounded-2xl border border-border bg-card/95 shadow-2xl backdrop-blur-xl">
+    <div role="dialog" aria-modal="true" aria-label="Interactive developer console" className="flex h-[min(640px,85vh)] w-full max-w-2xl flex-col overflow-hidden rounded-3xl border border-border bg-card/95 shadow-card backdrop-blur-xl">
       <div className="flex items-center justify-between border-b border-border bg-muted/60 px-4 py-3">
         <div className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-full bg-red-400" /><span className="h-2.5 w-2.5 rounded-full bg-amber-400" /><span className="h-2.5 w-2.5 rounded-full bg-emerald-400" /></div>
         <div className="text-[11px] font-medium text-muted-foreground">vivek.os · developer console v2.0</div>

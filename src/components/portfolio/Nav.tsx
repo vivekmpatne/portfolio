@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { FileText, Menu, Moon, Sun, X } from "lucide-react";
 import { profile } from "@/data/profile";
 import { useResumeAvailable } from "@/hooks/use-resume-available";
+import { BrandMark } from "./BrandMark";
 
 const sections = [
   { id: "home", label: "Home" },
@@ -60,21 +61,18 @@ export function Nav() {
   return (
     <header className="fixed inset-x-0 top-0 z-50 px-4 pt-4">
       <nav
-        className={`relative mx-auto flex max-w-6xl items-center justify-between overflow-hidden rounded-2xl border px-4 py-2.5 backdrop-blur-xl transition-all duration-300 ${
-          scrolled ? "border-border bg-card/80 shadow-nav" : "border-transparent bg-card/50"
+        className={`relative mx-auto flex max-w-6xl items-center justify-between overflow-hidden rounded-3xl border px-4 py-2.5 backdrop-blur-xl transition-all duration-300 ${
+          scrolled ? "border-border bg-card/80 shadow-card" : "border-transparent bg-card/50"
         }`}
       >
         <div
           aria-hidden
-          className="absolute inset-x-0 bottom-0 h-[2px] origin-left bg-[image:var(--gradient-primary)] transition-transform duration-100"
+          className="absolute inset-x-0 bottom-0 h-[2px] origin-left bg-[image:var(--gold-ivory-gradient)] transition-transform duration-100"
           style={{ transform: `scaleX(${progress / 100})` }}
         />
-        <a href="#home" className="flex items-center gap-2 text-base font-bold tracking-tight">
-          <span className="flex h-7 w-7 items-center justify-center rounded-lg border border-green-400/50 bg-[#0a1410] font-mono text-[11px] font-bold tracking-tight text-green-400 shadow-[0_0_10px_rgba(74,222,128,0.2)] transition-all duration-300 hover:animate-[terminal-pulse_1.1s_ease-in-out_infinite] hover:border-green-300 hover:text-green-300 motion-reduce:hover:animate-none">
-            <span aria-hidden="true">&gt;_</span>
-            <span className="sr-only">Terminal</span>
-          </span>
-          Vivek Patne
+        <a href="#home" className="group flex items-center gap-2 text-base font-bold tracking-tight">
+          <BrandMark className="h-8 w-8 shrink-0" />
+          <span>Vivek <span className="text-muted-foreground">Patne</span></span>
         </a>
         <ul className="hidden items-center gap-0.5 text-sm lg:flex">
           {sections.map((s) => (
@@ -94,7 +92,7 @@ export function Nav() {
         </ul>
         <div className="flex items-center gap-2">
           {resumeUrl && resumeAvailable && (
-            <a href={resumeUrl} target="_blank" rel="noopener noreferrer" download aria-label="Open resume" className="inline-flex items-center gap-1.5 rounded-full border border-primary/30 bg-primary/10 px-2.5 py-2 text-sm font-semibold text-primary shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-primary/50 hover:bg-primary/20 sm:px-4">
+            <a href={resumeUrl} target="_blank" rel="noopener noreferrer" download aria-label="Open resume" className="inline-flex items-center gap-1.5 rounded-full border border-primary/30 bg-primary/10 px-2.5 py-2 text-sm font-semibold text-primary shadow-card transition-all duration-300 hover:-translate-y-0.5 hover:border-primary/50 hover:bg-primary/20 sm:px-4">
               <FileText className="h-3.5 w-3.5" /> <span className="hidden sm:inline">Resume</span>
             </a>
           )}
@@ -123,7 +121,7 @@ export function Nav() {
       </nav>
 
       {open && (
-        <div className="mx-auto mt-2 max-w-6xl rounded-2xl border border-border bg-card/95 p-2 shadow-nav backdrop-blur-xl lg:hidden">
+        <div className="mx-auto mt-2 max-w-6xl rounded-3xl border border-border bg-card/95 p-2 shadow-card backdrop-blur-xl lg:hidden">
           <ul className="flex flex-col gap-1 text-sm">
             {sections.map((s) => (
               <li key={s.id}>
