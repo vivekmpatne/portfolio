@@ -11,6 +11,7 @@ import { Contact } from "@/components/portfolio/Contact";
 import { Footer } from "@/components/portfolio/Footer";
 import { BackToTop } from "@/components/portfolio/BackToTop";
 import { ShellHost } from "@/components/portfolio/Shell";
+import { VsCodeSimulation } from "@/components/portfolio/VsCodeSimulation";
 import { profile } from "@/data/profile";
 
 const SITE_URL = "https://vivek-patne-portfolio.lovable.app";
@@ -73,6 +74,7 @@ function Index() {
     <div className="relative min-h-screen overflow-x-hidden bg-background text-foreground">
       <ShellHost />
       <div className="relative z-20">
+        <VsCodeSimulation />
         <Nav />
         <main>
           <Hero />
