@@ -9,7 +9,7 @@ const sections = [
   { id: "skills", label: "Skills" },
   { id: "projects", label: "Projects" },
   { id: "experience", label: "Experience" },
-  { id: "achievements", label: "Achievements" },
+  { id: "achievements", label: "Coding Profiles" },
   { id: "consistency", label: "Consistency" },
   { id: "contact", label: "Contact" },
 ];
@@ -92,7 +92,7 @@ export function Nav() {
     >
       {/* Scroll progress ribbon — loading-bar style */}
       <div
-        className="absolute inset-x-0 top-0 h-[3px] overflow-hidden bg-[hsl(var(--phosphor)/0.12)]"
+        className="absolute inset-x-0 bottom-0 h-[2.5px] overflow-hidden bg-[hsl(var(--phosphor)/0.12)]"
         aria-hidden
       >
         <div
@@ -108,8 +108,9 @@ export function Nav() {
 
 
       <nav className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-        <a href="#home" className="font-display text-lg font-semibold tracking-tight">
-          Vivek Patne M
+        <a href="#home" className="flex items-center gap-2 font-mono text-base font-semibold tracking-tight transition-colors hover:text-primary">
+          <span className="font-bold text-primary">&gt;_</span>
+          <span>Vivek Patne M</span>
         </a>
         <ul className="hidden items-center gap-1 text-sm md:flex">
           {sections.map((s) => {
@@ -120,13 +121,13 @@ export function Nav() {
                   href={`#${s.id}`}
                   className={`relative rounded-md px-3 py-1.5 transition-colors ${
                     isActive
-                      ? "text-foreground"
+                      ? "font-medium text-primary"
                       : "text-muted-foreground hover:text-foreground"
                   }`}
                 >
                   {s.label}
                   {isActive && (
-                    <span className="absolute inset-x-3 -bottom-0.5 h-0.5 rounded-full bg-foreground" />
+                    <span className="absolute inset-x-3 -bottom-0.5 h-0.5 rounded-full bg-primary shadow-[0_0_8px_hsl(var(--phosphor))]" />
                   )}
                 </a>
               </li>
@@ -152,7 +153,7 @@ export function Nav() {
               document.documentElement.classList.toggle("dark", nextDark);
             }}
             aria-label="Toggle theme"
-            className="rounded-md border border-border bg-card p-2 shadow-card transition-colors hover:bg-accent"
+            className="rounded-md border border-border/70 bg-card p-2 shadow-card transition-colors hover:border-primary/50 hover:bg-accent"
           >
             {!mounted ? (
               <Monitor className="h-4 w-4" />

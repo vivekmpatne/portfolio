@@ -6,7 +6,7 @@ const focusAreas = [
   "Data Structures & Algorithms",
   "Full Stack Development",
   "Problem Solving",
-  "Software Engineering",
+  "Software Development",
 ];
 
 export function About() {

@@ -15,7 +15,7 @@ import { VsCodeSimulation } from "@/components/portfolio/VsCodeSimulation";
 import { profile } from "@/data/profile";
 
 const SITE_URL = "https://vivekpatne.me";
-const TITLE = "Vivek Patne M | Software Engineer";
+const TITLE = "Vivek Patne M | Aspiring SDE";
 const DESCRIPTION =
   "Vivek Patne M — CSE-DS student at RNSIT Bengaluru. Live GitHub, LeetCode & Codeforces stats, featured full-stack projects, and contact.";
 
@@ -42,7 +42,7 @@ export const Route = createFileRoute("/")({
           "@context": "https://schema.org",
           "@type": "Person",
           name: profile.name,
-          jobTitle: "Software Engineering Student",
+          jobTitle: "Aspiring SDE",
           description: profile.bio,
           url: `${SITE_URL}/`,
           email: `mailto:${profile.email}`,

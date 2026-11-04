@@ -42,7 +42,9 @@ const toneClass = (t?: Line["tone"]) =>
           : "text-[var(--vsc-text)]";
 
 export function VsCodeSimulation() {
-  const [show, setShow] = useState(false);
+  // Render the opaque boot screen in the first HTML pass to avoid a flash of
+  // the portfolio underneath before hydration starts.
+  const [show, setShow] = useState(true);
   const [leaving, setLeaving] = useState(false);
   const [typed, setTyped] = useState(0);
   const [lines, setLines] = useState(0);
@@ -93,7 +95,7 @@ export function VsCodeSimulation() {
     <div
       role="dialog"
       aria-label="Portfolio starting up"
-      className={`fixed inset-0 z-[100] flex items-center justify-center bg-[var(--vsc-bar)] p-0 font-mono text-[13px] transition-opacity duration-500 sm:p-6 ${leaving ? "opacity-0" : "opacity-100"}`}
+      className={`fixed inset-0 z-[100] flex items-center justify-center bg-[#181818] p-0 font-mono text-[13px] transition-opacity duration-500 sm:p-6 ${leaving ? "pointer-events-none opacity-0" : "opacity-100"}`}
     >
       <div className="flex h-full w-full max-w-6xl flex-col overflow-hidden border border-[var(--vsc-border)] bg-[var(--vsc-bg)] shadow-card sm:h-[85vh] sm:rounded-xl">
         {/* title bar */}

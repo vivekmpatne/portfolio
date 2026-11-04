@@ -60,6 +60,20 @@
   --phosphor: oklch(0.38 0.18 150);
   --amber-term: oklch(0.55 0.17 75);
 
+  /* Opaque Visual Studio Code boot simulation palette. */
+  --vsc-bg: oklch(0.23 0 0);
+  --vsc-side: oklch(0.26 0 0);
+  --vsc-bar: oklch(0.2 0 0);
+  --vsc-border: oklch(0.33 0 0);
+  --vsc-text: oklch(0.86 0 0);
+  --vsc-dim: oklch(0.6 0 0);
+  --vsc-blue: oklch(0.55 0.15 245);
+  --vsc-key: oklch(0.65 0.13 250);
+  --vsc-str: oklch(0.72 0.1 50);
+  --vsc-type: oklch(0.76 0.1 180);
+  --vsc-fn: oklch(0.87 0.1 100);
+  --vsc-ok: oklch(0.75 0.16 150);
+
   --shadow-card: 0 1px 0 oklch(0.38 0.18 150 / 8%), 0 0 0 1px oklch(0.38 0.18 150 / 18%);
   --shadow-card-hover: 0 0 24px -8px oklch(0.38 0.18 150 / 35%), 0 0 0 1px oklch(0.38 0.18 150 / 55%);
   --shadow-nav: 0 1px 0 oklch(0.38 0.18 150 / 12%);
@@ -247,6 +261,12 @@
   text-align: left;
   animation: loading-dots-anim 1.2s steps(1) infinite;
 }
+
+@keyframes vsc-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: none; }
+}
+.vsc-line { animation: vsc-in 220ms ease-out both; }
 
 /* Always-visible phosphor scrollbar inside the interactive shell */
 .term-scroll {

@@ -8,8 +8,8 @@ import { AsciiPortrait } from "./AsciiPortrait";
 
 
 const ROLES = [
-  "Aspiring Software Engineer",
-  "Full-Stack Engineer",
+  "Aspiring SDE",
+  "Full-Stack Developer",
   "DSA Grinder",
   "Building in Public",
 ];

@@ -1,10 +1,10 @@
 {
-  "name": "Vivek Patne | Software Engineer",
+  "name": "Vivek Patne M | Aspiring SDE",
   "short_name": "Vivek Patne",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#090d13",
-  "theme_color": "#090d13",
+  "background_color": "#f8faf8",
+  "theme_color": "#f8faf8",
   "icons": [
     { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" },
     { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png" }
