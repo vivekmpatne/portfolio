@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { FileText, Menu, X } from "lucide-react";
+import { FileText, Menu, Moon, Sun, X } from "lucide-react";
 import { profile } from "@/data/profile";
 import { useResumeAvailable } from "@/hooks/use-resume-available";
 
@@ -19,6 +19,7 @@ export function Nav() {
   const [progress, setProgress] = useState(0);
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState("home");
+  const [dark, setDark] = useState(false);
   const resumeUrl = profile.resumeUrl;
   const resumeAvailable = useResumeAvailable();
 
@@ -91,6 +92,17 @@ export function Nav() {
               <FileText className="h-3.5 w-3.5" /> <span className="hidden sm:inline">Resume</span>
             </a>
           )}
+          <button
+            onClick={() => {
+              const d = !dark;
+              setDark(d);
+              document.documentElement.classList.toggle("dark", d);
+            }}
+            aria-label={dark ? "Switch to light mode" : "Switch to dark mode"}
+            className="rounded-full border border-border bg-card p-2 transition-colors hover:bg-accent"
+          >
+            {dark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+          </button>
           <button
             onClick={() => setOpen((o) => !o)}
             aria-label="Toggle menu"
