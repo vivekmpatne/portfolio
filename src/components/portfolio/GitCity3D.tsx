@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import type { MutableRefObject } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { OrbitControls, Grid, AdaptiveDpr, AdaptiveEvents } from "@react-three/drei";
+import { OrbitControls, AdaptiveDpr, AdaptiveEvents } from "@react-three/drei";
 import * as THREE from "three";
 import type { DayMap, PlatformId } from "@/lib/activity/types";
 import { PLATFORM_LABELS } from "@/lib/activity/types";
@@ -654,18 +654,6 @@ function Scene({
         <planeGeometry args={[width + 10, depth + 10]} />
         <meshStandardMaterial color="#101722" roughness={0.85} metalness={0.18} />
       </mesh>
-
-      <Grid
-        position={[0, -0.04, 0]}
-        args={[width + 8, depth + 8]}
-        cellSize={STEP}
-        cellColor="#263446"
-        sectionSize={STEP * 7}
-        sectionColor="#3b4b63"
-        fadeDistance={80}
-        fadeStrength={1.4}
-        infiniteGrid={false}
-      />
 
       <GrowIn>
         <Towers

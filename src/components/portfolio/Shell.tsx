@@ -40,11 +40,16 @@ export function Shell({ onClose }: { onClose: () => void }) {
   };
   const onKey = (event: KeyboardEvent<HTMLInputElement>) => { if (event.key === "Enter") { run(value); setValue(""); } };
 
-  return <div className="flex min-h-0 flex-1 flex-col font-mono text-[13px] leading-relaxed text-foreground/90" onClick={() => inputRef.current?.focus()}>
-    <div ref={scrollRef} className="term-scroll min-h-0 flex-1 overflow-y-auto p-4">
-      {history.map((line, index) => <pre key={index} className={`whitespace-pre-wrap break-words ${line.kind === "in" ? "text-primary" : line.kind === "err" ? "text-destructive" : line.kind === "banner" ? "font-semibold text-foreground" : ""}`}>{line.text}</pre>)}
-      <div className="mt-2 flex items-center gap-2"><span className="shrink-0 text-primary">vivek@portfolio:~$</span><input ref={inputRef} value={value} onChange={(event) => setValue(event.target.value)} onKeyDown={onKey} spellCheck={false} autoCapitalize="off" autoComplete="off" className="min-w-0 flex-1 bg-transparent text-foreground outline-none" aria-label="Shell input" /></div>
-      <div className="mt-3 flex flex-wrap gap-2">{QUICK_COMMANDS.map((command) => <button key={command} type="button" onClick={() => { run(command); setValue(""); }} className="rounded-md border border-border bg-background/70 px-2 py-1 text-[11px] text-muted-foreground transition-colors hover:bg-accent hover:text-foreground">{command}</button>)}</div>
+  return <div className="flex min-h-0 flex-1 flex-col font-mono text-[13px] leading-relaxed text-[#c8f5d0]" onClick={() => inputRef.current?.focus()}>
+    <div
+      ref={scrollRef}
+      data-lenis-prevent
+      onWheel={(event) => event.stopPropagation()}
+      className="term-scroll min-h-0 flex-1 overflow-y-auto overscroll-contain p-4"
+    >
+      {history.map((line, index) => <pre key={index} className={`whitespace-pre-wrap break-words ${line.kind === "in" ? "text-[#4ade80]" : line.kind === "err" ? "text-[#f87171]" : line.kind === "banner" ? "font-semibold text-[#e2ffe8]" : "text-[#c8f5d0]"}`}>{line.text}</pre>)}
+      <div className="mt-2 flex items-center gap-2"><span className="shrink-0 text-[#4ade80]">vivek@portfolio:~$</span><input ref={inputRef} value={value} onChange={(event) => setValue(event.target.value)} onKeyDown={onKey} spellCheck={false} autoCapitalize="off" autoComplete="off" className="min-w-0 flex-1 bg-transparent text-[#f0fdf4] caret-[#4ade80] outline-none" aria-label="Shell input" /></div>
+      <div className="mt-3 flex flex-wrap gap-2">{QUICK_COMMANDS.map((command) => <button key={command} type="button" onClick={() => { run(command); setValue(""); }} className="rounded-md border border-[#224e33] bg-[#132a1e] px-2 py-1 font-mono text-[11px] text-[#a7f3d0] transition-colors hover:border-[#34d399] hover:bg-[#1a3d2c] hover:text-[#f0fdf4]">{command}</button>)}</div>
     </div>
   </div>;
 }
