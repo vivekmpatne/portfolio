@@ -165,13 +165,13 @@ export function VsCodeSimulation() {
             </pre>
 
             {/* terminal */}
-            <div className="h-[55%] shrink-0 border-t border-[var(--vsc-border)] bg-[var(--vsc-bar)] sm:h-[48%]">
+            <div className="h-[58%] shrink-0 overflow-y-auto border-t border-[var(--vsc-border)] bg-[var(--vsc-bar)] sm:h-[56%]">
               <div className="flex gap-5 border-b border-[var(--vsc-border)] px-4 py-1.5 text-[11px] uppercase tracking-wider text-[var(--vsc-dim)]">
                 <span className="border-b border-[var(--vsc-text)] text-[var(--vsc-text)]">Terminal</span>
                 <span>Output</span>
                 <span className="hidden sm:inline">Debug Console</span>
               </div>
-              <div className="p-4 leading-6">
+              <div className="px-4 py-3 leading-[1.4rem]">
                 <div>
                   <span className="text-[var(--vsc-ok)]">vivek@bengaluru</span>
                   <span className="text-[var(--vsc-dim)]">:</span>
