@@ -37,52 +37,48 @@
 
 :root {
   --radius: 0.75rem;
-  /* Luminous light studio — crisp white, porcelain, electric indigo */
-  --background: oklch(0.984 0.003 248);
-  --foreground: oklch(0.21 0.03 265);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.21 0.03 265);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.21 0.03 265);
-  --primary: oklch(0.51 0.23 277);
-  --primary-foreground: oklch(0.99 0 0);
-  --secondary: oklch(0.968 0.007 248);
-  --secondary-foreground: oklch(0.28 0.03 265);
-  --muted: oklch(0.968 0.007 248);
-  --muted-foreground: oklch(0.52 0.03 260);
-  --accent: oklch(0.955 0.025 277);
-  --accent-foreground: oklch(0.32 0.15 277);
+  /* Warm ivory paper + amber gold (light counterpart of obsidian & gold) */
+  --background: oklch(0.975 0.012 85);
+  --foreground: oklch(0.2 0.02 60);
+  --card: oklch(0.993 0.006 85);
+  --card-foreground: oklch(0.2 0.02 60);
+  --popover: oklch(0.993 0.006 85);
+  --popover-foreground: oklch(0.2 0.02 60);
+  --primary: oklch(0.62 0.15 62);
+  --primary-foreground: oklch(0.99 0.01 85);
+  --secondary: oklch(0.945 0.02 82);
+  --secondary-foreground: oklch(0.28 0.03 60);
+  --muted: oklch(0.945 0.02 82);
+  --muted-foreground: oklch(0.5 0.03 65);
+  --accent: oklch(0.93 0.05 80);
+  --accent-foreground: oklch(0.38 0.1 60);
   --destructive: oklch(0.58 0.22 25);
   --destructive-foreground: oklch(0.98 0 0);
-  --border: oklch(0.929 0.013 255);
-  --input: oklch(0.929 0.013 255);
-  --ring: oklch(0.51 0.23 277);
-  --sky: oklch(0.59 0.15 237);
-  --emerald: oklch(0.69 0.15 163);
-  /* legacy accent name used across components — now indigo */
-  --phosphor: oklch(0.51 0.23 277);
+  --border: oklch(0.89 0.025 80);
+  --input: oklch(0.89 0.025 80);
+  --ring: oklch(0.62 0.15 62);
+  --sky: oklch(0.6 0.12 200);
+  --emerald: oklch(0.62 0.14 155);
+  --phosphor: oklch(0.62 0.15 62);
   --amber-term: oklch(0.7 0.16 60);
-  --cyan-glow: oklch(0.72 0.14 210);
-  --gradient-primary: linear-gradient(120deg, oklch(0.51 0.23 277), oklch(0.6 0.17 237) 55%, oklch(0.7 0.15 175));
+  --cyan-glow: oklch(0.7 0.12 190);
+  --gradient-primary: linear-gradient(120deg, oklch(0.7 0.15 75), oklch(0.6 0.16 50) 55%, oklch(0.55 0.13 155));
   --gradient-mesh:
-    radial-gradient(900px 600px at 8% -5%, oklch(0.51 0.23 277 / 9%), transparent 60%),
-    radial-gradient(800px 600px at 100% 20%, oklch(0.72 0.14 210 / 8%), transparent 60%),
-    radial-gradient(700px 500px at 30% 100%, oklch(0.69 0.15 163 / 7%), transparent 60%);
+    radial-gradient(900px 600px at 8% -5%, oklch(0.75 0.15 75 / 14%), transparent 60%),
+    radial-gradient(800px 600px at 100% 20%, oklch(0.7 0.14 50 / 8%), transparent 60%),
+    radial-gradient(700px 500px at 30% 100%, oklch(0.62 0.14 155 / 6%), transparent 60%);
 
   --shadow-card:
-    0 1px 1px oklch(0.21 0.03 265 / 4%),
-    0 2px 4px -1px oklch(0.21 0.03 265 / 5%),
-    0 12px 28px -10px oklch(0.21 0.03 265 / 12%),
-    inset 0 1px 0 0 oklch(1 0 0 / 90%),
-    inset 0 -1px 0 0 oklch(0.21 0.03 265 / 4%);
+    0 1px 1px oklch(0.3 0.04 60 / 5%),
+    0 2px 4px -1px oklch(0.3 0.04 60 / 6%),
+    0 12px 28px -10px oklch(0.3 0.04 60 / 16%),
+    inset 0 1px 0 0 oklch(1 0 0 / 90%);
   --shadow-card-hover:
-    0 2px 4px -1px oklch(0.21 0.03 265 / 6%),
-    0 24px 40px -14px oklch(0.51 0.23 277 / 26%),
-    0 10px 24px -12px oklch(0.72 0.14 210 / 22%),
-    0 0 0 1px oklch(0.51 0.23 277 / 18%),
+    0 24px 40px -14px oklch(0.62 0.15 62 / 30%),
+    0 0 0 1px oklch(0.62 0.15 62 / 25%),
     inset 0 1px 0 0 oklch(1 0 0 / 100%);
-  --shadow-nav: 0 8px 30px -12px oklch(0.21 0.03 265 / 15%);
-  --shadow-glow: 0 10px 30px -8px oklch(0.51 0.23 277 / 45%), 0 0 0 1px oklch(0.51 0.23 277 / 25%);
+  --shadow-nav: 0 8px 30px -12px oklch(0.3 0.04 60 / 18%);
+  --shadow-glow: 0 10px 30px -8px oklch(0.62 0.15 62 / 45%), 0 0 0 1px oklch(0.62 0.15 62 / 25%);
 
   /* VS Code intro palette */
   --vsc-bg: oklch(0.23 0 0);
