@@ -46,7 +46,7 @@ export function TerminalOverlay() {
     if (!ctx) return;
 
     const CHARS = "01<>/{}[]#*&$%=+-_abcdefghijklmnopqrstuvwxyz";
-    let raf = 0;
+    let frameTimer = 0;
     let width = 0;
     let height = 0;
     let dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -79,7 +79,12 @@ export function TerminalOverlay() {
       }));
     };
 
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const draw = () => {
+      if (document.hidden) {
+        if (!reduced) frameTimer = window.setTimeout(draw, 200);
+        return;
+      }
       ctx.clearRect(0, 0, width, height);
       ctx.font = `12px "JetBrains Mono", monospace`;
       const isDark = document.documentElement.classList.contains("dark");
@@ -87,30 +92,23 @@ export function TerminalOverlay() {
       for (const p of particles) {
         ctx.fillStyle = `rgba(${rgb}, ${p.a})`;
         ctx.fillText(p.c, p.x, p.y);
-        p.y -= p.v;
+        p.y -= p.v * 2;
         if (p.y < -12) {
           p.y = height + 12;
           p.x = Math.random() * width;
           p.c = CHARS[Math.floor(Math.random() * CHARS.length)];
         }
       }
-      raf = requestAnimationFrame(draw);
+      if (!reduced) frameTimer = window.setTimeout(draw, 33);
     };
 
-    // Respect reduced-motion — draw once and stop.
-    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     resize();
-    if (reduced) {
-      draw();
-      cancelAnimationFrame(raf);
-    } else {
-      draw();
-    }
+    draw();
     const onResize = () => resize();
     window.addEventListener("resize", onResize);
     return () => {
       window.removeEventListener("resize", onResize);
-      cancelAnimationFrame(raf);
+      window.clearTimeout(frameTimer);
     };
   }, []);
 

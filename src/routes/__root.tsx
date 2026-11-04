@@ -122,8 +122,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 });
 
 function RootShell({ children }: { children: ReactNode }) {
-  // Apply the saved theme before first paint; light mode is the default.
-  const themeBootstrap = `(function(){try{document.documentElement.classList.toggle('dark',localStorage.getItem('theme')==='dark');}catch(e){}})();`;
+  // Always start new page visits in light mode.
+  const themeBootstrap = `(function(){document.documentElement.classList.remove('dark');})();`;
   return (
     <html lang="en" 
       className="scroll-pt-20"
@@ -163,22 +163,17 @@ function MotionRuntime() {
     let cancelled = false;
     let cleanupRuntime: (() => void) | undefined;
 
-    void Promise.all([import("lenis"), import("gsap"), import("gsap/ScrollTrigger")])
-      .then(([lenisModule, gsapModule, scrollTriggerModule]) => {
+    void import("lenis")
+      .then((lenisModule) => {
         if (cancelled) return;
-        const lenis = new lenisModule.default({ lerp: 0.1 });
-        const { gsap } = gsapModule;
-        const { ScrollTrigger } = scrollTriggerModule;
-        gsap.registerPlugin(ScrollTrigger);
-        lenis.on("scroll", ScrollTrigger.update);
-        const tick = (time: number) => lenis.raf(time * 1000);
-        gsap.ticker.add(tick);
-        gsap.ticker.lagSmoothing(0);
-        cleanupRuntime = () => {
-          lenis.off("scroll", ScrollTrigger.update);
-          gsap.ticker.remove(tick);
-          lenis.destroy();
-        };
+        const lenis = new lenisModule.default({
+          autoRaf: true,
+          lerp: 0.12,
+          smoothWheel: true,
+          anchors: true,
+          touchMultiplier: 1.1,
+        });
+        cleanupRuntime = () => lenis.destroy();
       })
       .catch((error: unknown) => console.error("Smooth scrolling could not initialize", error));
 

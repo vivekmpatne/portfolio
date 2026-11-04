@@ -32,39 +32,21 @@ export function CursorReticle() {
     const scl = { v: 1 };
     let lastHot: boolean | null = null;
 
-    const onMove = (e: MouseEvent) => {
-      pos.current.x = e.clientX;
-      pos.current.y = e.clientY;
-      const t = e.target as HTMLElement | null;
-      hot.current = !!t?.closest?.(
-        'a, button, [role="button"], input, textarea, select, summary, canvas, [data-cursor="hot"]',
-      );
-    };
-    const onDown = () => (down.current = true);
-    const onUp = () => (down.current = false);
-
     const tick = (now: number) => {
-      // Frame-rate independent smoothing (dt clamped to avoid tab-switch spikes)
+      raf = 0;
       const dt = Math.min((now - lastT) / 1000, 1 / 30);
       lastT = now;
-
       const dx = pos.current.x - ring.current.x;
       const dy = pos.current.y - ring.current.y;
-
-      // Ring trails with a snappy-but-silky exponential follow
       const k = 1 - Math.exp(-dt * 16);
       ring.current.x += dx * k;
       ring.current.y += dy * k;
 
-      // Rotation / tilt target only when actually moving fast enough
       const speed = Math.hypot(dx, dy);
       const targetRot = speed > 0.5 ? Math.atan2(dy, dx) * (180 / Math.PI) : rot.v;
       const targetTilt = Math.max(-10, Math.min(10, speed * 0.18));
       const targetScale = (hot.current ? 1.5 : 1) * (down.current ? 0.85 : 1);
-
-      // Smooth secondary values so nothing "pops"
       const k2 = 1 - Math.exp(-dt * 10);
-      // Interpolate rotation along the shortest arc
       let dRot = targetRot - rot.v;
       dRot = ((dRot + 540) % 360) - 180;
       rot.v += dRot * k2;
@@ -78,18 +60,49 @@ export function CursorReticle() {
           ringRef.current.style.opacity = hot.current ? "1" : "0.75";
         }
       }
-      if (dotRef.current) {
-        dotRef.current.style.transform = `translate3d(${pos.current.x}px, ${pos.current.y}px, 0) translate(-50%, -50%)`;
+
+      if (
+        Math.abs(dx) > 0.15 ||
+        Math.abs(dy) > 0.15 ||
+        Math.abs(targetTilt - tilt.v) > 0.08 ||
+        Math.abs(targetScale - scl.v) > 0.01 ||
+        Math.abs(dRot) > 0.5
+      ) {
+        raf = requestAnimationFrame(tick);
       }
-      raf = requestAnimationFrame(tick);
     };
-    raf = requestAnimationFrame(tick);
+    const schedule = () => {
+      if (!raf) {
+        lastT = performance.now();
+        raf = requestAnimationFrame(tick);
+      }
+    };
+    const onMove = (e: MouseEvent) => {
+      pos.current.x = e.clientX;
+      pos.current.y = e.clientY;
+      const target = e.target as HTMLElement | null;
+      hot.current = !!target?.closest?.(
+        'a, button, [role="button"], input, textarea, select, summary, canvas, [data-cursor="hot"]',
+      );
+      if (dotRef.current) {
+        dotRef.current.style.transform = `translate3d(${e.clientX}px, ${e.clientY}px, 0) translate(-50%, -50%)`;
+      }
+      schedule();
+    };
+    const onDown = () => {
+      down.current = true;
+      schedule();
+    };
+    const onUp = () => {
+      down.current = false;
+      schedule();
+    };
 
     window.addEventListener("mousemove", onMove, { passive: true });
     window.addEventListener("mousedown", onDown);
     window.addEventListener("mouseup", onUp);
     return () => {
-      cancelAnimationFrame(raf);
+      if (raf) cancelAnimationFrame(raf);
       window.removeEventListener("mousemove", onMove);
       window.removeEventListener("mousedown", onDown);
       window.removeEventListener("mouseup", onUp);

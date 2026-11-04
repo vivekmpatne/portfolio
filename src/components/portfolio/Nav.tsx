@@ -15,15 +15,10 @@ const sections = [
 ];
 
 export function Nav() {
-  // Lazy-init from the DOM class set by the pre-hydration script in __root.tsx.
-  // This keeps React state in sync with the class already on <html> and avoids
-  // a light/dark flash on reload or navigation.
-  const [dark, setDark] = useState<boolean>(() => {
-    if (typeof document === "undefined") return true;
-    return document.documentElement.classList.contains("dark");
-  });
+  const [dark, setDark] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [progress, setProgress] = useState(0);
+  const progressBarRef = useRef<HTMLDivElement>(null);
+  const progressTextRef = useRef<HTMLSpanElement>(null);
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState("home");
   const [mounted, setMounted] = useState(false);
@@ -35,32 +30,37 @@ export function Nav() {
   }, []);
 
   useEffect(() => {
+    let wasScrolled = false;
+    let lastProgressLabel = -1;
     const onScroll = () => {
-      setScrolled(window.scrollY > 10);
+      const isScrolled = window.scrollY > 10;
+      if (isScrolled !== wasScrolled) {
+        wasScrolled = isScrolled;
+        setScrolled(isScrolled);
+      }
       const h = document.documentElement;
       const total = h.scrollHeight - h.clientHeight;
-      setProgress(total > 0 ? (window.scrollY / total) * 100 : 0);
+      const progress = total > 0 ? Math.min(100, (window.scrollY / total) * 100) : 0;
+      if (progressBarRef.current) {
+        progressBarRef.current.style.transform = `scaleX(${progress / 100})`;
+      }
+      const progressLabel = progress >= 99.5 ? 100 : Math.round(progress);
+      if (progressTextRef.current && progressLabel !== lastProgressLabel) {
+        lastProgressLabel = progressLabel;
+        progressTextRef.current.textContent = progressLabel === 100
+          ? "[ loaded ] 100%"
+          : `loading ${progressLabel}%`;
+      }
     };
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
+    window.addEventListener("resize", onScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+    };
   }, []);
 
-  // Sync DOM + storage only when the user toggles the theme. We skip the very
-  // first run so we don't override the pre-hydration script's decision.
-  const mountedRef = useRef(false);
-  useEffect(() => {
-    if (!mountedRef.current) {
-      mountedRef.current = true;
-      return;
-    }
-    document.documentElement.classList.toggle("dark", dark);
-    try {
-      localStorage.setItem("theme", dark ? "dark" : "light");
-    } catch {
-      /* ignore */
-    }
-  }, [dark]);
 
 
   useEffect(() => {
@@ -96,20 +96,14 @@ export function Nav() {
         aria-hidden
       >
         <div
-          className="relative h-full bg-[hsl(var(--phosphor))] shadow-[0_0_10px_hsl(var(--phosphor)/0.9)] transition-[width] duration-100 ease-out"
-          style={{ width: `${progress}%` }}
-        >
-          {/* moving highlight sweep */}
-          <div className="pointer-events-none absolute inset-y-0 -left-1/4 w-1/4 animate-[ribbon_1.6s_linear_infinite] bg-gradient-to-r from-transparent via-white/70 to-transparent mix-blend-overlay" />
-        </div>
+          ref={progressBarRef}
+          className="relative h-full w-full origin-left bg-[hsl(var(--phosphor))] shadow-[0_0_10px_hsl(var(--phosphor)/0.9)] will-change-transform"
+          style={{ transform: "scaleX(0)" }}
+        />
       </div>
       {/* Loading-style label with animated dots */}
       <div className="pointer-events-none absolute right-3 top-[5px] hidden font-mono text-[9px] uppercase tracking-[0.25em] text-[hsl(var(--phosphor))] sm:block">
-        {progress >= 99.5 ? (
-          <span>[ loaded ] 100%</span>
-        ) : (
-          <>loading<span className="loading-dots" /> {Math.round(progress)}%</>
-        )}
+        <span ref={progressTextRef}>loading 0%</span>
       </div>
 
 
@@ -152,7 +146,11 @@ export function Nav() {
             </a>
           )}
           <button
-            onClick={() => setDark((d) => !d)}
+            onClick={() => {
+              const nextDark = !dark;
+              setDark(nextDark);
+              document.documentElement.classList.toggle("dark", nextDark);
+            }}
             aria-label="Toggle theme"
             className="rounded-md border border-border bg-card p-2 shadow-card transition-colors hover:bg-accent"
           >

@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { profile } from "@/data/profile";
@@ -30,6 +30,8 @@ function istStamp(iso: string) {
 }
 
 export function LiveLog() {
+  const rootRef = useRef<HTMLDivElement | null>(null);
+  const [active, setActive] = useState(false);
   const fetchFeed = useServerFn(getActivityFeed);
   const { data, isLoading, isError } = useQuery({
     queryKey: ["activity-feed"],
@@ -43,44 +45,70 @@ export function LiveLog() {
       }),
     refetchInterval: 5 * 60 * 1000,
     staleTime: 5 * 60 * 1000,
+    enabled: active,
   });
+
+  useEffect(() => {
+    const root = rootRef.current;
+    if (!root) return;
+    const observer = new IntersectionObserver(([entry]) => {
+      if (!entry.isIntersecting) return;
+      setActive(true);
+      observer.disconnect();
+    }, { rootMargin: "160px" });
+    observer.observe(root);
+    return () => observer.disconnect();
+  }, []);
 
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const events = data?.events ?? [];
 
-  // Auto-scroll upward like `tail -f`: keep the newest lines in view.
+  // Keep the decorative feed moving only while it is visible, at a modest frame rate.
   useEffect(() => {
     const el = scrollRef.current;
-    if (!el || events.length === 0) return;
-    let raf = 0;
-    let dir = 1;
-    let paused = 0;
+    if (!el || events.length === 0 || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    let direction = 1;
+    let pausedUntil = 0;
+    let interval: number | undefined;
+    let intersectsViewport = false;
     const step = () => {
-      if (!el.matches(":hover")) {
-        if (paused > 0) {
-          paused -= 1;
-        } else {
-          const max = el.scrollHeight - el.clientHeight;
-          if (max > 2) {
-            el.scrollTop += 0.35 * dir;
-            if (el.scrollTop >= max - 1) {
-              dir = -1;
-              paused = 120;
-            } else if (el.scrollTop <= 0) {
-              dir = 1;
-              paused = 120;
-            }
-          }
-        }
+      if (el.matches(":hover")) return;
+      const now = Date.now();
+      if (now < pausedUntil) return;
+      const max = el.scrollHeight - el.clientHeight;
+      if (max <= 2) return;
+      el.scrollTop += 0.7 * direction;
+      if (el.scrollTop >= max - 1) {
+        direction = -1;
+        pausedUntil = now + 1800;
+      } else if (el.scrollTop <= 0) {
+        direction = 1;
+        pausedUntil = now + 1800;
       }
-      raf = requestAnimationFrame(step);
     };
-    raf = requestAnimationFrame(step);
-    return () => cancelAnimationFrame(raf);
+    const sync = () => {
+      if (interval !== undefined) window.clearInterval(interval);
+      interval = undefined;
+      if (intersectsViewport && document.visibilityState === "visible") {
+        interval = window.setInterval(step, 32);
+      }
+    };
+    const observer = new IntersectionObserver(([entry]) => {
+      intersectsViewport = entry.isIntersecting;
+      sync();
+    }, { rootMargin: "40px" });
+    observer.observe(el);
+    document.addEventListener("visibilitychange", sync);
+    return () => {
+      observer.disconnect();
+      document.removeEventListener("visibilitychange", sync);
+      if (interval !== undefined) window.clearInterval(interval);
+    };
   }, [events.length]);
 
   return (
-    <div className="mt-6">
+    <div ref={rootRef} className="mt-6">
       <div className="mb-3 text-xs font-medium uppercase tracking-widest text-muted-foreground">
         Live System Activity Log
       </div>

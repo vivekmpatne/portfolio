@@ -689,10 +689,10 @@ function Scene({
         enablePan
         enableZoom={zoomEnabled}
         enableDamping
-        dampingFactor={0.045}
-        rotateSpeed={0.42}
-        zoomSpeed={0.45}
-        panSpeed={0.4}
+        dampingFactor={0.075}
+        rotateSpeed={0.52}
+        zoomSpeed={0.5}
+        panSpeed={0.6}
         screenSpacePanning={false}
         touches={{ ONE: THREE.TOUCH.ROTATE, TWO: THREE.TOUCH.DOLLY_PAN }}
         minDistance={16}
@@ -782,6 +782,9 @@ export default function GitCity3D({ weeks, merged, calendars, colors }: Props) {
   );
 
   const controlsRef = useRef<OrbitLike | null>(null);
+  const canvasHostRef = useRef<HTMLDivElement>(null);
+  const [canvasVisible, setCanvasVisible] = useState(false);
+  const [pageVisible, setPageVisible] = useState(true);
   const dragRef = useRef(false);
   const downRef = useRef<{ x: number; y: number } | null>(null);
   const [zoomEnabled, setZoomEnabled] = useState(false);
@@ -803,14 +806,35 @@ export default function GitCity3D({ weeks, merged, calendars, colors }: Props) {
   }, []);
 
   useEffect(() => {
+    const host = canvasHostRef.current;
+    if (!host) return;
+
+    let intersectsViewport = false;
+    const syncVisibility = () => {
+      setPageVisible(document.visibilityState === "visible");
+    };
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        intersectsViewport = entry.isIntersecting;
+        setCanvasVisible(intersectsViewport);
+      },
+      { rootMargin: "140px" },
+    );
+    observer.observe(host);
+    document.addEventListener("visibilitychange", syncVisibility);
     const onBlur = () => setZoomEnabled(false);
     window.addEventListener("blur", onBlur);
-    return () => window.removeEventListener("blur", onBlur);
+    return () => {
+      observer.disconnect();
+      document.removeEventListener("visibilitychange", syncVisibility);
+      window.removeEventListener("blur", onBlur);
+    };
   }, []);
 
   return (
     <div>
       <div
+        ref={canvasHostRef}
         className="relative h-[420px] w-full overflow-hidden [touch-action:pan-y] rounded-xl border border-border shadow-card"
         style={{ background: "linear-gradient(180deg, #090d13 0%, #101722 100%)" }}
         onPointerDown={(e) => {
@@ -836,8 +860,9 @@ export default function GitCity3D({ weeks, merged, calendars, colors }: Props) {
         onDoubleClick={resetCamera}
       >
         <Canvas
+          frameloop={(canvasVisible || touring) && pageVisible ? "always" : "never"}
           camera={{ position: DEFAULT_CAM, fov: 42 }}
-          dpr={[1, 1.5]}
+          dpr={[1, 1.25]}
           gl={{ antialias: false, alpha: false, powerPreference: "high-performance" }}
           onPointerMissed={() => setHover(null)}
         >

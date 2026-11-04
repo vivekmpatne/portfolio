@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "react";
 
-const KEY = "vscode-sim:seen";
 const CMD = "npm run dev";
 
 type Line = { text: string; tone?: "dim" | "ok" | "blue" | "fn" };
@@ -14,8 +13,8 @@ const OUTPUT: Line[] = [
   { text: "  ➜  Local:   http://localhost:8080/", tone: "blue" },
   { text: "  ➜  Network: use --host to expose", tone: "dim" },
   { text: "" },
-  { text: "✔ It works on my machine...", tone: "fn" },
-  { text: "✔ ...and relax, it works on YOUR machine too 🚀", tone: "ok" },
+  { text: "\u2714 It works on my machine...", tone: "fn" },
+  { text: "\u2714 ...and it works on YOUR machine too \u{1F680}", tone: "ok" },
 ];
 
 const TREE = [
@@ -50,21 +49,18 @@ export function VsCodeSimulation() {
   const timers = useRef<number[]>([]);
 
   const close = () => {
-    try {
-      sessionStorage.setItem(KEY, "1");
-    } catch {}
     setLeaving(true);
     timers.current.push(window.setTimeout(() => setShow(false), 450));
   };
 
   useEffect(() => {
-    let seen = false;
-    try {
-      seen = sessionStorage.getItem(KEY) === "1";
-    } catch {}
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (seen || reduced) return;
     setShow(true);
+    if (reduced) {
+      setTyped(CMD.length);
+      setLines(OUTPUT.length);
+      return;
+    }
     const T = timers.current;
     let t = 700;
     for (let i = 1; i <= CMD.length; i++) {

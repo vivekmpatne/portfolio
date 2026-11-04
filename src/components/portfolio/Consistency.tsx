@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useQueries } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { Flame, Trophy, Calendar, Zap, ChevronDown, AlertCircle, BookOpenCheck } from "lucide-react";
@@ -55,11 +55,24 @@ const SOURCES: SourceDef[] = [
 ];
 
 export function Consistency() {
+  const sectionRef = useRef<HTMLElement>(null);
+  const [sectionActive, setSectionActive] = useState(false);
   const currentYear = new Date().getFullYear();
   const years = [currentYear, currentYear - 1, currentYear - 2];
   const [year, setYear] = useState(currentYear);
   const [view, setView] = useState<"grid" | "city">("grid");
 
+  useEffect(() => {
+    const section = sectionRef.current;
+    if (!section) return;
+    const observer = new IntersectionObserver(([entry]) => {
+      if (!entry.isIntersecting) return;
+      setSectionActive(true);
+      observer.disconnect();
+    }, { rootMargin: "220px" });
+    observer.observe(section);
+    return () => observer.disconnect();
+  }, []);
 
   const { github, leetcode, codeforces, codechef, hackerrank, gfg, tuf } = profile.codingProfiles;
 
@@ -81,6 +94,7 @@ export function Consistency() {
     refetchOnReconnect: true as const,
     refetchOnMount: "always" as const,
     retry: 1 as const,
+    enabled: sectionActive,
   };
   const queries = useQueries({
     queries: [
@@ -168,7 +182,7 @@ export function Consistency() {
   ];
 
   return (
-    <section id="consistency" className="mx-auto max-w-6xl px-6 py-20">
+    <section ref={sectionRef} id="consistency" className="mx-auto max-w-6xl px-6 py-20">
       <SectionHeader title="Consistency Dashboard" />
       <p className="-mt-2 mb-4 max-w-2xl text-muted-foreground">
         Real engineering activity aggregated live from GitHub, LeetCode, Codeforces, CodeChef, HackerRank, GeeksforGeeks, and TUF+ — no manual updates.
