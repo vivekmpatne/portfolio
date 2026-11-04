@@ -86,7 +86,7 @@ export function LiveStats() {
   const cfOk = cf && cf.status !== "unavailable";
 
   return (
-    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
       <Card icon={<SiLeetcode />} brand="#FFA116" label="LeetCode" cached={lc?.status === "cached"}>
         {lcQ.isLoading ? (
           <Skeleton />

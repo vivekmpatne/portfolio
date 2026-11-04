@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from "react";
-import { Mail, MapPin, Send, Check, Loader2, Copy } from "lucide-react";
+import { Copy, Mail, Send, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,114 +13,58 @@ export function Contact() {
   const [form, setForm] = useState({ name: "", email: "", message: "" });
   const [sending, setSending] = useState(false);
 
-  const onSubmit = async (e: FormEvent) => {
-    e.preventDefault();
+  const onSubmit = async (event: FormEvent) => {
+    event.preventDefault();
     if (sending) return;
     setSending(true);
     try {
       await sendContactEmail({ data: form });
-      toast.success("Message sent successfully! I'll get back to you soon.");
+      toast.success("Message sent. Thanks for reaching out.");
       setForm({ name: "", email: "", message: "" });
-    } catch (err) {
-      console.error(err);
-      toast.error("Failed to send message. Please try again or email me directly.");
+    } catch (error) {
+      console.error(error);
+      toast.error("Message could not be sent. Please try again or email me directly.");
     } finally {
       setSending(false);
     }
   };
 
-  const contactItems = [
-    { icon: MapPin, label: "Location", value: profile.location, href: null },
-  ];
+  const copyEmail = async () => {
+    try {
+      await navigator.clipboard.writeText(profile.email);
+      toast.success("Email copied");
+    } catch {
+      toast.error("Copy failed. Please select the email address.");
+    }
+  };
 
   return (
-    <section id="contact" className="mx-auto max-w-6xl px-6 py-10 sm:py-14">
-      <SectionHeader title="Let's talk about what you're building" subtitle="Open to SDE roles, internship opportunities, and technical discussions. Email is the fastest way to reach me." />
-      <div className="grid gap-8 md:grid-cols-2">
-        <div className="space-y-6">
-          <p className="text-lg text-muted-foreground">
-            Open to SDE roles, internship opportunities, and technical discussions. Email is the fastest way to reach me.
-          </p>
-
-          <button type="button" onClick={async()=>{await navigator.clipboard.writeText(profile.email);toast.success("Email copied to clipboard");}} className="flex w-full items-center justify-between gap-3 rounded-full border border-border bg-card px-5 py-3 text-left text-sm"><span className="flex min-w-0 items-center gap-3"><Mail className="h-4 w-4 shrink-0 text-primary"/><span className="truncate">{profile.email}</span></span><Copy className="h-4 w-4 shrink-0 text-muted-foreground"/></button>
-
-          <div className="space-y-2">
-            {contactItems.map((item) => {
-              const Icon = item.icon;
-              const inner = (
-                <div className="flex items-center gap-4 rounded-xl border border-border bg-card p-4 shadow-card transition-all hover:-translate-y-0.5 hover:border-foreground/30 hover:shadow-card">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-accent">
-                    <Icon className="h-4 w-4 text-foreground" />
-                  </div>
-                  <div className="min-w-0">
-                    <div className="text-[11px] font-medium uppercase tracking-widest text-muted-foreground">
-                      {item.label}
-                    </div>
-                    <div className="truncate text-sm font-medium text-foreground">
-                      {item.value}
-                    </div>
-                  </div>
-                </div>
-              );
-              return item.href ? (
-                <a key={item.label} href={item.href} className="block">
-                  {inner}
-                </a>
-              ) : (
-                <div key={item.label}>{inner}</div>
-              );
-            })}
+    <section id="contact" className="mx-auto max-w-6xl px-6 py-20 sm:py-28">
+      <SectionHeader eyebrow="Start a conversation" title="Have a good problem?" subtitle="Tell me about your team, product, or the technical challenge you are working through." />
+      <div className="grid gap-8 lg:grid-cols-[.86fr_1.14fr] lg:gap-16">
+        <div className="flex flex-col items-start gap-6">
+          <div>
+            <p className="font-mono text-[10px] uppercase tracking-[.18em] text-muted-foreground">Direct email</p>
+            <button type="button" onClick={copyEmail} className="mt-3 inline-flex min-h-12 max-w-full items-center gap-3 rounded-full border border-border bg-card px-4 text-sm text-foreground transition-colors hover:border-primary/40 sm:px-5">
+              <Mail className="h-4 w-4 shrink-0 text-primary" />
+              <span className="truncate">{profile.email}</span>
+              <Copy className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+            </button>
           </div>
-
-          <div className="rounded-xl border border-border bg-card p-5 shadow-card">
-            <div className="mb-3 text-[11px] font-medium uppercase tracking-widest text-muted-foreground">
-              Open To
-            </div>
-            <ul className="space-y-2">
-              {profile.openTo.map((item) => (
-                <li key={item} className="flex items-center gap-2 text-sm text-foreground">
-                  <span className="flex h-5 w-5 items-center justify-center rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400">
-                    <Check className="h-3 w-3" strokeWidth={3} />
-                  </span>
-                  {item}
-                </li>
-              ))}
-            </ul>
-          </div>
-
           <SocialIcons />
+          <p className="max-w-sm text-sm leading-6 text-muted-foreground">A note about your team, product, or technical challenge is a great place to start.</p>
         </div>
 
-        <form
-          onSubmit={onSubmit}
-          className="h-fit space-y-3 rounded-3xl border border-border bg-card p-6 shadow-card"
-        >
-          <Input
-            required
-            placeholder="Your name"
-            value={form.name}
-            onChange={(e) => setForm({ ...form, name: e.target.value })}
-          />
-          <Input
-            required
-            type="email"
-            placeholder="Your email"
-            value={form.email}
-            onChange={(e) => setForm({ ...form, email: e.target.value })}
-          />
-          <Textarea
-            required
-            rows={6}
-            placeholder="Message"
-            value={form.message}
-            onChange={(e) => setForm({ ...form, message: e.target.value })}
-          />
-          <Button type="submit" className="w-full" disabled={sending}>
-            {sending ? (
-              <><Loader2 className="mr-1 h-4 w-4 animate-spin" /> Sending...</>
-            ) : (
-              <><Send className="mr-1 h-4 w-4" /> Send Message</>
-            )}
+        <form onSubmit={onSubmit} className="space-y-3 rounded-[1.75rem] border border-border bg-card p-5 sm:p-7">
+          <div className="mb-5">
+            <p className="font-mono text-[10px] uppercase tracking-[.18em] text-primary">Send a message</p>
+            <p className="mt-2 text-sm text-muted-foreground">The form delivers directly to Vivek.</p>
+          </div>
+          <Input required placeholder="Your name" value={form.name} onChange={(event) => setForm({ ...form, name: event.target.value })} />
+          <Input required type="email" placeholder="Your email" value={form.email} onChange={(event) => setForm({ ...form, email: event.target.value })} />
+          <Textarea required rows={5} placeholder="What would you like to discuss?" value={form.message} onChange={(event) => setForm({ ...form, message: event.target.value })} />
+          <Button type="submit" className="min-h-12 w-full rounded-full bg-accent-gradient font-semibold text-primary-foreground hover:opacity-90" disabled={sending}>
+            {sending ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Sending</> : <><Send className="mr-2 h-4 w-4" />Send message</>}
           </Button>
         </form>
       </div>

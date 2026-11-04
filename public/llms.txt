@@ -4,4 +4,4 @@
 
 ## Pages
 
-- [Home](/): Hero, about, live coding stats, consistency heatmap, achievements, skills, projects, experience, and contact in a single-page portfolio.
+- [Home](/): Introduction, background and education, technical toolkit, selected projects, live coding profiles and activity, and contact.

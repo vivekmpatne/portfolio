@@ -641,27 +641,27 @@ function Scene({
 
   return (
     <>
-      <color attach="background" args={["#F8FAFC"]} />
-      <fog attach="fog" args={["#F8FAFC", 40, 105]} />
+      <color attach="background" args={["#090d13"]} />
+      <fog attach="fog" args={["#090d13", 40, 105]} />
 
-      <ambientLight intensity={0.9} />
-      <hemisphereLight args={["#FFFFFF", "#E2E8F0", 0.65]} />
-      <directionalLight position={[25, 40, 20]} intensity={1.2} />
-      <directionalLight position={[-20, 15, -15]} intensity={0.4} color="#60A5FA" />
+      <ambientLight intensity={0.55} />
+      <hemisphereLight args={["#a4b7ff", "#080b10", 0.45]} />
+      <directionalLight position={[25, 40, 20]} intensity={1.2} color="#eef2f8" />
+      <directionalLight position={[-20, 15, -15]} intensity={0.4} color="#a4b7ff" />
 
       {/* ground */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.06, 0]} frustumCulled={false} raycast={() => null}>
         <planeGeometry args={[width + 10, depth + 10]} />
-        <meshStandardMaterial color="#F1F5F9" roughness={0.85} metalness={0.05} />
+        <meshStandardMaterial color="#101722" roughness={0.85} metalness={0.18} />
       </mesh>
 
       <Grid
         position={[0, -0.04, 0]}
         args={[width + 8, depth + 8]}
         cellSize={STEP}
-        cellColor="#E2E8F0"
+        cellColor="#263446"
         sectionSize={STEP * 7}
-        sectionColor="#CBD5E1"
+        sectionColor="#3b4b63"
         fadeDistance={80}
         fadeStrength={1.4}
         infiniteGrid={false}
@@ -812,7 +812,7 @@ export default function GitCity3D({ weeks, merged, calendars, colors }: Props) {
     <div>
       <div
         className="relative h-[420px] w-full overflow-hidden [touch-action:pan-y] rounded-xl border border-border shadow-card"
-        style={{ background: "linear-gradient(180deg, #F8FAFC 0%, #FFFFFF 100%)" }}
+        style={{ background: "linear-gradient(180deg, #090d13 0%, #101722 100%)" }}
         onPointerDown={(e) => {
           downRef.current = { x: e.clientX, y: e.clientY };
           dragRef.current = false;

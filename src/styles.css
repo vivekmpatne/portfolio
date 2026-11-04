@@ -20,6 +20,8 @@
   --color-popover-foreground: var(--popover-foreground);
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
+  --color-secondary-accent: var(--secondary-accent);
+  --color-signal: var(--signal);
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
   --color-muted: var(--muted);
@@ -33,44 +35,46 @@
   --color-ring: var(--ring);
   --color-phosphor: var(--phosphor);
   --color-amber-term: var(--amber-term);
-  --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
-  --font-display: "Anton", Impact, ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
 }
 
 :root {
   color-scheme: dark;
   --radius: 1.5rem;
-  --background: #0a0908;
-  --foreground: #e8dec8;
-  --card: #12100e;
-  --card-foreground: #e8dec8;
-  --surface: #1c1a17;
-  --popover: #12100e;
-  --popover-foreground: #e8dec8;
-  --primary: #c2ad82;
-  --primary-foreground: #0e0d0b;
+  --background: #090d13;
+  --foreground: #eef2f8;
+  --card: #101722;
+  --card-foreground: #eef2f8;
+  --surface: #172231;
+  --popover: #101722;
+  --popover-foreground: #eef2f8;
+  --primary: #c7f36f;
+  --primary-foreground: #10140b;
+  --secondary-accent: #a4b7ff;
+  --signal: #ff9b72;
   --secondary: var(--surface);
-  --secondary-foreground: #e8dec8;
+  --secondary-foreground: #eef2f8;
   --muted: var(--surface);
-  --muted-foreground: #a49a88;
-  --accent: #28231c;
-  --accent-foreground: #e8dec8;
+  --muted-foreground: #9aa7b8;
+  --accent: #222f42;
+  --accent-foreground: #eef2f8;
   --destructive: oklch(0.58 0.22 25);
   --destructive-foreground: oklch(0.98 0 0);
-  --border: #24201c;
-  --input: #2a2723;
-  --ring: #c2ad82;
+  --border: #263446;
+  --input: #263446;
+  --ring: #c7f36f;
   --sky: oklch(0.6 0.12 200);
   --emerald: oklch(0.62 0.14 155);
   --phosphor: oklch(0.62 0.15 62);
   --amber-term: oklch(0.7 0.16 60);
   --cyan-glow: oklch(0.7 0.12 190);
-  --gold-ivory-gradient: linear-gradient(120deg, #f2e9dc, #c2ad82);
-  --gradient-mesh: radial-gradient(900px 600px at 50% -10%, rgba(194,173,130,.09), transparent 60%);
+  --accent-gradient: linear-gradient(125deg, #c7f36f 0%, #a4b7ff 100%);
+  --gradient-mesh: radial-gradient(900px 650px at 76% -14%, rgba(122,148,255,.12), transparent 64%), radial-gradient(780px 560px at 0% 42%, rgba(199,243,111,.055), transparent 58%);
 
-  --shadow-card: 0 18px 44px -28px rgba(0,0,0,.78), inset 0 1px 0 rgba(255,255,255,.045);
-  --shadow-tile: 0 12px 24px -6px rgba(0,0,0,.7), inset 0 1px 1px rgba(255,255,255,.22), inset 0 -2px 4px rgba(0,0,0,.6);
+  --shadow-card: 0 24px 60px -36px rgba(0,0,0,.9), inset 0 1px 0 rgba(255,255,255,.04);
+  --shadow-tile: 0 14px 28px -14px rgba(0,0,0,.85), inset 0 1px 0 rgba(255,255,255,.1);
 
   /* VS Code intro palette */
   --vsc-bg: oklch(0.23 0 0);
@@ -146,8 +150,12 @@
 }
 .squircle-3d:hover { transform: translateY(-6px) scale(1.04); box-shadow: var(--shadow-tile), 0 0 28px color-mix(in oklab, var(--primary) 16%, transparent); }
 .eyebrow-script { color:var(--primary); font-family: Georgia,serif; font-style:italic; }
-.display-heading { color:var(--foreground); font-family:var(--font-display); font-weight:400; letter-spacing:-.025em; line-height:.92; text-transform:uppercase; }
-.bg-gold-ivory { background-image: var(--gold-ivory-gradient); }
+.display-heading { color:var(--foreground); font-family:var(--font-display); font-weight:700; letter-spacing:-.04em; line-height:.92; text-transform:uppercase; }
+.bg-accent-gradient { background-image: var(--accent-gradient); }
+.hero-stage { background-image: linear-gradient(color-mix(in oklab,var(--secondary-accent) 5%,transparent) 1px,transparent 1px),linear-gradient(90deg,color-mix(in oklab,var(--secondary-accent) 5%,transparent) 1px,transparent 1px); background-size:44px 44px; mask-image:linear-gradient(to bottom,black,transparent 88%); }
+.hero-portrait { box-shadow:0 0 0 1px color-mix(in oklab,var(--secondary-accent) 18%,transparent),0 40px 100px -40px color-mix(in oklab,var(--secondary-accent) 30%,transparent); }
+.project-frame { background:radial-gradient(ellipse at 72% 8%,color-mix(in oklab,var(--secondary-accent) 16%,transparent),transparent 44%),var(--card); }
+.hero-status-glow { box-shadow:0 0 24px color-mix(in oklab,var(--primary) 55%,transparent); }
 .brand-mark { position:relative; display:block; overflow:hidden; border-radius:10px; }
 .brand-mark::after { content:""; position:absolute; inset:0; pointer-events:none; background:linear-gradient(110deg,transparent 25%,rgba(255,255,255,.28) 50%,transparent 75%); transform:translateX(-130%); transition:transform 300ms ease; }
 .group:hover .brand-mark::after { transform:translateX(130%); }
@@ -166,7 +174,7 @@ html.lenis.lenis-stopped { overflow:clip; }
   transition: transform 350ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 350ms ease-out, border-color 300ms ease-out;
 }
 @utility bg-gradient-primary {
-  background-image: var(--gold-ivory-gradient);
+  background-image: var(--accent-gradient);
 }
 
 /* ---------- Terminal-specific utilities ---------- */
@@ -243,7 +251,7 @@ html.lenis.lenis-stopped { overflow:clip; }
   color: var(--primary);
 }
 @utility text-gradient {
-  background: var(--gold-ivory-gradient);
+  background: var(--accent-gradient);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;

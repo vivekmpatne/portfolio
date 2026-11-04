@@ -7,6 +7,7 @@ import { profile } from "@/data/profile";
 import { SectionHeader } from "./SectionHeader";
 import { GitCity } from "./GitCity";
 import { LiveLog } from "./LiveLog";
+import { LiveStats } from "./LiveStats";
 
 
 
@@ -161,16 +162,20 @@ export function Consistency() {
 
   const currentDisplay = stats.current === null ? "—" : stats.current;
   const metrics = [
-    { icon: Flame,    label: "Current Streak",    value: currentDisplay,     suffix: stats.current === null ? "" : "days", color: "text-orange-500" },
-    { icon: Trophy,   label: "Longest Streak",    value: stats.longest,      suffix: "days",     color: "text-amber-500" },
-    { icon: Calendar, label: `Active in ${year}`, value: stats.active,       suffix: "days",     color: "text-emerald-500" },
-    { icon: Zap,      label: "Total Activity",    value: totalContribs,      suffix: "contribs", color: "text-indigo-500" },
+    { icon: Flame,    label: "Current Streak",    value: currentDisplay,     suffix: stats.current === null ? "" : "days", color: "text-primary" },
+    { icon: Trophy,   label: "Longest Streak",    value: stats.longest,      suffix: "days",     color: "text-secondary-accent" },
+    { icon: Calendar, label: `Active in ${year}`, value: stats.active,       suffix: "days",     color: "text-cyan-300" },
+    { icon: Zap,      label: "Total Activity",    value: totalContribs,      suffix: "contribs", color: "text-signal" },
   ];
 
   return (
-    <section id="consistency" className="mx-auto max-w-6xl px-6 py-10 sm:py-14">
-      <SectionHeader title="Consistency Dashboard" />
-      <p className="-mt-2 mb-4 max-w-2xl text-muted-foreground">
+    <section id="activity" className="mx-auto max-w-6xl px-6 py-20 sm:py-28">
+      <SectionHeader eyebrow="A public build log" title="The work leaves a trace." subtitle="Coding profiles, activity over time, and recent engineering signals. One place to follow the practice behind the projects." />
+      <div className="mb-12">
+        <h3 className="mb-4 font-mono text-[10px] uppercase tracking-[.2em] text-muted-foreground">Live coding profiles</h3>
+        <LiveStats />
+      </div>
+      <p className="mb-6 max-w-2xl text-sm text-muted-foreground">
         Real engineering activity aggregated live from GitHub, LeetCode, Codeforces, CodeChef, HackerRank, GeeksforGeeks, and TUF+ — no manual updates.
       </p>
 

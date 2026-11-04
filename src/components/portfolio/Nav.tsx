@@ -1,43 +1,21 @@
 import { useEffect, useState } from "react";
-import { FileText, Menu, Moon, Sun, X } from "lucide-react";
-import { profile } from "@/data/profile";
-import { useResumeAvailable } from "@/hooks/use-resume-available";
+import { Menu, X, ArrowUpRight } from "lucide-react";
 import { BrandMark } from "./BrandMark";
 
 const sections = [
-  { id: "home", label: "Home" },
   { id: "about", label: "About" },
-  { id: "skills", label: "Skills" },
+  { id: "skills", label: "Toolkit" },
   { id: "projects", label: "Projects" },
-  { id: "experience", label: "Experience" },
-  { id: "achievements", label: "Profiles" },
-  { id: "consistency", label: "Consistency" },
-  { id: "contact", label: "Contact" },
+  { id: "activity", label: "Activity" },
 ];
 
 export function Nav() {
   const [scrolled, setScrolled] = useState(false);
-  const [progress, setProgress] = useState(0);
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState("home");
-  const [dark, setDark] = useState(false);
-  const resumeUrl = profile.resumeUrl;
-  const resumeAvailable = useResumeAvailable();
 
   useEffect(() => {
-    let prefersDark = false;
-    try {
-      prefersDark = localStorage.getItem("theme") === "dark";
-    } catch {}
-    document.documentElement.classList.toggle("dark", prefersDark);
-    setDark(prefersDark);
-
-    const onScroll = () => {
-      setScrolled(window.scrollY > 10);
-      const h = document.documentElement;
-      const total = h.scrollHeight - h.clientHeight;
-      setProgress(total > 0 ? (window.scrollY / total) * 100 : 0);
-    };
+    const onScroll = () => setScrolled(window.scrollY > 18);
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
@@ -45,105 +23,40 @@ export function Nav() {
 
   useEffect(() => {
     const observers: IntersectionObserver[] = [];
-    sections.forEach((s) => {
-      const el = document.getElementById(s.id);
-      if (!el) return;
-      const obs = new IntersectionObserver(
-        (entries) => entries.forEach((e) => e.isIntersecting && setActive(s.id)),
-        { rootMargin: "-40% 0px -55% 0px", threshold: 0 },
+    for (const section of sections) {
+      const element = document.getElementById(section.id);
+      if (!element) continue;
+      const observer = new IntersectionObserver(
+        (entries) => entries.forEach((entry) => entry.isIntersecting && setActive(section.id)),
+        { rootMargin: "-38% 0px -54% 0px", threshold: 0 },
       );
-      obs.observe(el);
-      observers.push(obs);
-    });
-    return () => observers.forEach((o) => o.disconnect());
+      observer.observe(element);
+      observers.push(observer);
+    }
+    return () => observers.forEach((observer) => observer.disconnect());
   }, []);
 
   return (
-    <header className="fixed inset-x-0 top-0 z-50 px-4 pt-4">
-      <nav
-        className={`relative mx-auto flex max-w-6xl items-center justify-between overflow-hidden rounded-3xl border px-4 py-2.5 backdrop-blur-xl transition-all duration-300 ${
-          scrolled ? "border-border bg-card/80 shadow-card" : "border-transparent bg-card/50"
-        }`}
-      >
-        <div
-          aria-hidden
-          className="absolute inset-x-0 bottom-0 h-[2px] origin-left bg-[image:var(--gold-ivory-gradient)] transition-transform duration-100"
-          style={{ transform: `scaleX(${progress / 100})` }}
-        />
-        <a href="#home" className="group flex items-center gap-2 text-base font-bold tracking-tight">
-          <BrandMark className="h-8 w-8 shrink-0" />
-          <span>Vivek <span className="text-muted-foreground">Patne</span></span>
+    <header className="fixed inset-x-0 top-0 z-50 px-4 pt-3 sm:px-6 sm:pt-5">
+      <nav className={`mx-auto flex max-w-6xl items-center justify-between rounded-full border px-3 py-2 backdrop-blur-2xl transition-colors sm:px-4 ${scrolled ? "border-border bg-background/90 shadow-card" : "border-border/70 bg-background/70"}`} aria-label="Main navigation">
+        <a href="#home" onClick={() => setOpen(false)} className="flex min-h-10 items-center gap-2.5 rounded-full pl-1 text-sm font-semibold tracking-tight text-foreground">
+          <BrandMark className="h-8 w-8" /> <span>Vivek <span className="text-muted-foreground">Patne</span></span>
         </a>
-        <ul className="hidden items-center gap-0.5 text-sm lg:flex">
-          {sections.map((s) => (
-            <li key={s.id}>
-              <a
-                href={`#${s.id}`}
-                className={`rounded-full px-3 py-1.5 font-medium transition-colors ${
-                  active === s.id
-                    ? "bg-accent text-accent-foreground"
-                    : "text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                {s.label}
-              </a>
-            </li>
-          ))}
+        <ul className="hidden items-center gap-1 lg:flex">
+          {sections.map((section) => <li key={section.id}><a href={`#${section.id}`} className={`inline-flex min-h-10 items-center rounded-full px-3.5 text-xs transition-colors ${active === section.id ? "bg-surface text-foreground" : "text-muted-foreground hover:text-foreground"}`}>{section.label}</a></li>)}
         </ul>
         <div className="flex items-center gap-2">
-          {resumeUrl && resumeAvailable && (
-            <a href={resumeUrl} target="_blank" rel="noopener noreferrer" download aria-label="Open resume" className="inline-flex items-center gap-1.5 rounded-full border border-primary/30 bg-primary/10 px-2.5 py-2 text-sm font-semibold text-primary shadow-card transition-all duration-300 hover:-translate-y-0.5 hover:border-primary/50 hover:bg-primary/20 sm:px-4">
-              <FileText className="h-3.5 w-3.5" /> <span className="hidden sm:inline">Resume</span>
-            </a>
-          )}
-          <button
-            onClick={() => {
-              const d = !dark;
-              setDark(d);
-              document.documentElement.classList.toggle("dark", d);
-              try {
-                localStorage.setItem("theme", d ? "dark" : "light");
-              } catch {}
-            }}
-            aria-label={dark ? "Switch to light mode" : "Switch to dark mode"}
-            className="rounded-full border border-border bg-card p-2 transition-colors hover:bg-accent"
-          >
-            {dark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-          </button>
-          <button
-            onClick={() => setOpen((o) => !o)}
-            aria-label="Toggle menu"
-            className="rounded-full border border-border bg-card p-2 transition-colors hover:bg-accent lg:hidden"
-          >
-            {open ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
-          </button>
+          <a href="#contact" className="hidden min-h-10 items-center gap-2 rounded-full bg-accent-gradient px-4 text-xs font-semibold text-primary-foreground transition-transform hover:-translate-y-0.5 sm:inline-flex">Let’s talk <ArrowUpRight className="h-3.5 w-3.5" /></a>
+          <button type="button" aria-label={open ? "Close navigation menu" : "Open navigation menu"} aria-expanded={open} aria-controls="mobile-navigation" onClick={() => setOpen((value) => !value)} className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-border bg-card text-foreground transition-colors hover:border-primary/35 lg:hidden">{open ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}</button>
         </div>
       </nav>
 
-      {open && (
-        <div className="mx-auto mt-2 max-w-6xl rounded-3xl border border-border bg-card/95 p-2 shadow-card backdrop-blur-xl lg:hidden">
-          <ul className="flex flex-col gap-1 text-sm">
-            {sections.map((s) => (
-              <li key={s.id}>
-                <a
-                  href={`#${s.id}`}
-                  onClick={() => setOpen(false)}
-                  className={`block rounded-xl px-3 py-2 font-medium transition-colors ${
-                    active === s.id ? "bg-accent text-accent-foreground" : "text-muted-foreground hover:bg-muted"
-                  }`}
-                >
-                  {s.label}
-                </a>
-              </li>
-            ))}
-            {resumeUrl && resumeAvailable && <li>
-              <a href={resumeUrl} target="_blank" rel="noopener noreferrer" download className="flex items-center gap-2 rounded-xl px-3 py-2 font-medium text-primary transition-colors hover:bg-primary/10">
-                <FileText className="h-4 w-4" /> Resume
-              </a>
-            </li>}
-          </ul>
-        </div>
-      )}
+      {open && <div id="mobile-navigation" className="mx-auto mt-2 max-w-6xl rounded-[1.5rem] border border-border bg-background/95 p-2 shadow-card backdrop-blur-xl lg:hidden">
+        <ul className="grid gap-1">
+          {sections.map((section) => <li key={section.id}><a href={`#${section.id}`} onClick={() => setOpen(false)} className={`flex min-h-11 items-center rounded-xl px-4 text-sm ${active === section.id ? "bg-surface text-foreground" : "text-muted-foreground hover:bg-card hover:text-foreground"}`}>{section.label}</a></li>)}
+          <li><a href="#contact" onClick={() => setOpen(false)} className="flex min-h-11 items-center justify-center rounded-xl bg-accent-gradient px-4 text-sm font-semibold text-primary-foreground">Let’s talk <ArrowUpRight className="ml-2 h-4 w-4" /></a></li>
+        </ul>
+      </div>}
     </header>
   );
 }

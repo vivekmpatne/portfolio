@@ -4,14 +4,10 @@ import { Hero } from "@/components/portfolio/Hero";
 import { About } from "@/components/portfolio/About";
 import { Skills } from "@/components/portfolio/Skills";
 import { Projects } from "@/components/portfolio/Projects";
-import { Experience } from "@/components/portfolio/Experience";
-import { Achievements } from "@/components/portfolio/Achievements";
 import { Consistency } from "@/components/portfolio/Consistency";
 import { Contact } from "@/components/portfolio/Contact";
 import { Footer } from "@/components/portfolio/Footer";
 import { BackToTop } from "@/components/portfolio/BackToTop";
-import { ShellHost } from "@/components/portfolio/Shell";
-import { VsCodeSimulation } from "@/components/portfolio/VsCodeSimulation";
 import { profile } from "@/data/profile";
 
 const SITE_URL = "https://vivekpatne.me";
@@ -75,17 +71,13 @@ export const Route = createFileRoute("/")({
 function Index() {
   return (
     <div className="relative min-h-screen overflow-x-hidden bg-background text-foreground">
-      <ShellHost />
       <div className="relative z-20">
-        <VsCodeSimulation />
         <Nav />
         <main>
           <Hero />
           <About />
           <Skills />
           <Projects />
-          <Experience />
-          <Achievements />
           <Consistency />
           <Contact />
         </main>
