@@ -10,18 +10,17 @@ const iconFor: Record<TimelineType, typeof GraduationCap> = {
 
 export function Experience() {
   return (
-    <section id="experience" className="mx-auto max-w-6xl px-6 py-10 sm:py-14">
+    <section id="experience" className="mx-auto max-w-6xl px-6 py-20">
       <SectionHeader title="Experience & Education" />
-      <ol className="relative ml-3 space-y-8 pl-8">
-        <span aria-hidden className="absolute left-0 top-0 h-full w-0.5 rounded-full bg-gradient-primary opacity-60" />
+      <ol className="relative ml-3 space-y-8 border-l-2 border-border pl-8">
         {timeline.map((item, i) => {
           const Icon = iconFor[item.type];
           return (
             <li key={i} className="relative">
-              <span className="absolute -left-[47px] flex h-8 w-8 items-center justify-center rounded-full bg-gradient-primary shadow-card ring-4 ring-background">
-                <Icon className="h-4 w-4 text-primary-foreground" />
+              <span className="absolute -left-[46px] flex h-8 w-8 items-center justify-center rounded-full border border-border bg-card shadow-card ring-4 ring-background">
+                <Icon className="h-4 w-4 text-foreground" />
               </span>
-              <div className="rounded-3xl border border-border/80 bg-card/95 p-5 shadow-card transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-card">
+              <div className="rounded-xl border border-border bg-card p-5 shadow-card transition-all duration-300 hover:-translate-y-0.5 hover:border-foreground/30 hover:shadow-card-hover">
                 <div className="flex flex-wrap items-baseline justify-between gap-2">
                   <h3 className="font-display text-lg font-semibold">{item.title}</h3>
                   <span className="rounded-full border border-border bg-secondary px-2.5 py-0.5 text-xs font-medium text-foreground/80">

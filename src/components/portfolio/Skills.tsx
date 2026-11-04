@@ -50,7 +50,7 @@ const techIcon: Record<string, IconType> = {
 
 export function Skills() {
   return (
-    <section id="skills" className="mx-auto max-w-6xl px-6 py-10 sm:py-14">
+    <section id="skills" className="mx-auto max-w-6xl px-6 py-20">
       <SectionHeader title="Skills" />
       <div className="grid gap-5 md:grid-cols-2">
         {Object.entries(skills).map(([category, items]) => {
@@ -77,7 +77,7 @@ export function Skills() {
                   padding: "1px",
                 }}
               />
-              <div className="relative overflow-hidden rounded-2xl border border-border/80 bg-card/95 p-6 shadow-card transition-all duration-300 hover:-translate-y-1 hover:shadow-card-hover group-hover:shadow-card-hover">
+              <div className="relative overflow-hidden rounded-2xl border border-border bg-card p-6 shadow-card transition-shadow duration-300 group-hover:shadow-card-hover">
                 <div
                   className="pointer-events-none absolute -inset-px opacity-0 transition-opacity duration-300 group-hover:opacity-100"
                   style={{
@@ -97,7 +97,7 @@ export function Skills() {
                     return (
                       <span
                         key={skill}
-                        className="inline-flex items-center gap-1.5 rounded-lg border border-border/70 bg-background/90 px-2.5 py-1.5 text-sm shadow-[0_1px_2px_rgba(0,0,0,0.03)] transition-all hover:-translate-y-0.5 hover:scale-105 hover:border-primary/40 hover:bg-accent hover:shadow-md"
+                        className="inline-flex items-center gap-1.5 rounded-md border border-border bg-background/80 px-2.5 py-1.5 text-sm shadow-card transition-all duration-200 hover:-translate-y-0.5 hover:scale-105 hover:border-foreground/40 hover:bg-accent hover:shadow-card-hover"
                       >
                         {TechIcon ? <TechIcon className="h-3.5 w-3.5 text-muted-foreground" /> : null}
                         {skill}

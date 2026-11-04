@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { FileText, Menu, Moon, Sun, X } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { Moon, Sun, FileText, Menu, X, Monitor } from "lucide-react";
 import { profile } from "@/data/profile";
 import { useResumeAvailable } from "@/hooks/use-resume-available";
 
@@ -9,22 +9,32 @@ const sections = [
   { id: "skills", label: "Skills" },
   { id: "projects", label: "Projects" },
   { id: "experience", label: "Experience" },
-  { id: "achievements", label: "Profiles" },
+  { id: "achievements", label: "Achievements" },
   { id: "consistency", label: "Consistency" },
   { id: "contact", label: "Contact" },
 ];
 
 export function Nav() {
+  // Lazy-init from the DOM class set by the pre-hydration script in __root.tsx.
+  // This keeps React state in sync with the class already on <html> and avoids
+  // a light/dark flash on reload or navigation.
+  const [dark, setDark] = useState<boolean>(() => {
+    if (typeof document === "undefined") return true;
+    return document.documentElement.classList.contains("dark");
+  });
   const [scrolled, setScrolled] = useState(false);
   const [progress, setProgress] = useState(0);
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState("home");
-  const [dark, setDark] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const resumeUrl = profile.resumeUrl;
   const resumeAvailable = useResumeAvailable();
 
   useEffect(() => {
-    document.documentElement.classList.remove("dark");
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
     const onScroll = () => {
       setScrolled(window.scrollY > 10);
       const h = document.documentElement;
@@ -36,14 +46,35 @@ export function Nav() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  // Sync DOM + storage only when the user toggles the theme. We skip the very
+  // first run so we don't override the pre-hydration script's decision.
+  const mountedRef = useRef(false);
+  useEffect(() => {
+    if (!mountedRef.current) {
+      mountedRef.current = true;
+      return;
+    }
+    document.documentElement.classList.toggle("dark", dark);
+    try {
+      localStorage.setItem("theme", dark ? "dark" : "light");
+    } catch {
+      /* ignore */
+    }
+  }, [dark]);
+
+
   useEffect(() => {
     const observers: IntersectionObserver[] = [];
     sections.forEach((s) => {
       const el = document.getElementById(s.id);
       if (!el) return;
       const obs = new IntersectionObserver(
-        (entries) => entries.forEach((e) => e.isIntersecting && setActive(s.id)),
-        { rootMargin: "-40% 0px -55% 0px", threshold: 0 },
+        (entries) => {
+          entries.forEach((e) => {
+            if (e.isIntersecting) setActive(s.id);
+          });
+        },
+        { rootMargin: "-40% 0px -55% 0px", threshold: 0 }
       );
       obs.observe(el);
       observers.push(obs);
@@ -52,88 +83,130 @@ export function Nav() {
   }, []);
 
   return (
-    <header className="fixed inset-x-0 top-0 z-50 px-4 pt-4">
-      <nav
-        className={`relative mx-auto flex max-w-6xl items-center justify-between overflow-hidden rounded-2xl border px-4 py-2.5 backdrop-blur-xl transition-all duration-300 ${
-          scrolled ? "border-border bg-card/80 shadow-nav" : "border-transparent bg-card/50"
-        }`}
+    <header
+      className={`fixed top-0 left-0 right-0 z-50 w-full transition-all ${
+        scrolled
+          ? "border-b border-border bg-background/75 shadow-nav backdrop-blur-xl"
+          : "bg-background/40 backdrop-blur-md"
+      }`}
+    >
+      {/* Scroll progress ribbon — loading-bar style */}
+      <div
+        className="absolute inset-x-0 top-0 h-[3px] overflow-hidden bg-[hsl(var(--phosphor)/0.12)]"
+        aria-hidden
       >
         <div
-          aria-hidden
-          className="absolute inset-x-0 bottom-0 h-[2px] origin-left bg-[image:var(--gradient-primary)] transition-transform duration-100"
-          style={{ transform: `scaleX(${progress / 100})` }}
-        />
-        <a href="#home" className="flex items-center gap-2 text-base font-bold tracking-tight">
-          <span className="flex h-7 w-7 items-center justify-center rounded-lg border border-green-400/50 bg-[#0a1410] font-mono text-[11px] font-bold tracking-tight text-green-400 shadow-[0_0_10px_rgba(74,222,128,0.2)] transition-all duration-300 hover:animate-[terminal-pulse_1.1s_ease-in-out_infinite] hover:border-green-300 hover:text-green-300 motion-reduce:hover:animate-none">
-            <span aria-hidden="true">&gt;_</span>
-            <span className="sr-only">Terminal</span>
-          </span>
+          className="relative h-full bg-[hsl(var(--phosphor))] shadow-[0_0_10px_hsl(var(--phosphor)/0.9)] transition-[width] duration-100 ease-out"
+          style={{ width: `${progress}%` }}
+        >
+          {/* moving highlight sweep */}
+          <div className="pointer-events-none absolute inset-y-0 -left-1/4 w-1/4 animate-[ribbon_1.6s_linear_infinite] bg-gradient-to-r from-transparent via-white/70 to-transparent mix-blend-overlay" />
+        </div>
+      </div>
+      {/* Loading-style label with animated dots */}
+      <div className="pointer-events-none absolute right-3 top-[5px] hidden font-mono text-[9px] uppercase tracking-[0.25em] text-[hsl(var(--phosphor))] sm:block">
+        {progress >= 99.5 ? (
+          <span>[ loaded ] 100%</span>
+        ) : (
+          <>loading<span className="loading-dots" /> {Math.round(progress)}%</>
+        )}
+      </div>
+
+
+      <nav className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
+        <a href="#home" className="font-display text-lg font-semibold tracking-tight">
           Vivek Patne M
         </a>
-        <ul className="hidden items-center gap-0.5 text-sm lg:flex">
-          {sections.map((s) => (
-            <li key={s.id}>
-              <a
-                href={`#${s.id}`}
-                className={`rounded-full px-3 py-1.5 font-medium transition-colors ${
-                  active === s.id
-                    ? "bg-accent text-accent-foreground"
-                    : "text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                {s.label}
-              </a>
-            </li>
-          ))}
+        <ul className="hidden items-center gap-1 text-sm md:flex">
+          {sections.map((s) => {
+            const isActive = active === s.id;
+            return (
+              <li key={s.id}>
+                <a
+                  href={`#${s.id}`}
+                  className={`relative rounded-md px-3 py-1.5 transition-colors ${
+                    isActive
+                      ? "text-foreground"
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  {s.label}
+                  {isActive && (
+                    <span className="absolute inset-x-3 -bottom-0.5 h-0.5 rounded-full bg-foreground" />
+                  )}
+                </a>
+              </li>
+            );
+          })}
         </ul>
         <div className="flex items-center gap-2">
           {resumeUrl && resumeAvailable && (
-            <a href={resumeUrl} target="_blank" rel="noopener noreferrer" download aria-label="Open resume" className="inline-flex items-center gap-1.5 rounded-full border border-primary/30 bg-primary/10 px-2.5 py-2 text-sm font-semibold text-primary shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-primary/50 hover:bg-primary/20 sm:px-4">
-              <FileText className="h-3.5 w-3.5" /> <span className="hidden sm:inline">Resume</span>
+            <a
+              href={resumeUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              download
+              className="hidden items-center gap-1.5 rounded-md border border-border bg-card px-3 py-1.5 text-sm font-medium shadow-card transition-all hover:-translate-y-0.5 hover:border-foreground/40 hover:bg-accent hover:shadow-card-hover sm:inline-flex"
+            >
+              <FileText className="h-3.5 w-3.5" /> Resume
             </a>
           )}
           <button
-            onClick={() => {
-              const d = !dark;
-              setDark(d);
-              document.documentElement.classList.toggle("dark", d);
-            }}
-            aria-label={dark ? "Switch to light mode" : "Switch to dark mode"}
-            className="rounded-full border border-border bg-card p-2 transition-colors hover:bg-accent"
+            onClick={() => setDark((d) => !d)}
+            aria-label="Toggle theme"
+            className="rounded-md border border-border bg-card p-2 shadow-card transition-colors hover:bg-accent"
           >
-            {dark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+            {!mounted ? (
+              <Monitor className="h-4 w-4" />
+            ) : dark ? (
+              <Sun className="h-4 w-4" />
+            ) : (
+              <Moon className="h-4 w-4" />
+            )}
           </button>
           <button
             onClick={() => setOpen((o) => !o)}
             aria-label="Toggle menu"
-            className="rounded-full border border-border bg-card p-2 transition-colors hover:bg-accent lg:hidden"
+            className="rounded-md border border-border bg-card p-2 shadow-card transition-colors hover:bg-accent md:hidden"
           >
             {open ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
           </button>
         </div>
       </nav>
 
+      {/* Mobile menu */}
       {open && (
-        <div className="mx-auto mt-2 max-w-6xl rounded-2xl border border-border bg-card/95 p-2 shadow-nav backdrop-blur-xl lg:hidden">
-          <ul className="flex flex-col gap-1 text-sm">
+        <div className="border-t border-border bg-background/95 backdrop-blur md:hidden">
+          <ul className="mx-auto flex max-w-6xl flex-col gap-1 px-6 py-3 text-sm">
             {sections.map((s) => (
               <li key={s.id}>
                 <a
                   href={`#${s.id}`}
                   onClick={() => setOpen(false)}
-                  className={`block rounded-xl px-3 py-2 font-medium transition-colors ${
-                    active === s.id ? "bg-accent text-accent-foreground" : "text-muted-foreground hover:bg-muted"
+                  className={`block rounded-md px-3 py-2 transition-colors hover:bg-accent ${
+                    active === s.id
+                      ? "bg-accent text-foreground"
+                      : "text-muted-foreground hover:text-foreground"
                   }`}
                 >
                   {s.label}
                 </a>
               </li>
             ))}
-            {resumeUrl && resumeAvailable && <li>
-              <a href={resumeUrl} target="_blank" rel="noopener noreferrer" download className="flex items-center gap-2 rounded-xl px-3 py-2 font-medium text-primary transition-colors hover:bg-primary/10">
-                <FileText className="h-4 w-4" /> Resume
-              </a>
-            </li>}
+            {resumeUrl && resumeAvailable && (
+              <li>
+                <a
+                  href={resumeUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  download
+                  onClick={() => setOpen(false)}
+                  className="flex items-center gap-2 rounded-md px-3 py-2 text-foreground transition-colors hover:bg-accent"
+                >
+                  <FileText className="h-4 w-4" /> Resume
+                </a>
+              </li>
+            )}
           </ul>
         </div>
       )}

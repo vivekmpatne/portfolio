@@ -40,7 +40,7 @@ export function Projects() {
   const touchStartX = useRef<number | null>(null);
 
   return (
-    <section id="projects" className="mx-auto max-w-6xl px-6 py-10 sm:py-14">
+    <section id="projects" className="mx-auto max-w-6xl px-6 py-20">
       <div className="flex items-end justify-between gap-4">
         <SectionHeader title="Projects" />
         <div className="mb-4 flex shrink-0 gap-2">
@@ -118,7 +118,7 @@ function ProjectCard({ project }: { project: Project }) {
   const currentImage = showSecondary && project.secondaryImage ? project.secondaryImage : project.image;
   return (
     <article
-      className={`group relative flex h-full flex-col overflow-hidden rounded-2xl border border-border/80 bg-card/95 shadow-card transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-card-hover ${
+      className={`group relative flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-card transition-all hover:border-foreground/30 hover:shadow-xl ${
         project.image ? "md:grid md:grid-cols-2 md:gap-0" : ""
       }`}
     >

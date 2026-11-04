@@ -10,7 +10,7 @@ import { Consistency } from "@/components/portfolio/Consistency";
 import { Contact } from "@/components/portfolio/Contact";
 import { Footer } from "@/components/portfolio/Footer";
 import { BackToTop } from "@/components/portfolio/BackToTop";
-import { ShellHost } from "@/components/portfolio/Shell";
+import { TerminalOverlay } from "@/components/portfolio/TerminalOverlay";
 import { VsCodeSimulation } from "@/components/portfolio/VsCodeSimulation";
 import { profile } from "@/data/profile";
 
@@ -90,8 +90,8 @@ function Index() {
         </main>
         <Footer />
         <BackToTop />
+        <TerminalOverlay />
       </div>
-      <ShellHost />
     </div>
   );
 }

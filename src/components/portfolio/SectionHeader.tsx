@@ -1,19 +1,22 @@
-const HEADERS: Record<string, string> = {
-  about: "01. ABOUT",
-  skills: "02. SKILLS",
-  projects: "03. PROJECTS",
-  "experience & education": "04. EXPERIENCE",
-  "coding profiles": "05. CODING PROFILES",
-  "consistency dashboard": "06. CONSISTENCY",
-};
-
 export function SectionHeader({ title, subtitle }: { title: string; subtitle?: string }) {
-  const terminalTitle = HEADERS[title.toLowerCase()] ?? "07. CONTACT";
+  const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_|_$/g, "");
   return (
-    <div className="mb-6 sm:mb-8">
-      <p className="font-mono text-sm font-semibold tracking-wide text-primary">// {terminalTitle}</p>
-      <h2 className="mt-3 text-3xl font-bold tracking-tight md:text-4xl">{title}</h2>
-      {subtitle ? <p className="mt-3 max-w-2xl text-muted-foreground">{subtitle}</p> : null}
+    <div className="mb-10">
+      <div className="flex items-center gap-2 text-xs text-muted-foreground">
+        <span className="phosphor-glow">guest@vivek</span>
+        <span className="opacity-60">:</span>
+        <span className="opacity-70">~/portfolio</span>
+        <span className="phosphor-glow">$</span>
+        <span className="text-foreground/90">cat {slug}.md</span>
+      </div>
+      <h2 className="mt-3 font-display text-4xl md:text-5xl leading-none tracking-wide">
+        <span className="phosphor-glow">#</span>{" "}
+        <span className="text-foreground">{title}</span>
+      </h2>
+      {subtitle ? (
+        <p className="mt-2 text-sm text-muted-foreground">// {subtitle}</p>
+      ) : null}
+      <div className="mt-4 h-px w-full bg-[repeating-linear-gradient(to_right,color-mix(in_oklab,var(--phosphor)_55%,transparent)_0_6px,transparent_6px_12px)]" />
     </div>
   );
 }

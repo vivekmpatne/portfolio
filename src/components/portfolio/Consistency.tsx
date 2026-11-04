@@ -7,7 +7,6 @@ import { profile } from "@/data/profile";
 import { SectionHeader } from "./SectionHeader";
 import { GitCity } from "./GitCity";
 import { LiveLog } from "./LiveLog";
-import { LiveStats } from "./LiveStats";
 
 
 
@@ -162,20 +161,16 @@ export function Consistency() {
 
   const currentDisplay = stats.current === null ? "—" : stats.current;
   const metrics = [
-    { icon: Flame,    label: "Current Streak",    value: currentDisplay,     suffix: stats.current === null ? "" : "days", color: "text-primary" },
-    { icon: Trophy,   label: "Longest Streak",    value: stats.longest,      suffix: "days",     color: "text-secondary-accent" },
-    { icon: Calendar, label: `Active in ${year}`, value: stats.active,       suffix: "days",     color: "text-cyan-300" },
-    { icon: Zap,      label: "Total Activity",    value: totalContribs,      suffix: "contribs", color: "text-signal" },
+    { icon: Flame,    label: "Current Streak",    value: currentDisplay,     suffix: stats.current === null ? "" : "days", color: "text-orange-500" },
+    { icon: Trophy,   label: "Longest Streak",    value: stats.longest,      suffix: "days",     color: "text-amber-500" },
+    { icon: Calendar, label: `Active in ${year}`, value: stats.active,       suffix: "days",     color: "text-emerald-500" },
+    { icon: Zap,      label: "Total Activity",    value: totalContribs,      suffix: "contribs", color: "text-indigo-500" },
   ];
 
   return (
-    <section id="activity" className="mx-auto max-w-6xl px-6 py-20 sm:py-28">
-      <SectionHeader eyebrow="A public build log" title="The work leaves a trace." subtitle="Coding profiles, activity over time, and recent engineering signals. One place to follow the practice behind the projects." />
-      <div className="mb-12">
-        <h3 className="mb-4 font-mono text-[10px] uppercase tracking-[.2em] text-muted-foreground">Live coding profiles</h3>
-        <LiveStats />
-      </div>
-      <p className="mb-6 max-w-2xl text-sm text-muted-foreground">
+    <section id="consistency" className="mx-auto max-w-6xl px-6 py-20">
+      <SectionHeader title="Consistency Dashboard" />
+      <p className="-mt-2 mb-4 max-w-2xl text-muted-foreground">
         Real engineering activity aggregated live from GitHub, LeetCode, Codeforces, CodeChef, HackerRank, GeeksforGeeks, and TUF+ — no manual updates.
       </p>
 
@@ -204,7 +199,7 @@ export function Consistency() {
           return (
             <div
               key={m.label}
-              className="group rounded-3xl border border-border/80 bg-card/95 p-5 shadow-card transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-card"
+              className="group rounded-2xl border border-border bg-card p-5 shadow-card transition-all hover:-translate-y-1 hover:border-foreground/30 hover:shadow-card-hover"
             >
               <div className="flex items-center justify-between">
                 <Icon className={`h-5 w-5 ${m.color}`} />
@@ -222,7 +217,7 @@ export function Consistency() {
       </div>
 
       {/* Heatmap card */}
-      <div className="rounded-3xl border border-border/80 bg-card/95 p-5 shadow-card">
+      <div className="rounded-2xl border border-border bg-card p-5 shadow-card">
         <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
           <div>
             <div className="font-display text-base font-semibold">Engineering Activity — {year}</div>
@@ -353,7 +348,7 @@ export function Consistency() {
             return (
               <div
                 key={s.key}
-                className="flex items-center justify-between rounded-3xl border border-border/80 bg-card/95 px-4 py-3 shadow-card transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-card"
+                className="flex items-center justify-between rounded-xl border border-border bg-card px-4 py-3 shadow-card transition-all hover:-translate-y-0.5 hover:border-foreground/30 hover:shadow-card-hover"
               >
                 <div className="flex items-center gap-3">
                   <Icon className="h-5 w-5" style={{ color: s.color }} />
