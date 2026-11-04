@@ -12,10 +12,20 @@ const focusAreas = [
 export function About() {
   return (
     <section id="about" className="mx-auto max-w-6xl px-6 py-10 sm:py-14">
-      <SectionHeader title="About" />
+      <p className="eyebrow-script mb-2 text-xl">a little about me</p>
+      <SectionHeader title="Code on earth, eyes on the stars" />
       <p className="max-w-3xl text-lg leading-relaxed text-muted-foreground">
         {profile.bio}
       </p>
+
+      <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        {[[`${profile.stats.problemsSolved}+`,"DSA problems solved"],["SIC IoT","Capstone shortlisted"],["RNSIT","B.E. CSE-DS ’28"],["8.35","Current CGPA"]].map(([v,l])=><div key={l} className="rounded-2xl border border-[#24201c] bg-[#141210] p-5"><strong className="display-heading text-2xl">{v}</strong><p className="mt-2 text-sm text-muted-foreground">{l}</p></div>)}
+      </div>
+      <div className="relative mt-8 flex items-end gap-5 overflow-hidden rounded-3xl border border-[#24201c] bg-[#12100e] p-4 sm:max-w-md">
+        <div className="pointer-events-none absolute -right-6 -top-8 h-40 w-40 rounded-full bg-[#c2ad82]/20 blur-3xl" />
+        <img src={profile.avatar} alt={profile.name} className="relative h-28 w-24 rounded-2xl object-cover sm:h-32 sm:w-28" />
+        <div className="relative pb-1"><p className="eyebrow-script text-2xl">Vivek</p><span className="mt-2 inline-flex rounded-full border border-[#2a2723] bg-[#1c1a17] px-3 py-1 text-xs text-[#e8dec8]">RNSIT · Bengaluru</span></div>
+      </div>
 
       {/* Focus Areas — compact inline chips */}
       <div className="mt-8">

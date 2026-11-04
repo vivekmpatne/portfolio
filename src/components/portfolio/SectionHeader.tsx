@@ -20,8 +20,8 @@ export function SectionHeader({ title, subtitle }: { title: string; subtitle?: s
         <span className="h-px w-10 bg-gradient-primary" />
         <span className="text-muted-foreground">{title}</span>
       </div>
-      <h2 className="mt-4 text-4xl font-bold tracking-tight md:text-5xl">
-        <span className="text-gradient">{title}</span>
+      <h2 className="display-heading mt-4 text-4xl md:text-6xl">
+        <span>{title}</span>
       </h2>
       {subtitle ? <p className="mt-3 max-w-2xl text-muted-foreground">{subtitle}</p> : null}
     </div>

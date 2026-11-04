@@ -117,8 +117,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 });
 
 function RootShell({ children }: { children: ReactNode }) {
-  // Light theme only — clear any stale dark preference from older versions.
-  const themeBootstrap = `(function(){try{localStorage.removeItem('theme');sessionStorage.removeItem('boot:v1');}catch(e){}})();`;
+  // Apply the saved theme before first paint; light mode is the default.
+  const themeBootstrap = `(function(){try{document.documentElement.classList.toggle('dark',localStorage.getItem('theme')==='dark');}catch(e){}})();`;
   return (
     <html lang="en" 
       className="scroll-pt-20"

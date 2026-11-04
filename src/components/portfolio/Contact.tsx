@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from "react";
-import { Mail, MapPin, Send, Check, Loader2 } from "lucide-react";
+import { Mail, MapPin, Send, Check, Loader2, Copy } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -30,19 +30,19 @@ export function Contact() {
   };
 
   const contactItems = [
-    { icon: Mail, label: "Email", value: profile.email, href: `mailto:${profile.email}` },
     { icon: MapPin, label: "Location", value: profile.location, href: null },
   ];
 
   return (
     <section id="contact" className="mx-auto max-w-6xl px-6 py-10 sm:py-14">
-      <SectionHeader title="Let's Build Something Great Together" />
+      <SectionHeader title="Let's build something great" subtitle="Open to SDE roles, internship opportunities, and technical discussions. Email is the fastest way to reach me." />
       <div className="grid gap-8 md:grid-cols-2">
         <div className="space-y-6">
           <p className="text-lg text-muted-foreground">
-            Always open to interesting conversations, internship opportunities,
-            and collaborations. The fastest way to reach me is via email.
+            Open to SDE roles, internship opportunities, and technical discussions. Email is the fastest way to reach me.
           </p>
+
+          <button type="button" onClick={async()=>{await navigator.clipboard.writeText(profile.email);toast.success("Email copied to clipboard");}} className="flex w-full items-center justify-between gap-3 rounded-full border border-[#2a2723] bg-[#141210] px-5 py-3 text-left text-sm"><span className="flex min-w-0 items-center gap-3"><Mail className="h-4 w-4 shrink-0 text-primary"/><span className="truncate">{profile.email}</span></span><Copy className="h-4 w-4 shrink-0 text-muted-foreground"/></button>
 
           <div className="space-y-2">
             {contactItems.map((item) => {

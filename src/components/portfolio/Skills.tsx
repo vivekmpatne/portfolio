@@ -51,7 +51,11 @@ const techIcon: Record<string, IconType> = {
 export function Skills() {
   return (
     <section id="skills" className="mx-auto max-w-6xl px-6 py-10 sm:py-14">
-      <SectionHeader title="Skills" />
+      <p className="eyebrow-script mb-2 text-xl">the toolkit</p>
+      <SectionHeader title="Tools I ship with" subtitle="The stack I reach for when an idea needs to become a real, working product." />
+      <div className="mb-8 grid grid-cols-4 gap-4 sm:grid-cols-7">
+        {["React","TypeScript","Node.js","MongoDB","PostgreSQL","Docker","Git","Linux","C++","Python","ESP32","MQTT"].map((name,i)=><div key={name} className="flex flex-col items-center gap-2 text-center"><div className="squircle-3d flex aspect-square w-full max-w-[76px] items-center justify-center text-lg font-bold text-[#c2ad82]">{["⚛","TS","JS","◈","▤","▦","⌘","Tux","C++","Py","IoT","⌁"][i]}</div><span className="text-[11px] text-muted-foreground">{name}</span></div>)}
+      </div>
       <div className="grid gap-5 md:grid-cols-2">
         {Object.entries(skills).map(([category, items]) => {
           const Icon = categoryIcon[category] ?? Code2;

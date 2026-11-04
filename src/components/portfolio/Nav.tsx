@@ -24,7 +24,13 @@ export function Nav() {
   const resumeAvailable = useResumeAvailable();
 
   useEffect(() => {
-    document.documentElement.classList.remove("dark");
+    let prefersDark = false;
+    try {
+      prefersDark = localStorage.getItem("theme") === "dark";
+    } catch {}
+    document.documentElement.classList.toggle("dark", prefersDark);
+    setDark(prefersDark);
+
     const onScroll = () => {
       setScrolled(window.scrollY > 10);
       const h = document.documentElement;
@@ -97,6 +103,9 @@ export function Nav() {
               const d = !dark;
               setDark(d);
               document.documentElement.classList.toggle("dark", d);
+              try {
+                localStorage.setItem("theme", d ? "dark" : "light");
+              } catch {}
             }}
             aria-label={dark ? "Switch to light mode" : "Switch to dark mode"}
             className="rounded-full border border-border bg-card p-2 transition-colors hover:bg-accent"

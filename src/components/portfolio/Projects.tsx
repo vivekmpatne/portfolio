@@ -118,17 +118,18 @@ function ProjectCard({ project }: { project: Project }) {
   const currentImage = showSecondary && project.secondaryImage ? project.secondaryImage : project.image;
   return (
     <article
-      className={`group relative flex h-full flex-col overflow-hidden rounded-2xl border border-border/80 bg-card/95 shadow-card transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-card-hover ${
+      className={`group relative flex h-full flex-col overflow-hidden rounded-3xl border border-[#24201c] bg-[#12100e] shadow-card transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-card-hover ${
         project.image ? "md:grid md:grid-cols-2 md:gap-0" : ""
       }`}
     >
       {project.image && (
         <div className="relative overflow-hidden border-b border-border bg-secondary aspect-[16/10] md:aspect-auto md:border-b-0 md:border-r">
+          <div className="absolute inset-x-0 top-0 z-10 flex h-9 items-center gap-1.5 border-b border-white/10 bg-[#171512]/95 px-3 backdrop-blur"><i className="h-2.5 w-2.5 rounded-full bg-[#ef6a5b]"/><i className="h-2.5 w-2.5 rounded-full bg-[#e9bd4b]"/><i className="h-2.5 w-2.5 rounded-full bg-[#62c554]"/><span className="ml-3 rounded-full bg-black/30 px-4 py-1 text-[10px] text-white/55">{project.liveUrl?.replace(/^https?:\/\//, "").split("/")[0] ?? "Project preview"}</span></div>
           {/* eslint-disable-next-line jsx-a11y/alt-text */}
           <img
             src={currentImage ?? undefined}
             alt={`${project.title} — ${showSecondary ? project.secondaryImageLabel ?? "secondary" : project.imageLabel ?? "screenshot"}`}
-            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+            className="h-full w-full object-cover pt-9 transition-transform duration-500 group-hover:scale-105"
             onError={(e) => {
               (e.currentTarget.parentElement as HTMLElement).style.display = "none";
             }}
@@ -152,7 +153,7 @@ function ProjectCard({ project }: { project: Project }) {
         </div>
       )}
 
-      <div className="flex flex-1 flex-col p-7 md:p-8">
+      <div className="flex flex-1 flex-col p-7 md:p-10">
         <div className="mb-3 flex flex-wrap items-center gap-2">
           {project.category === "learning" && (
             <span className="inline-flex items-center gap-1 rounded-full border border-border bg-accent px-2.5 py-0.5 text-[10px] font-medium uppercase tracking-wider">
@@ -176,7 +177,7 @@ function ProjectCard({ project }: { project: Project }) {
           </span>
         </div>
 
-        <h3 className="font-display font-semibold text-2xl md:text-3xl">
+        <h3 className="display-heading text-2xl md:text-4xl">
           {project.title}
         </h3>
         {project.highlight && (
