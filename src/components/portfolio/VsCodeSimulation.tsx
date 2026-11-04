@@ -147,7 +147,7 @@ export function VsCodeSimulation() {
               {[
                 ["{"],
                 ['  "name": ', '"vivek-patne-portfolio"', ","],
-                ['  "author": ', '"Vivek Patne"', ","],
+                ['  "author": ', '"Vivek Patne M"', ","],
                 ['  "scripts": { "dev": ', '"vite dev"', " },"],
                 ['  "stack": [', '"React 19", "TanStack Start", "Tailwind v4"', "],"],
                 ['  "status": ', '"open-to-work"'],

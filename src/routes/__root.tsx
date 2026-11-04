@@ -79,11 +79,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { name: "author", content: "Vivek Patne" },
-      { title: "Vivek Patne | Software Engineer" },
+      { name: "author", content: "Vivek Patne M" },
+      { title: "Vivek Patne M | Software Engineer" },
       { name: "theme-color", content: "#090d13" },
       { property: "og:type", content: "website" },
-      { property: "og:site_name", content: "Vivek Patne" },
+      { property: "og:site_name", content: "Vivek Patne M" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:site", content: "@vm_patne" },
     ],
@@ -108,7 +108,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         children: JSON.stringify({
           "@context": "https://schema.org",
           "@type": "WebSite",
-          name: "Vivek Patne — Portfolio",
+          name: "Vivek Patne M — Portfolio",
           url: "https://vivekpatne.me/",
         }),
       },

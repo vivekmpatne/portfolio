@@ -5,23 +5,18 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-  --radius-sm: 10px;
-  --radius-md: 14px;
-  --radius-lg: 24px;
-  --radius-xl: 24px;
-  --radius-2xl: 24px;
-  --radius-3xl: 24px;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
   --color-card-foreground: var(--card-foreground);
-  --color-surface: var(--surface);
   --color-popover: var(--popover);
   --color-popover-foreground: var(--popover-foreground);
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
-  --color-secondary-accent: var(--secondary-accent);
-  --color-signal: var(--signal);
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
   --color-muted: var(--muted);
@@ -35,46 +30,59 @@
   --color-ring: var(--ring);
   --color-phosphor: var(--phosphor);
   --color-amber-term: var(--amber-term);
-  --font-sans: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
-  --font-display: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
 }
 
 :root {
-  color-scheme: dark;
-  --radius: 1.5rem;
-  --background: #090d13;
-  --foreground: #eef2f8;
-  --card: #101722;
-  --card-foreground: #eef2f8;
-  --surface: #172231;
-  --popover: #101722;
-  --popover-foreground: #eef2f8;
-  --primary: #c7f36f;
-  --primary-foreground: #10140b;
-  --secondary-accent: #a4b7ff;
-  --signal: #ff9b72;
-  --secondary: var(--surface);
-  --secondary-foreground: #eef2f8;
-  --muted: var(--surface);
-  --muted-foreground: #9aa7b8;
-  --accent: #222f42;
-  --accent-foreground: #eef2f8;
+  --radius: 0.75rem;
+  /* Luminous light studio — crisp white, porcelain, electric indigo */
+  --background: oklch(0.984 0.003 248);
+  --foreground: oklch(0.21 0.03 265);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.21 0.03 265);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.21 0.03 265);
+  --primary: oklch(0.51 0.23 277);
+  --primary-foreground: oklch(0.99 0 0);
+  --secondary: oklch(0.968 0.007 248);
+  --secondary-foreground: oklch(0.28 0.03 265);
+  --muted: oklch(0.968 0.007 248);
+  --muted-foreground: oklch(0.52 0.03 260);
+  --accent: oklch(0.955 0.025 277);
+  --accent-foreground: oklch(0.32 0.15 277);
   --destructive: oklch(0.58 0.22 25);
   --destructive-foreground: oklch(0.98 0 0);
-  --border: #263446;
-  --input: #263446;
-  --ring: #c7f36f;
-  --sky: oklch(0.6 0.12 200);
-  --emerald: oklch(0.62 0.14 155);
-  --phosphor: oklch(0.62 0.15 62);
+  --border: oklch(0.929 0.013 255);
+  --input: oklch(0.929 0.013 255);
+  --ring: oklch(0.51 0.23 277);
+  --sky: oklch(0.59 0.15 237);
+  --emerald: oklch(0.69 0.15 163);
+  /* legacy accent name used across components — now indigo */
+  --phosphor: oklch(0.51 0.23 277);
   --amber-term: oklch(0.7 0.16 60);
-  --cyan-glow: oklch(0.7 0.12 190);
-  --accent-gradient: linear-gradient(125deg, #c7f36f 0%, #a4b7ff 100%);
-  --gradient-mesh: radial-gradient(900px 650px at 76% -14%, rgba(122,148,255,.12), transparent 64%), radial-gradient(780px 560px at 0% 42%, rgba(199,243,111,.055), transparent 58%);
+  --cyan-glow: oklch(0.72 0.14 210);
+  --gradient-primary: linear-gradient(120deg, oklch(0.51 0.23 277), oklch(0.6 0.17 237) 55%, oklch(0.7 0.15 175));
+  --gradient-mesh:
+    radial-gradient(900px 600px at 8% -5%, oklch(0.51 0.23 277 / 9%), transparent 60%),
+    radial-gradient(800px 600px at 100% 20%, oklch(0.72 0.14 210 / 8%), transparent 60%),
+    radial-gradient(700px 500px at 30% 100%, oklch(0.69 0.15 163 / 7%), transparent 60%);
 
-  --shadow-card: 0 24px 60px -36px rgba(0,0,0,.9), inset 0 1px 0 rgba(255,255,255,.04);
-  --shadow-tile: 0 14px 28px -14px rgba(0,0,0,.85), inset 0 1px 0 rgba(255,255,255,.1);
+  --shadow-card:
+    0 1px 1px oklch(0.21 0.03 265 / 4%),
+    0 2px 4px -1px oklch(0.21 0.03 265 / 5%),
+    0 12px 28px -10px oklch(0.21 0.03 265 / 12%),
+    inset 0 1px 0 0 oklch(1 0 0 / 90%),
+    inset 0 -1px 0 0 oklch(0.21 0.03 265 / 4%);
+  --shadow-card-hover:
+    0 2px 4px -1px oklch(0.21 0.03 265 / 6%),
+    0 24px 40px -14px oklch(0.51 0.23 277 / 26%),
+    0 10px 24px -12px oklch(0.72 0.14 210 / 22%),
+    0 0 0 1px oklch(0.51 0.23 277 / 18%),
+    inset 0 1px 0 0 oklch(1 0 0 / 100%);
+  --shadow-nav: 0 8px 30px -12px oklch(0.21 0.03 265 / 15%);
+  --shadow-glow: 0 10px 30px -8px oklch(0.51 0.23 277 / 45%), 0 0 0 1px oklch(0.51 0.23 277 / 25%);
 
   /* VS Code intro palette */
   --vsc-bg: oklch(0.23 0 0);
@@ -91,7 +99,36 @@
   --vsc-ok: oklch(0.75 0.16 150);
 }
 
-.dark { color-scheme: dark; }
+/* Cyber-terminal dark theme (opt-in via toggle) */
+.dark {
+  --background: #090d13;
+  --foreground: #d8e3dc;
+  --card: #0a1410;
+  --card-foreground: #d8e3dc;
+  --popover: #0a1410;
+  --popover-foreground: #d8e3dc;
+  --primary: #4ade80;
+  --primary-foreground: #07110b;
+  --secondary: #101a16;
+  --secondary-foreground: #d8e3dc;
+  --muted: #111b17;
+  --muted-foreground: #9aaba0;
+  --accent: #14251b;
+  --accent-foreground: #86efac;
+  --border: #26382d;
+  --input: #26382d;
+  --ring: #4ade80;
+  --phosphor: #4ade80;
+  --gradient-primary: linear-gradient(120deg, #4ade80, #34d399 55%, #22c55e);
+  --gradient-mesh:
+    radial-gradient(900px 600px at 8% -5%, rgb(74 222 128 / 8%), transparent 60%),
+    radial-gradient(800px 600px at 100% 30%, rgb(52 211 153 / 5%), transparent 60%);
+  --shadow-card: 0 1px 2px rgb(0 0 0 / 35%), 0 14px 34px -10px rgb(0 0 0 / 55%), inset 0 1px 0 rgb(255 255 255 / 5%);
+  --shadow-card-hover: 0 26px 44px -14px rgb(0 0 0 / 65%), 0 0 0 1px rgb(74 222 128 / 25%), 0 12px 30px -12px rgb(74 222 128 / 22%);
+  --shadow-nav: 0 8px 30px -12px rgb(0 0 0 / 60%);
+  --shadow-glow: 0 0 24px rgb(74 222 128 / 20%), 0 0 0 1px rgb(74 222 128 / 25%);
+}
+.dark .shadow-card { background-image: linear-gradient(180deg, oklch(1 0 0 / 4%), transparent 40%); }
 
 @keyframes vsc-in { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
 .vsc-line { animation: vsc-in 220ms ease-out both; }
@@ -101,7 +138,7 @@
     border-color: var(--color-border);
   }
   html {
-    scroll-behavior: auto;
+    scroll-behavior: smooth;
   }
   body {
     background-color: var(--color-background);
@@ -133,48 +170,23 @@
   }
 }
 
-.squircle-3d {
-  position: relative;
-  isolation: isolate;
-  overflow: hidden;
-  border: 1px solid color-mix(in oklab, var(--foreground) 12%, transparent);
-  border-radius: 22px;
-  background: linear-gradient(180deg, color-mix(in oklab, var(--surface) 85%, white 15%) 0%, var(--card) 100%);
-  box-shadow: var(--shadow-tile);
-  transition: transform 250ms ease, box-shadow 250ms ease;
-}
-.squircle-3d::before {
-  content: ""; position: absolute; z-index: -1; inset: 0 0 55%;
-  background: radial-gradient(ellipse at top,rgba(255,255,255,.28) 0%,rgba(255,255,255,.04) 70%,transparent 100%);
-  pointer-events:none;
-}
-.squircle-3d:hover { transform: translateY(-6px) scale(1.04); box-shadow: var(--shadow-tile), 0 0 28px color-mix(in oklab, var(--primary) 16%, transparent); }
-.eyebrow-script { color:var(--primary); font-family: Georgia,serif; font-style:italic; }
-.display-heading { color:var(--foreground); font-family:var(--font-display); font-weight:700; letter-spacing:-.04em; line-height:.92; text-transform:uppercase; }
-.bg-accent-gradient { background-image: var(--accent-gradient); }
-.hero-stage { background-image: linear-gradient(color-mix(in oklab,var(--secondary-accent) 5%,transparent) 1px,transparent 1px),linear-gradient(90deg,color-mix(in oklab,var(--secondary-accent) 5%,transparent) 1px,transparent 1px); background-size:44px 44px; mask-image:linear-gradient(to bottom,black,transparent 88%); }
-.hero-portrait { box-shadow:0 0 0 1px color-mix(in oklab,var(--secondary-accent) 18%,transparent),0 40px 100px -40px color-mix(in oklab,var(--secondary-accent) 30%,transparent); }
-.project-frame { background:radial-gradient(ellipse at 72% 8%,color-mix(in oklab,var(--secondary-accent) 16%,transparent),transparent 44%),var(--card); }
-.hero-status-glow { box-shadow:0 0 24px color-mix(in oklab,var(--primary) 55%,transparent); }
-.brand-mark { position:relative; display:block; overflow:hidden; border-radius:10px; }
-.brand-mark::after { content:""; position:absolute; inset:0; pointer-events:none; background:linear-gradient(110deg,transparent 25%,rgba(255,255,255,.28) 50%,transparent 75%); transform:translateX(-130%); transition:transform 300ms ease; }
-.group:hover .brand-mark::after { transform:translateX(130%); }
-html.lenis, html.lenis body { height:auto; }
-html.lenis.lenis-smooth { scroll-behavior:auto !important; }
-html.lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior:contain; }
-html.lenis.lenis-stopped { overflow:clip; }
-@media (max-width: 479px) { .hero-badge { scale: .9; } }
-@media (prefers-reduced-motion: reduce) { .squircle-3d { transition:none; } }
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { scroll-behavior:auto !important; animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important; }
-}
-
 @utility shadow-card {
   box-shadow: var(--shadow-card);
+  background-image: linear-gradient(180deg, oklch(1 0 0 / 70%), transparent 40%);
   transition: transform 350ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 350ms ease-out, border-color 300ms ease-out;
 }
+@utility shadow-card-hover {
+  box-shadow: var(--shadow-card-hover);
+  transition: transform 350ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 350ms ease-out, border-color 300ms ease-out;
+}
+@utility shadow-nav {
+  box-shadow: var(--shadow-nav);
+}
+@utility shadow-glow {
+  box-shadow: var(--shadow-glow);
+}
 @utility bg-gradient-primary {
-  background-image: var(--accent-gradient);
+  background-image: var(--gradient-primary);
 }
 
 /* ---------- Terminal-specific utilities ---------- */
@@ -251,14 +263,14 @@ html.lenis.lenis-stopped { overflow:clip; }
   color: var(--primary);
 }
 @utility text-gradient {
-  background: var(--accent-gradient);
+  background: var(--gradient-primary);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
 }
 @keyframes float-slow {
-  0%, 100% { translate: 0 0; }
-  50% { translate: 0 -14px; }
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-14px) rotate(4deg); }
 }
 
 /* Slow drifting scroll for the floating character field */

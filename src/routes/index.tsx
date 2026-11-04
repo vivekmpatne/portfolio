@@ -4,16 +4,20 @@ import { Hero } from "@/components/portfolio/Hero";
 import { About } from "@/components/portfolio/About";
 import { Skills } from "@/components/portfolio/Skills";
 import { Projects } from "@/components/portfolio/Projects";
+import { Experience } from "@/components/portfolio/Experience";
+import { Achievements } from "@/components/portfolio/Achievements";
 import { Consistency } from "@/components/portfolio/Consistency";
 import { Contact } from "@/components/portfolio/Contact";
 import { Footer } from "@/components/portfolio/Footer";
 import { BackToTop } from "@/components/portfolio/BackToTop";
+import { ShellHost } from "@/components/portfolio/Shell";
+import { VsCodeSimulation } from "@/components/portfolio/VsCodeSimulation";
 import { profile } from "@/data/profile";
 
 const SITE_URL = "https://vivekpatne.me";
-const TITLE = "Vivek Patne | Software Engineer";
+const TITLE = "Vivek Patne M | Software Engineer";
 const DESCRIPTION =
-  "Vivek Patne — CSE-DS student at RNSIT Bengaluru. Live GitHub, LeetCode & Codeforces stats, featured full-stack projects, and contact.";
+  "Vivek Patne M — CSE-DS student at RNSIT Bengaluru. Live GitHub, LeetCode & Codeforces stats, featured full-stack projects, and contact.";
 
 
 export const Route = createFileRoute("/")({
@@ -72,18 +76,22 @@ function Index() {
   return (
     <div className="relative min-h-screen overflow-x-hidden bg-background text-foreground">
       <div className="relative z-20">
+        <VsCodeSimulation />
         <Nav />
         <main>
           <Hero />
           <About />
           <Skills />
           <Projects />
+          <Experience />
+          <Achievements />
           <Consistency />
           <Contact />
         </main>
         <Footer />
         <BackToTop />
       </div>
+      <ShellHost />
     </div>
   );
 }

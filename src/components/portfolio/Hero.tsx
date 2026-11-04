@@ -1,72 +1,127 @@
-import { ArrowDownRight, ArrowRight, MapPin } from "lucide-react";
+import { useEffect, useState } from "react";
+import { ArrowRight, FileText, Mail, MapPin, Code2, Users, Cpu } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { profile } from "@/data/profile";
 import { SocialIcons } from "./SocialIcons";
-import { BrandMark } from "./BrandMark";
+import { useResumeAvailable } from "@/hooks/use-resume-available";
+import { PuzzleAvatar } from "./PuzzleAvatar";
+
+const ROLES = [
+  "Aspiring Software Engineer",
+  "Full-Stack Engineer",
+  "DSA Grinder",
+  "Building in Public",
+];
+
+const STATS = [
+  { icon: Code2, value: `${profile.stats.problemsSolved}+`, label: "DSA Solved" },
+  {
+    icon: Users,
+    value: `${profile.stats.linkedinConnections.toLocaleString("en-IN")}+`,
+    label: "LinkedIn Network",
+  },
+  { icon: Cpu, value: "Samsung IoT", label: "Capstone · SIC 2026" },
+];
 
 export function Hero() {
+  const resumeUrl = profile.resumeUrl;
+  const resumeAvailable = useResumeAvailable();
+  const [rIndex, setRIndex] = useState(0);
+  const [visible, setVisible] = useState(true);
+
+  useEffect(() => {
+    const t = setInterval(() => {
+      setVisible(false);
+      setTimeout(() => {
+        setRIndex((i) => (i + 1) % ROLES.length);
+        setVisible(true);
+      }, 300);
+    }, 2600);
+    return () => clearInterval(t);
+  }, []);
+
   return (
-    <section id="home" className="relative isolate overflow-hidden px-6 pb-14 pt-28 sm:pt-32">
-      <div aria-hidden className="hero-stage pointer-events-none absolute inset-x-0 top-0 -z-10 h-[760px]" />
-      <div aria-hidden className="pointer-events-none absolute -right-40 top-20 -z-10 h-[520px] w-[520px] rounded-full bg-secondary-accent/10 blur-[130px]" />
-      <div aria-hidden className="pointer-events-none absolute -left-40 top-[420px] -z-10 h-[300px] w-[300px] rounded-full bg-primary/10 blur-[110px]" />
+    <section id="home" className="relative overflow-hidden">
+      {/* soft ambient light */}
+      <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
+        <div className="absolute -top-32 left-1/4 h-[420px] w-[420px] rounded-full bg-primary/10 blur-3xl" />
+        <div className="absolute top-20 right-0 h-[360px] w-[360px] rounded-full bg-[var(--sky)]/10 blur-3xl" />
+      </div>
 
-      <div className="mx-auto grid min-h-[min(760px,calc(100svh-7rem))] max-w-6xl items-center gap-14 lg:grid-cols-[1.08fr_.92fr] lg:gap-16">
-        <div className="relative z-10">
-          <div className="mb-8 flex items-center gap-3">
-            <BrandMark className="h-10 w-10" />
-            <div className="font-mono text-[11px] uppercase tracking-[.18em] text-muted-foreground">{profile.name}<span className="mx-2 text-primary">/</span>Portfolio 2026</div>
-          </div>
+      <div className="mx-auto grid max-w-6xl gap-14 px-6 pt-28 pb-12 md:grid-cols-[minmax(0,1fr)_380px] md:items-center md:pt-36 md:pb-16">
+        <div className="min-w-0">
+          <span className="inline-flex items-center gap-2 rounded-full border border-[var(--emerald)]/30 bg-[var(--emerald)]/10 px-3.5 py-1.5 text-xs font-semibold text-foreground">
+            <span className="relative flex h-2 w-2">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[var(--emerald)] opacity-60" />
+              <span className="relative inline-flex h-2 w-2 rounded-full bg-[var(--emerald)]" />
+            </span>
+            Available for SDE Roles & Internships
+          </span>
 
-          <div className="mb-5 inline-flex items-center gap-2.5 rounded-full border border-primary/20 bg-primary/[.07] px-3.5 py-2 text-xs font-medium text-foreground/90">
-            <span className="relative flex h-2 w-2"><span className="absolute h-full w-full animate-ping rounded-full bg-primary opacity-50"/><span className="relative h-2 w-2 rounded-full bg-primary"/></span>
-            Open to software engineering internships
-          </div>
-
-          <p className="mb-3 font-mono text-xs uppercase tracking-[.2em] text-secondary-accent">CSE-DS student · Bengaluru, India</p>
-          <h1 className="max-w-[780px] font-display text-[clamp(3.75rem,8vw,7.5rem)] font-bold leading-[.91] tracking-[-.075em] text-foreground">
-            From problems<br />to <span className="text-gradient">products.</span>
+          <p className="mt-6 text-sm font-medium text-muted-foreground">Hi, I'm {profile.name} 👋</p>
+          <h1 className="mt-2 text-5xl font-extrabold leading-[1.05] tracking-tight md:text-7xl">
+            Software Engineer
+            <br />
+            <span className="text-gradient">&amp; Builder</span>
           </h1>
-          <p className="mt-7 max-w-xl text-base leading-7 text-muted-foreground sm:text-lg sm:leading-8">
-            I study computer science at RNSIT and build across full-stack software, IoT, and algorithmic problem solving.
+
+          <p className="mt-6 max-w-xl text-base leading-relaxed text-muted-foreground md:text-lg">
+            CSE-DS @ RNSIT Bengaluru · Crafting resilient IoT systems & full-stack web products.
           </p>
 
+          <div className="mt-4 flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
+            <span className="inline-flex items-center gap-1.5">
+              <MapPin className="h-4 w-4" /> {profile.location}
+            </span>
+            <span className="h-1 w-1 rounded-full bg-border" />
+            <span
+              className={`font-medium text-primary transition-all duration-300 ${
+                visible ? "translate-y-0 opacity-100" : "-translate-y-1 opacity-0"
+              }`}
+            >
+              {ROLES[rIndex]}
+            </span>
+          </div>
+
           <div className="mt-8 flex flex-wrap items-center gap-3">
-            <a href="#projects" className="inline-flex min-h-12 items-center gap-2 rounded-full bg-accent-gradient px-5 font-semibold text-primary-foreground transition-transform hover:-translate-y-0.5">
-              Explore my work <ArrowRight className="h-4 w-4" />
-            </a>
-            <a href="#contact" className="inline-flex min-h-12 items-center gap-2 rounded-full border border-border bg-card/70 px-5 font-medium text-foreground transition-colors hover:border-primary/40 hover:bg-card">
-              Get in touch <ArrowDownRight className="h-4 w-4 text-primary" />
-            </a>
+            <Button asChild size="lg" className="rounded-full px-6 shadow-card-hover">
+              <a href="#projects">
+                View Projects <ArrowRight className="ml-1 h-4 w-4" />
+              </a>
+            </Button>
+            {resumeUrl && resumeAvailable && (
+              <Button asChild size="lg" variant="outline" className="rounded-full border-primary/30 bg-primary/10 px-6 text-primary shadow-sm transition-all duration-300 hover:border-primary/50 hover:bg-primary/20">
+                <a href={resumeUrl} target="_blank" rel="noopener noreferrer" download>
+                  <FileText className="mr-1 h-4 w-4" /> Resume
+                </a>
+              </Button>
+            )}
+            <Button asChild size="lg" variant="ghost" className="rounded-full px-5">
+              <a href="#contact">
+                <Mail className="mr-1 h-4 w-4" /> Let's talk
+              </a>
+            </Button>
           </div>
 
-          <div className="mt-9 flex flex-wrap items-center gap-x-5 gap-y-3">
-            <SocialIcons />
-            <span className="hidden h-7 w-px bg-border sm:block" />
-            <span className="inline-flex items-center gap-2 text-xs text-muted-foreground"><MapPin className="h-3.5 w-3.5 text-primary" />{profile.location}</span>
-          </div>
-        </div>
-
-        <div className="relative mx-auto w-full max-w-[460px] lg:ml-auto">
-          <div aria-hidden className="absolute -inset-5 rounded-[2.2rem] border border-secondary-accent/10 rotate-3" />
-          <div className="hero-portrait relative overflow-hidden rounded-[1.8rem] border border-secondary-accent/20 bg-card p-2">
-            <div className="relative overflow-hidden rounded-[1.35rem] bg-surface">
-              <img src={profile.avatar} alt={`${profile.name}, computer science student and software developer`} className="aspect-[4/5] w-full object-cover object-center" fetchPriority="high" />
-              <div aria-hidden className="absolute inset-0 bg-gradient-to-t from-[#090d13]/90 via-transparent to-transparent" />
-              <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-4 p-5 sm:p-6">
-                <div>
-                  <p className="font-display text-2xl font-semibold tracking-tight text-white sm:text-3xl">Vivek Patne</p>
-                  <p className="mt-1 text-sm text-white/70">CSE-DS · RNSIT</p>
-                </div>
-                <span className="rounded-full border border-white/15 bg-white/10 px-3 py-1.5 font-mono text-[10px] uppercase tracking-wider text-white/85 backdrop-blur-md">2028</span>
+          <div className="mt-10 grid max-w-xl grid-cols-1 gap-3 sm:grid-cols-3">
+            {STATS.map((s) => (
+              <div
+                key={s.label}
+                className="rounded-2xl border border-border bg-card p-4 shadow-card transition-all duration-300 hover:-translate-y-1 hover:shadow-card-hover"
+              >
+                <s.icon className="h-4 w-4 text-primary" />
+                <div className="mt-2 text-xl font-bold tracking-tight">{s.value}</div>
+                <div className="text-xs text-muted-foreground">{s.label}</div>
               </div>
-            </div>
+            ))}
           </div>
-          <div className="absolute -bottom-5 -left-6 hidden rounded-2xl border border-border bg-card/95 px-4 py-3 shadow-card sm:block">
-            <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">Current focus</span>
-            <p className="mt-1 text-sm font-medium text-foreground">Algorithms <span className="text-primary">×</span> real systems</p>
+
+          <div className="mt-8">
+            <SocialIcons />
           </div>
-          <span aria-hidden className="absolute -right-3 top-10 h-3 w-3 rounded-full bg-primary hero-status-glow" />
         </div>
+
+        <PuzzleAvatar />
       </div>
     </section>
   );
