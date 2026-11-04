@@ -125,7 +125,16 @@ export function Hero() {
         <div className="relative mx-auto w-full max-w-[380px]">
           <div className="pointer-events-none absolute inset-8 rounded-full bg-[#c2ad82]/20 blur-[70px]" />
           <PuzzleAvatar />
-          {[{I:Trophy, t:"LeetCode", p:"-top-3 left-0"},{I:Github,t:"GitHub",p:"top-10 -right-2"},{I:Braces,t:"Code",p:"bottom-10 -left-3"},{I:Terminal,t:"Terminal",p:"-bottom-3 right-4"}].map(({I,t,p})=><div key={t} aria-label={t} className={`squircle-3d absolute ${p} flex h-14 w-14 items-center justify-center text-[#e8dec8]`}><I className="h-6 w-6"/></div>)}
+          {[
+            { I: Trophy, t: "LeetCode", p: "-top-4 -left-4 md:-top-5 md:-left-6", delay: "0s" },
+            { I: Github, t: "GitHub", p: "top-4 -right-4 md:top-6 md:-right-6", delay: "0.8s" },
+            { I: Braces, t: "Code", p: "bottom-8 -left-5 md:bottom-10 md:-left-7", delay: "1.6s" },
+            { I: Terminal, t: "Terminal", p: "-bottom-3 right-4 md:-bottom-4 md:right-6", delay: "2.4s" },
+          ].map(({ I, t, p, delay }) => (
+            <div key={t} aria-label={t} className={`hero-badge squircle-3d absolute z-20 flex h-14 w-14 pointer-events-auto items-center justify-center text-[#e8dec8] motion-safe:animate-[float-slow_6s_ease-in-out_infinite] ${p}`} style={{ animationDelay: delay }}>
+              <I className="h-6 w-6" />
+            </div>
+          ))}
         </div>
       </div>
     </section>

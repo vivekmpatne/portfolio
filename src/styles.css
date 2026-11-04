@@ -170,6 +170,7 @@
 .squircle-3d:hover { transform: translateY(-6px) scale(1.04); box-shadow: 0 18px 34px -8px rgba(0,0,0,.8),0 0 28px rgba(194,173,130,.16),inset 0 1px 1px rgba(255,255,255,.24); }
 .eyebrow-script { color:#c2ad82; font-family: Georgia,serif; font-style:italic; }
 .display-heading { color:#e8dec8; font-weight:900; letter-spacing:-.055em; line-height:.92; text-transform:uppercase; }
+@media (max-width: 479px) { .hero-badge { scale: .9; } }
 @media (prefers-reduced-motion: reduce) { .squircle-3d { transition:none; } }
 
 @utility shadow-card {
@@ -271,8 +272,8 @@
   color: transparent;
 }
 @keyframes float-slow {
-  0%, 100% { transform: translateY(0) rotate(0deg); }
-  50% { transform: translateY(-14px) rotate(4deg); }
+  0%, 100% { translate: 0 0; }
+  50% { translate: 0 -14px; }
 }
 
 /* Slow drifting scroll for the floating character field */

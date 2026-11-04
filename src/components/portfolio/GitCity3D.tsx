@@ -290,7 +290,7 @@ function HoverLight({ building }: { building: Building | null }) {
   );
 }
 
-const DEFAULT_CAM: [number, number, number] = [18, 22, 34];
+const DEFAULT_CAM: [number, number, number] = [0, 22, 28];
 const DEFAULT_TARGET: [number, number, number] = [0, 1, 0];
 
 const BEACON_COUNT = 5;
@@ -369,17 +369,19 @@ function Beacons({ buildings }: { buildings: Building[] }) {
   );
 }
 
-/** Cinematic drone flight: low sweep through the skyline, then a rising orbit. */
+/** Cinematic drone flight: outer boulevard pass, clear rooftop flyover, then a high orbit. */
 function DroneTour({
   active,
   width,
   depth,
+  maxBuildingHeight,
   controlsRef,
   onDone,
 }: {
   active: boolean;
   width: number;
   depth: number;
+  maxBuildingHeight: number;
   controlsRef: MutableRefObject<OrbitLike | null>;
   onDone: () => void;
 }) {
@@ -387,27 +389,33 @@ function DroneTour({
   const curve = useMemo(() => {
     const hw = width / 2;
     const hd = depth / 2;
+    const safeRoofY = Math.max(11.5, maxBuildingHeight + 3.2);
     return new THREE.CatmullRomCurve3(
       [
-        new THREE.Vector3(-hw - 8, 12, hd + 12),
-        new THREE.Vector3(-hw + 2, 5, hd + 3),
-        new THREE.Vector3(-hw * 0.4, 3.4, 0.7),
-        new THREE.Vector3(0, 4, -0.7),
-        new THREE.Vector3(hw * 0.45, 3.6, 0.7),
-        new THREE.Vector3(hw - 2, 6, -hd - 3),
-        new THREE.Vector3(hw * 0.3, 14, -hd - 12),
-        new THREE.Vector3(-hw * 0.4, 18, -hd - 4),
-        new THREE.Vector3(-hw * 0.6, 14, hd * 0.3),
+        // Phase 1: approach and low pass along the empty outer front road.
+        new THREE.Vector3(-hw - 7, 7, hd + 7),
+        new THREE.Vector3(-hw * 0.4, 4.8, hd + 4.5),
+        new THREE.Vector3(hw * 0.3, 5.2, hd + 4.2),
+        // Phase 2: climb around the right perimeter before crossing the skyline.
+        new THREE.Vector3(hw + 6, 8.5, hd * 0.4),
+        new THREE.Vector3(hw * 0.2, safeRoofY, -hd * 0.3),
+        new THREE.Vector3(-hw * 0.3, safeRoofY + 1.5, -hd - 4),
+        // Phase 3: panoramic orbit and return alignment.
+        new THREE.Vector3(-hw - 6, 17, -hd - 6),
+        new THREE.Vector3(-hw * 0.6, 18, hd + 2),
+        new THREE.Vector3(0, 21, hd + 18),
       ],
       false,
       "centripetal",
     );
-  }, [width, depth]);
+  }, [width, depth, maxBuildingHeight]);
 
   const drone = useRef<THREE.Group>(null);
   const body = useRef<THREE.Group>(null);
   const rotors = useRef<(THREE.Mesh | null)[]>([]);
   const lights = useRef<THREE.MeshBasicMaterial[]>([]);
+  const spotlight = useRef<THREE.SpotLight>(null);
+  const spotlightTarget = useRef<THREE.Object3D>(null);
   const camPos = useRef(new THREE.Vector3());
   const camLook = useRef(new THREE.Vector3());
   const tmp = useMemo(
@@ -456,7 +464,17 @@ function DroneTour({
 
     const u = t.current;
     curve.getPointAt(u, tmp.p);
+    const halfWidth = width / 2;
+    const halfDepth = depth / 2;
+    // A curve can interpolate between an exterior waypoint and a roof waypoint.
+    // Raise any interpolated point already over the footprint above the skyline.
+    if (Math.abs(tmp.p.x) <= halfWidth + 0.5 && Math.abs(tmp.p.z) <= halfDepth + 0.5) {
+      tmp.p.y = Math.max(tmp.p.y, maxBuildingHeight + 3.1);
+    }
     curve.getPointAt(Math.min(1, u + 0.01), tmp.a);
+    if (Math.abs(tmp.a.x) <= halfWidth + 0.5 && Math.abs(tmp.a.z) <= halfDepth + 0.5) {
+      tmp.a.y = Math.max(tmp.a.y, maxBuildingHeight + 3.1);
+    }
     tmp.dir.subVectors(tmp.a, tmp.p);
     if (tmp.dir.lengthSq() < 1e-6) tmp.dir.copy(tmp.prevDir);
     tmp.dir.normalize();
@@ -470,9 +488,13 @@ function DroneTour({
     const time = state.clock.elapsedTime;
     if (drone.current && body.current) {
       drone.current.position.copy(tmp.p);
-      drone.current.position.y += Math.sin(time * 2.2) * 0.06;
+      drone.current.position.y += Math.sin(time * 2.2) * 0.04;
       drone.current.rotation.set(0, Math.atan2(tmp.prevDir.x, tmp.prevDir.z), 0);
       body.current.rotation.set(0.18 * tmp.speed, 0, tmp.bank);
+    }
+    if (spotlight.current && spotlightTarget.current) {
+      spotlight.current.target = spotlightTarget.current;
+      spotlightTarget.current.updateMatrixWorld();
     }
     rotors.current.forEach((r, i) => {
       if (r) r.rotation.y += dt * (40 + i * 3) * (i % 2 ? 1 : -1);
@@ -483,6 +505,14 @@ function DroneTour({
     // chase cam: behind + above the drone, heavily damped
     tmp.want.copy(tmp.p).addScaledVector(tmp.prevDir, -3.2);
     tmp.want.y += 1.4;
+    // Keep the chase camera over the roofs whenever its horizontal position
+    // enters the city footprint. This also avoids cutting through tower tops
+    // during the rising perimeter turn.
+    const hw = width / 2;
+    const hd = depth / 2;
+    if (Math.abs(tmp.want.x) < hw + 1 && Math.abs(tmp.want.z) < hd + 1) {
+      tmp.want.y = Math.max(tmp.want.y, maxBuildingHeight + 3.2);
+    }
     const endBlend = THREE.MathUtils.smoothstep(u, 0.85, 1);
     tmp.want.lerp(tmp.home, endBlend);
     tmp.a.copy(tmp.p).addScaledVector(tmp.prevDir, 2).lerp(tmp.target, endBlend);
@@ -556,7 +586,8 @@ function DroneTour({
           <coneGeometry args={[0.7, 2.5, 20, 1, true]} />
           <meshBasicMaterial color="#5dffb0" transparent opacity={0.08} depthWrite={false} side={THREE.DoubleSide} toneMapped={false} />
         </mesh>
-        <pointLight position={[0, -0.2, 0]} color="#5dffb0" intensity={3} distance={5} />
+        <object3D ref={spotlightTarget} position={[0, -8, 0]} />
+        <spotLight ref={spotlight} position={[0, -0.2, 0]} color="#5dffb0" intensity={5} distance={22} angle={0.48} penumbra={0.75} />
       </group>
     </group>
   );
@@ -572,6 +603,7 @@ function Scene({
   buildings,
   width,
   depth,
+  maxBuildingHeight,
   onHover,
   hoverDate,
   dragRef,
@@ -583,6 +615,7 @@ function Scene({
   buildings: Building[];
   width: number;
   depth: number;
+  maxBuildingHeight: number;
   onHover: (b: Building | null) => void;
   hoverDate: string | null;
   dragRef: MutableRefObject<boolean>;
@@ -645,7 +678,7 @@ function Scene({
       </GrowIn>
 
       <Beacons buildings={buildings} />
-      <DroneTour active={touring} width={width} depth={depth} controlsRef={controlsRef} onDone={onTourDone} />
+      <DroneTour active={touring} width={width} depth={depth} maxBuildingHeight={maxBuildingHeight} controlsRef={controlsRef} onDone={onTourDone} />
       <Cars cars={cars} span={width + STEP * 4} />
       <HoverLight building={hoverBuilding} />
 
@@ -743,6 +776,11 @@ export default function GitCity3D({ weeks, merged, calendars, colors }: Props) {
     return { buildings: out, width: w, depth: d };
   }, [weeks, merged, calendars, colors]);
 
+  const maxBuildingHeight = useMemo(
+    () => Math.max(...buildings.map((b) => b.h), 4.5),
+    [buildings],
+  );
+
   const controlsRef = useRef<OrbitLike | null>(null);
   const dragRef = useRef(false);
   const downRef = useRef<{ x: number; y: number } | null>(null);
@@ -809,6 +847,7 @@ export default function GitCity3D({ weeks, merged, calendars, colors }: Props) {
             buildings={buildings}
             width={width}
             depth={depth}
+            maxBuildingHeight={maxBuildingHeight}
             onHover={setHover}
             hoverDate={hover?.date ?? null}
             dragRef={dragRef}
