@@ -249,14 +249,14 @@ export function VsCodeSimulation() {
             <span className="h-3 w-3 rounded-full" style={{ background: "#ff5f57" }} />
             <span className="h-3 w-3 rounded-full" style={{ background: "#febc2e" }} />
             <span className="h-3 w-3 rounded-full" style={{ background: "#28c840" }} />
-            <span className="ml-3 hidden gap-3 lg:flex" style={{ color: C.text }}>
+            <span className="ml-3 hidden gap-3 xl:flex" style={{ color: C.text }}>
               {["File", "Edit", "Selection", "View", "Go", "Run", "Terminal", "Help"].map((m) => (
                 <span key={m}>{m}</span>
               ))}
             </span>
           </div>
           <div
-            className="absolute left-1/2 hidden h-6 w-[38%] -translate-x-1/2 items-center justify-center gap-2 rounded-md sm:flex"
+            className="absolute left-1/2 hidden h-6 w-[30%] -translate-x-1/2 items-center justify-center gap-2 rounded-md sm:flex"
             style={{ background: "#2a2a2a", border: `1px solid ${C.border}`, color: C.dim }}
           >
             <Search size={12} /> vivek-patne-portfolio
