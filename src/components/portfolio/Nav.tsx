@@ -92,19 +92,16 @@ export function Nav() {
     >
       {/* Scroll progress ribbon — loading-bar style */}
       <div
-        className="absolute inset-x-0 bottom-0 h-[2.5px] overflow-hidden bg-[hsl(var(--phosphor)/0.12)]"
+        className="absolute inset-x-0 bottom-0 h-[2.5px] overflow-hidden bg-[color-mix(in_oklch,var(--phosphor)_15%,transparent)]"
         aria-hidden
       >
         <div
           ref={progressBarRef}
-          className="relative h-full w-full origin-left bg-[hsl(var(--phosphor))] shadow-[0_0_10px_hsl(var(--phosphor)/0.9)] will-change-transform"
+          className="relative h-full w-full origin-left bg-[var(--phosphor)] shadow-[0_0_10px_var(--phosphor)] will-change-transform"
           style={{ transform: "scaleX(0)" }}
         />
       </div>
-      {/* Loading-style label with animated dots */}
-      <div className="pointer-events-none absolute right-3 top-[5px] hidden font-mono text-[9px] uppercase tracking-[0.25em] text-[hsl(var(--phosphor))] sm:block">
-        <span ref={progressTextRef}>loading 0%</span>
-      </div>
+
 
 
       <nav className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
@@ -127,7 +124,7 @@ export function Nav() {
                 >
                   {s.label}
                   {isActive && (
-                    <span className="absolute inset-x-3 -bottom-0.5 h-0.5 rounded-full bg-primary shadow-[0_0_8px_hsl(var(--phosphor))]" />
+                    <span className="absolute inset-x-3 -bottom-0.5 h-0.5 rounded-full bg-primary shadow-[0_0_8px_var(--phosphor)]" />
                   )}
                 </a>
               </li>
